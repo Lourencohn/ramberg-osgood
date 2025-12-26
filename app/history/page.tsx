@@ -1,9 +1,9 @@
 import { DashboardLayout } from "@/components/layout/dashboard-layout"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-import { Search, Download, Trash2, Eye } from "lucide-react"
+import { Search, Download, Trash2, Eye, Filter, Thermometer, Gauge, CheckCircle2, Calendar, FileSpreadsheet } from "lucide-react"
 
 const simulationHistory = [
   {
@@ -14,7 +14,7 @@ const simulationHistory = [
     tensileStrength: 52.3,
     youngModulus: 3421,
     elongation: 4.2,
-    status: "completed",
+    status: "Concluído",
   },
   {
     id: "SIM-002",
@@ -24,7 +24,7 @@ const simulationHistory = [
     tensileStrength: 49.8,
     youngModulus: 3312,
     elongation: 3.9,
-    status: "completed",
+    status: "Concluído",
   },
   {
     id: "SIM-003",
@@ -34,7 +34,7 @@ const simulationHistory = [
     tensileStrength: 54.1,
     youngModulus: 3528,
     elongation: 4.5,
-    status: "completed",
+    status: "Concluído",
   },
   {
     id: "SIM-004",
@@ -44,7 +44,7 @@ const simulationHistory = [
     tensileStrength: 47.2,
     youngModulus: 3198,
     elongation: 3.6,
-    status: "completed",
+    status: "Concluído",
   },
   {
     id: "SIM-005",
@@ -54,7 +54,7 @@ const simulationHistory = [
     tensileStrength: 55.6,
     youngModulus: 3612,
     elongation: 4.8,
-    status: "completed",
+    status: "Concluído",
   },
 ]
 
@@ -62,65 +62,151 @@ export default function HistoryPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
+        {/* Header */}
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-balance">Histórico de Simulações</h1>
-            <p className="mt-2 text-muted-foreground text-pretty">Visualize e gerencie todas as predições realizadas</p>
+            <h1 className="text-2xl font-bold tracking-tight md:text-3xl">Histórico de Simulações</h1>
+            <p className="mt-1.5 text-muted-foreground">
+              Gerencie e exporte todas as predições realizadas
+            </p>
           </div>
-          <Button>
-            <Download className="mr-2 size-4" />
+          <Button className="gap-2 shadow-sm">
+            <FileSpreadsheet className="size-4" />
             Exportar Tudo
           </Button>
         </div>
 
+        {/* Stats Summary */}
+        <div className="grid gap-4 sm:grid-cols-3">
+          <Card className="bg-gradient-to-br from-foreground to-foreground/90 text-background border-foreground">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="flex size-10 items-center justify-center rounded-lg bg-background/20">
+                  <FileSpreadsheet className="size-5 text-background" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-background">{simulationHistory.length}</p>
+                  <p className="text-xs text-background/70">Total de Simulações</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="flex size-10 items-center justify-center rounded-lg bg-muted">
+                  <CheckCircle2 className="size-5 text-foreground" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold">{simulationHistory.length}</p>
+                  <p className="text-xs text-muted-foreground">Concluídas</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="flex size-10 items-center justify-center rounded-lg bg-muted">
+                  <Calendar className="size-5 text-foreground" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold">Hoje</p>
+                  <p className="text-xs text-muted-foreground">Última simulação</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Main Content */}
         <Card>
-          <CardHeader>
-            <div className="flex items-center gap-4">
+          <CardHeader className="pb-4">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                <Input placeholder="Buscar simulações..." className="pl-9" />
+                <Input
+                  placeholder="Buscar por ID, temperatura ou velocidade..."
+                  className="pl-10 bg-muted/50 border-0 focus-visible:ring-1"
+                />
               </div>
-              <Button variant="outline">Filtrar</Button>
+              <Button variant="outline" className="gap-2">
+                <Filter className="size-4" />
+                Filtrar
+              </Button>
             </div>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
+            <div className="space-y-3">
               {simulationHistory.map((sim) => (
                 <div
                   key={sim.id}
-                  className="flex items-center justify-between rounded-lg border border-border p-4 transition-colors hover:bg-muted/50"
+                  className="group flex flex-col gap-4 rounded-xl border border-border bg-card p-4 transition-all duration-200 hover:border-foreground/20 hover:bg-muted/30 hover:shadow-sm sm:flex-row sm:items-center sm:justify-between"
                 >
-                  <div className="flex-1 space-y-2">
-                    <div className="flex items-center gap-3">
-                      <span className="font-mono text-sm font-medium">{sim.id}</span>
-                      <Badge variant="secondary">{sim.status}</Badge>
-                      <span className="text-xs text-muted-foreground">{sim.date}</span>
+                  <div className="flex-1 space-y-3">
+                    {/* ID and Status Row */}
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="inline-flex items-center rounded-md bg-foreground text-background px-2.5 py-1 font-mono text-sm font-semibold">
+                        {sim.id}
+                      </span>
+                      <Badge variant="secondary" className="gap-1 font-normal">
+                        <CheckCircle2 className="size-3 text-foreground" />
+                        {sim.status}
+                      </Badge>
+                      <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                        <Calendar className="size-3" />
+                        {sim.date}
+                      </span>
                     </div>
-                    <div className="flex gap-6 text-sm">
-                      <div>
-                        <span className="text-muted-foreground">Temperatura:</span>
-                        <span className="ml-1 font-medium">{sim.temperature}°C</span>
+
+                    {/* Parameters Row */}
+                    <div className="flex flex-wrap gap-4">
+                      <div className="flex items-center gap-2 rounded-lg bg-muted px-3 py-1.5">
+                        <Thermometer className="size-4 text-foreground" />
+                        <span className="text-sm">
+                          <span className="text-muted-foreground">Temp:</span>{" "}
+                          <span className="font-semibold">{sim.temperature}°C</span>
+                        </span>
                       </div>
-                      <div>
-                        <span className="text-muted-foreground">Velocidade:</span>
-                        <span className="ml-1 font-medium">{sim.speed}mm/s</span>
+                      <div className="flex items-center gap-2 rounded-lg bg-muted px-3 py-1.5">
+                        <Gauge className="size-4 text-foreground" />
+                        <span className="text-sm">
+                          <span className="text-muted-foreground">Vel:</span>{" "}
+                          <span className="font-semibold">{sim.speed}mm/s</span>
+                        </span>
                       </div>
                     </div>
-                    <div className="flex gap-6 text-xs text-muted-foreground">
-                      <span>σ: {sim.tensileStrength} MPa</span>
-                      <span>E: {sim.youngModulus} MPa</span>
-                      <span>ε: {sim.elongation}%</span>
+
+                    {/* Results Row */}
+                    <div className="flex flex-wrap gap-4 text-sm">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-muted-foreground">σ:</span>
+                        <span className="font-semibold text-foreground">{sim.tensileStrength} MPa</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-muted-foreground">E:</span>
+                        <span className="font-semibold text-foreground">{sim.youngModulus} MPa</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-muted-foreground">ε:</span>
+                        <span className="font-semibold text-foreground">{sim.elongation}%</span>
+                      </div>
                     </div>
                   </div>
-                  <div className="flex gap-2">
-                    <Button variant="ghost" size="icon">
+
+                  {/* Actions */}
+                  <div className="flex gap-1 sm:gap-2">
+                    <Button variant="ghost" size="icon" className="h-9 w-9 hover:bg-foreground/10 hover:text-foreground">
                       <Eye className="size-4" />
+                      <span className="sr-only">Visualizar</span>
                     </Button>
-                    <Button variant="ghost" size="icon">
+                    <Button variant="ghost" size="icon" className="h-9 w-9 hover:bg-foreground/10 hover:text-foreground">
                       <Download className="size-4" />
+                      <span className="sr-only">Baixar</span>
                     </Button>
-                    <Button variant="ghost" size="icon">
+                    <Button variant="ghost" size="icon" className="h-9 w-9 hover:bg-foreground/10 hover:text-foreground">
                       <Trash2 className="size-4" />
+                      <span className="sr-only">Excluir</span>
                     </Button>
                   </div>
                 </div>

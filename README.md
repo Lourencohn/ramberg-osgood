@@ -1,30 +1,43 @@
-# PLA property prediction
+# ResistencIA
 
-*Automatically synced with your [v0.app](https://v0.app) deployments*
+Aplicação web para previsão de curvas tensão‑deformação do PLA usando o modelo de Ramberg‑Osgood, com base em dados reais de ensaios de tração.
 
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/lourencohns-projects/v0-pla-property-prediction)
-[![Built with v0](https://img.shields.io/badge/Built%20with-v0.app-black?style=for-the-badge)](https://v0.app/chat/nXcd5u9hLRm)
+## Requisitos
 
-## Overview
+- Node.js 18+
+- PostgreSQL 13+
 
-This repository will stay in sync with your deployed chats on [v0.app](https://v0.app).
-Any changes you make to your deployed app will be automatically pushed to this repository from [v0.app](https://v0.app).
+## Configuração do banco
 
-## Deployment
+1. Copie o arquivo `.env.example` para `.env` e ajuste o `DATABASE_URL`.
+2. Crie o banco de dados local (exemplo):
+   ```bash
+   createdb ramberg_osgood
+   ```
+3. Aplique o schema:
+   ```bash
+   npm run db:schema
+   ```
+4. Importe os dados da pasta `data/`:
+   ```bash
+   npm run db:import
+   ```
+   Para validar sem gravar nada:
+   ```bash
+   node scripts/import-data.js --dry-run
+   ```
 
-Your project is live at:
+## Rodar o projeto
 
-**[https://vercel.com/lourencohns-projects/v0-pla-property-prediction](https://vercel.com/lourencohns-projects/v0-pla-property-prediction)**
+```bash
+npm install
+npm run dev
+```
 
-## Build your app
+O app estará em `http://localhost:3000`.
 
-Continue building your app on:
+## Scripts úteis
 
-**[https://v0.app/chat/nXcd5u9hLRm](https://v0.app/chat/nXcd5u9hLRm)**
-
-## How It Works
-
-1. Create and modify your project using [v0.app](https://v0.app)
-2. Deploy your chats from the v0 interface
-3. Changes are automatically pushed to this repository
-4. Vercel deploys the latest version from this repository
+- `npm run db:schema` aplica o schema do PostgreSQL.
+- `npm run db:import` importa os ensaios em `data/`.
+- `npm run dev` inicia o Next.js em modo desenvolvimento.

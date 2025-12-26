@@ -8,7 +8,7 @@ const _geist = Geist({ subsets: ["latin"] })
 const _geistMono = Geist_Mono({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Dashboard PLA - Predição de Propriedades Mecânicas",
+  title: "ResistencIA - Predição de Propriedades Mecânicas",
   description:
     "Sistema completo de previsão e análise de propriedades mecânicas para peças de PLA fabricadas por impressão 3D FDM",
   generator: "v0.app",
