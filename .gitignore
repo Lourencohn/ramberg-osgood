@@ -26,7 +26,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# Agent context files
 GEMINI.md
 CLAUDE.md
 AGENTS.md
