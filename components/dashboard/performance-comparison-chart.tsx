@@ -44,7 +44,6 @@ export function PerformanceComparisonChart() {
               <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
               <XAxis
                 dataKey="speed"
-                label={{ value: "Velocidade (mm/s)", position: "insideBottom", offset: -5 }}
                 className="text-xs"
               />
               <YAxis className="text-xs" />
