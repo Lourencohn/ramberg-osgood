@@ -30,7 +30,7 @@ export default async function PredictPage() {
         </div>
 
 
-        <Alert className="border-foreground/20 bg-foreground/5">
+        <Alert className="border-foreground/20 bg-white">
           <Info className="size-4 text-foreground" />
           <AlertDescription className="text-sm">
             Insira a temperatura e velocidade de impressão para calcular as propriedades mecânicas

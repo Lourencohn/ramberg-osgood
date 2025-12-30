@@ -91,7 +91,7 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
 
           <TabsContent value="properties" className="space-y-4 mt-4">
 
-            <div className="rounded-xl border border-foreground/20 bg-gradient-to-br from-foreground/5 to-foreground/10 p-4">
+            <div className="rounded-xl border border-foreground/20 bg-white p-4">
               <div className="flex items-center gap-2 mb-4">
                 <div className="flex size-8 items-center justify-center rounded-lg bg-foreground/10">
                   <Zap className="size-4 text-foreground" />
@@ -103,19 +103,19 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
                 {result ? " · Interpolação por base radial nos ensaios reais." : ""}
               </p>
               <div className="space-y-3">
-                <div className="flex items-center justify-between rounded-lg bg-card/80 px-4 py-3">
+                <div className="flex items-center justify-between rounded-lg border border-border bg-white px-4 py-3">
                   <span className="text-sm text-muted-foreground">E (Módulo de Elasticidade)</span>
                   <span className="font-mono font-semibold text-foreground">
                     {params ? `${numberFormatter.format(params.E)} MPa` : "-- MPa"}
                   </span>
                 </div>
-                <div className="flex items-center justify-between rounded-lg bg-card/80 px-4 py-3">
+                <div className="flex items-center justify-between rounded-lg border border-border bg-white px-4 py-3">
                   <span className="text-sm text-muted-foreground">σ₀ (Tensão de Referência)</span>
                   <span className="font-mono font-semibold text-foreground">
                     {params ? `${stressFormatter.format(params.sigma_0)} MPa` : "-- MPa"}
                   </span>
                 </div>
-                <div className="flex items-center justify-between rounded-lg bg-card/80 px-4 py-3">
+                <div className="flex items-center justify-between rounded-lg border border-border bg-white px-4 py-3">
                   <span className="text-sm text-muted-foreground">n (Expoente de Encruamento)</span>
                   <span className="font-mono font-semibold text-foreground">
                     {params ? numberFormatter.format(params.n) : "--"}
@@ -125,7 +125,7 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
             </div>
 
 
-            <div className="rounded-xl border border-border bg-card p-4">
+            <div className="rounded-xl border border-border bg-white p-4">
               <div className="flex items-center gap-2 mb-4">
                 <div className="flex size-8 items-center justify-center rounded-lg bg-muted">
                   <Target className="size-4 text-foreground" />
@@ -133,7 +133,7 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
                 <h3 className="font-semibold text-foreground">Propriedades Mecânicas</h3>
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
-                <div className="flex items-center gap-3 rounded-lg bg-muted/50 px-4 py-3">
+                <div className="flex items-center gap-3 rounded-lg border border-border bg-white px-4 py-3">
                   <Shield className="size-4 text-foreground" />
                   <div className="flex-1">
                     <p className="text-xs text-muted-foreground">Tensão de Escoamento</p>
@@ -142,7 +142,7 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3 rounded-lg bg-muted/50 px-4 py-3">
+                <div className="flex items-center gap-3 rounded-lg border border-border bg-white px-4 py-3">
                   <Zap className="size-4 text-foreground" />
                   <div className="flex-1">
                     <p className="text-xs text-muted-foreground">Tensão Máxima</p>
@@ -151,7 +151,7 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3 rounded-lg bg-muted/50 px-4 py-3">
+                <div className="flex items-center gap-3 rounded-lg border border-border bg-white px-4 py-3">
                   <Percent className="size-4 text-foreground" />
                   <div className="flex-1">
                     <p className="text-xs text-muted-foreground">Ductilidade</p>
@@ -160,7 +160,7 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3 rounded-lg bg-muted/50 px-4 py-3">
+                <div className="flex items-center gap-3 rounded-lg border border-border bg-white px-4 py-3">
                   <Battery className="size-4 text-foreground" />
                   <div className="flex-1">
                     <p className="text-xs text-muted-foreground">Resiliência</p>
@@ -170,7 +170,7 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
                   </div>
                 </div>
               </div>
-              <div className="mt-3 flex items-center gap-3 rounded-lg bg-muted/50 px-4 py-3">
+              <div className="mt-3 flex items-center gap-3 rounded-lg border border-border bg-white px-4 py-3">
                 <Target className="size-4 text-foreground" />
                 <div className="flex-1">
                   <p className="text-xs text-muted-foreground">Tenacidade</p>
@@ -201,7 +201,7 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
               </div>
             ) : (
               <>
-                <div className="rounded-xl border border-border bg-card p-4 text-xs text-muted-foreground">
+                <div className="rounded-xl border border-border bg-white p-4 text-xs text-muted-foreground">
                   {validationProfile ? (
                     <p>
                       {validationProfile.isExact

@@ -34,7 +34,7 @@ export function SignupForm({ error, ...props }: SignupFormProps) {
           <FieldGroup>
             <Field>
               <FieldLabel htmlFor="name">Nome completo</FieldLabel>
-              <Input id="name" name="name" type="text" placeholder="Seu nome" required />
+              <Input id="name" name="name" type="text" placeholder="" required />
             </Field>
             <Field>
               <FieldLabel htmlFor="email">E-mail</FieldLabel>
@@ -42,7 +42,7 @@ export function SignupForm({ error, ...props }: SignupFormProps) {
                 id="email"
                 name="email"
                 type="email"
-                placeholder="voce@exemplo.com"
+                placeholder=""
                 autoComplete="email"
                 required
               />

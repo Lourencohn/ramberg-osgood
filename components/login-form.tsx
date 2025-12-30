@@ -40,7 +40,7 @@ export function LoginForm({ className, error, ...props }: LoginFormProps) {
                   id="email"
                   name="email"
                   type="email"
-                  placeholder="voce@exemplo.com"
+                  placeholder=""
                   autoComplete="email"
                   required
                 />

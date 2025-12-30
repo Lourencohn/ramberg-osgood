@@ -84,11 +84,11 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
             <SidebarMenuButton
               size="lg"
               asChild
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground h-16"
             >
               <Link href="/dashboard">
-                <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                  <Image src="/logo.png" alt="ResistencIA" width={22} height={22} />
+                <div className="bg-white text-sidebar-primary-foreground flex aspect-square size-12 items-center justify-center rounded-lg">
+                  <Image src="/logo.png" alt="ResistencIA" width={40} height={40} />
                 </div>
                 <div className="flex flex-col gap-0.5 leading-none">
                   <span className="text-sm font-semibold">ResistencIA</span>
