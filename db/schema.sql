@@ -92,6 +92,20 @@ CREATE TABLE IF NOT EXISTS mechanical_properties (
   UNIQUE (test_run_id, method)
 );
 
+CREATE TABLE IF NOT EXISTS users (
+  id bigserial PRIMARY KEY,
+  name text NOT NULL,
+  email text NOT NULL UNIQUE,
+  password_salt text NOT NULL,
+  password_hash text NOT NULL,
+  session_token_hash text,
+  session_expires_at timestamptz,
+  last_login_at timestamptz,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_users_session_token ON users (session_token_hash);
+
 CREATE OR REPLACE VIEW v_measurements_export AS
 SELECT
   p.code AS profile_code,

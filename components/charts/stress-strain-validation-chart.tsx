@@ -22,7 +22,7 @@ const stressFormatter = new Intl.NumberFormat("pt-BR", {
 export function StressStrainValidationChart({ curve, points }: StressStrainValidationChartProps) {
   if (!points.length || !curve.length) {
     return (
-      <div className="h-72 flex items-center justify-center border-2 border-dashed border-border rounded-lg">
+      <div className="h-[340px] flex items-center justify-center border-2 border-dashed border-border rounded-lg">
         <p className="text-muted-foreground">Sem pontos reais suficientes para validação.</p>
       </div>
     )
@@ -40,7 +40,7 @@ export function StressStrainValidationChart({ curve, points }: StressStrainValid
           color: "var(--chart-3)",
         },
       }}
-      className="h-72 w-full aspect-auto"
+      className="h-[340px] w-full aspect-auto"
     >
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={curve}>
