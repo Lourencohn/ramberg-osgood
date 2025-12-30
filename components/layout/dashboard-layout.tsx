@@ -4,6 +4,7 @@ import type React from "react"
 
 import { useState, useEffect, useCallback } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -68,8 +69,8 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             sidebarCollapsed ? "px-3 justify-center" : "px-6"
           )}>
             <Link href="/" className="flex items-center gap-2">
-              <div className="flex size-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-md">
-                <Sparkles className="size-5" />
+              <div className="flex size-9 items-center justify-center rounded-xl bg-background shadow-sm ring-1 ring-border/50">
+                <Image src="/logo.png" alt="ResistencIA" width={28} height={28} className="size-7 object-contain" />
               </div>
               {!sidebarCollapsed && (
                 <div className="flex flex-col">
@@ -170,8 +171,8 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
               <div className="flex h-full flex-col">
                 <div className="flex h-16 items-center border-b border-border px-6">
                   <Link href="/" className="flex items-center gap-2" onClick={() => setSidebarOpen(false)}>
-                    <div className="flex size-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-md">
-                      <Sparkles className="size-5" />
+                    <div className="flex size-9 items-center justify-center rounded-xl bg-background shadow-sm ring-1 ring-border/50">
+                      <Image src="/logo.png" alt="ResistencIA" width={28} height={28} className="size-7 object-contain" />
                     </div>
                     <div className="flex flex-col">
                       <span className="font-bold tracking-tight">ResistencIA</span>
@@ -212,8 +213,8 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             </SheetContent>
           </Sheet>
           <Link href="/" className="flex items-center gap-2">
-            <div className="flex size-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-sm">
-              <Sparkles className="size-4" />
+            <div className="flex size-8 items-center justify-center rounded-lg bg-background shadow-sm ring-1 ring-border/50">
+              <Image src="/logo.png" alt="ResistencIA" width={24} height={24} className="size-6 object-contain" />
             </div>
             <span className="font-bold tracking-tight">ResistencIA</span>
           </Link>
