@@ -2,6 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import type { RunMetrics } from "@/lib/dashboard-data"
+import { formatDataSource } from "@/lib/formatters"
 import { ArrowRight, Thermometer, Gauge, CheckCircle2, FileText } from "lucide-react"
 import Link from "next/link"
 
@@ -63,12 +64,12 @@ export function RecentSimulations({ runs }: RecentSimulationsProps) {
                     </div>
                     <Badge variant="secondary" className="ml-2 gap-1 text-xs font-normal">
                       <CheckCircle2 className="size-3 text-foreground" />
-                      {run.testCode}
+                      Ensaio {run.testNumber}
                     </Badge>
-                    {run.source ? (
+                    {formatDataSource(run.source) ? (
                       <Badge variant="outline" className="gap-1 text-[11px] font-normal">
                         <FileText className="size-3" />
-                        {run.source}
+                        {formatDataSource(run.source)}
                       </Badge>
                     ) : null}
                   </div>

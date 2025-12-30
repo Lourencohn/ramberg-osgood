@@ -1,73 +1,46 @@
 import { DashboardLayout } from "@/components/layout/dashboard-layout"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
+import { getRunMetrics } from "@/lib/dashboard-data"
+import { formatDataSource } from "@/lib/formatters"
 import { Search, Download, Trash2, Eye, Filter, Thermometer, Gauge, CheckCircle2, Calendar, FileSpreadsheet } from "lucide-react"
 
-const simulationHistory = [
-  {
-    id: "SIM-001",
-    date: "2024-01-15 14:23",
-    temperature: 210,
-    speed: 45,
-    tensileStrength: 52.3,
-    youngModulus: 3421,
-    elongation: 4.2,
-    status: "Concluído",
-  },
-  {
-    id: "SIM-002",
-    date: "2024-01-15 12:10",
-    temperature: 215,
-    speed: 50,
-    tensileStrength: 49.8,
-    youngModulus: 3312,
-    elongation: 3.9,
-    status: "Concluído",
-  },
-  {
-    id: "SIM-003",
-    date: "2024-01-14 16:45",
-    temperature: 205,
-    speed: 40,
-    tensileStrength: 54.1,
-    youngModulus: 3528,
-    elongation: 4.5,
-    status: "Concluído",
-  },
-  {
-    id: "SIM-004",
-    date: "2024-01-14 09:30",
-    temperature: 220,
-    speed: 55,
-    tensileStrength: 47.2,
-    youngModulus: 3198,
-    elongation: 3.6,
-    status: "Concluído",
-  },
-  {
-    id: "SIM-005",
-    date: "2024-01-13 15:20",
-    temperature: 200,
-    speed: 35,
-    tensileStrength: 55.6,
-    youngModulus: 3612,
-    elongation: 4.8,
-    status: "Concluído",
-  },
-]
+const dateFormatter = new Intl.DateTimeFormat("pt-BR", {
+  dateStyle: "short",
+  timeStyle: "short",
+})
 
-export default function HistoryPage() {
+const stressFormatter = new Intl.NumberFormat("pt-BR", {
+  minimumFractionDigits: 1,
+  maximumFractionDigits: 1,
+})
+
+const strainFormatter = new Intl.NumberFormat("pt-BR", {
+  minimumFractionDigits: 4,
+  maximumFractionDigits: 4,
+})
+
+const countFormatter = new Intl.NumberFormat("pt-BR")
+
+export default async function HistoryPage() {
+  const runs = await getRunMetrics()
+  const orderedRuns = [...runs].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+  )
+  const runsWithStress = runs.filter((run) => run.maxStress !== null).length
+  const lastRun = orderedRuns[0]
+  const lastRunLabel = lastRun ? dateFormatter.format(new Date(lastRun.createdAt)) : "—"
   return (
     <DashboardLayout>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight md:text-3xl">Histórico de Simulações</h1>
+            <h1 className="text-2xl font-bold tracking-tight md:text-3xl">Histórico de Ensaios</h1>
             <p className="mt-1.5 text-muted-foreground">
-              Gerencie e exporte todas as predições realizadas
+              Gerencie e exporte os ensaios importados no banco
             </p>
           </div>
           <Button className="gap-2 shadow-sm">
@@ -85,8 +58,8 @@ export default function HistoryPage() {
                   <FileSpreadsheet className="size-5 text-background" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-background">{simulationHistory.length}</p>
-                  <p className="text-xs text-background/70">Total de Simulações</p>
+                  <p className="text-2xl font-bold text-background">{countFormatter.format(runs.length)}</p>
+                  <p className="text-xs text-background/70">Total de Ensaios</p>
                 </div>
               </div>
             </CardContent>
@@ -98,8 +71,8 @@ export default function HistoryPage() {
                   <CheckCircle2 className="size-5 text-foreground" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold">{simulationHistory.length}</p>
-                  <p className="text-xs text-muted-foreground">Concluídas</p>
+                  <p className="text-2xl font-bold">{countFormatter.format(runsWithStress)}</p>
+                  <p className="text-xs text-muted-foreground">Com tensão calculada</p>
                 </div>
               </div>
             </CardContent>
@@ -111,8 +84,8 @@ export default function HistoryPage() {
                   <Calendar className="size-5 text-foreground" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold">Hoje</p>
-                  <p className="text-xs text-muted-foreground">Última simulação</p>
+                  <p className="text-2xl font-bold">{lastRunLabel}</p>
+                  <p className="text-xs text-muted-foreground">Último ensaio</p>
                 </div>
               </div>
             </CardContent>
@@ -126,7 +99,7 @@ export default function HistoryPage() {
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
-                  placeholder="Buscar por ID, temperatura ou velocidade..."
+                  placeholder="Buscar por ensaio, temperatura ou velocidade..."
                   className="pl-10 bg-muted/50 border-0 focus-visible:ring-1"
                 />
               </div>
@@ -137,25 +110,36 @@ export default function HistoryPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
-              {simulationHistory.map((sim) => (
+            {orderedRuns.length === 0 ? (
+              <div className="flex h-full items-center justify-center rounded-lg border border-dashed border-border p-6 text-sm text-muted-foreground">
+                Nenhum ensaio encontrado.
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {orderedRuns.map((run) => (
                 <div
-                  key={sim.id}
+                  key={run.id}
                   className="group flex flex-col gap-4 rounded-xl border border-border bg-card p-4 transition-all duration-200 hover:border-foreground/20 hover:bg-muted/30 hover:shadow-sm sm:flex-row sm:items-center sm:justify-between"
                 >
                   <div className="flex-1 space-y-3">
                     {/* ID and Status Row */}
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="inline-flex items-center rounded-md bg-foreground text-background px-2.5 py-1 font-mono text-sm font-semibold">
-                        {sim.id}
+                        Ensaio {run.testNumber}
                       </span>
                       <Badge variant="secondary" className="gap-1 font-normal">
                         <CheckCircle2 className="size-3 text-foreground" />
-                        {sim.status}
+                        {run.maxStress !== null ? "Com tensão" : "Sem tensão"}
                       </Badge>
+                      {formatDataSource(run.source) ? (
+                        <Badge variant="outline" className="gap-1 text-[11px] font-normal">
+                          <FileSpreadsheet className="size-3" />
+                          {formatDataSource(run.source)}
+                        </Badge>
+                      ) : null}
                       <span className="flex items-center gap-1 text-xs text-muted-foreground">
                         <Calendar className="size-3" />
-                        {sim.date}
+                        {dateFormatter.format(new Date(run.createdAt))}
                       </span>
                     </div>
 
@@ -165,14 +149,14 @@ export default function HistoryPage() {
                         <Thermometer className="size-4 text-foreground" />
                         <span className="text-sm">
                           <span className="text-muted-foreground">Temp:</span>{" "}
-                          <span className="font-semibold">{sim.temperature}°C</span>
+                          <span className="font-semibold">{run.temperature}°C</span>
                         </span>
                       </div>
                       <div className="flex items-center gap-2 rounded-lg bg-muted px-3 py-1.5">
                         <Gauge className="size-4 text-foreground" />
                         <span className="text-sm">
                           <span className="text-muted-foreground">Vel:</span>{" "}
-                          <span className="font-semibold">{sim.speed}mm/s</span>
+                          <span className="font-semibold">{run.speed}mm/s</span>
                         </span>
                       </div>
                     </div>
@@ -180,16 +164,20 @@ export default function HistoryPage() {
                     {/* Results Row */}
                     <div className="flex flex-wrap gap-4 text-sm">
                       <div className="flex items-center gap-1.5">
-                        <span className="text-muted-foreground">σ:</span>
-                        <span className="font-semibold text-foreground">{sim.tensileStrength} MPa</span>
+                        <span className="text-muted-foreground">σ máx:</span>
+                        <span className="font-semibold text-foreground">
+                          {run.maxStress !== null ? `${stressFormatter.format(run.maxStress)} MPa` : "—"}
+                        </span>
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <span className="text-muted-foreground">E:</span>
-                        <span className="font-semibold text-foreground">{sim.youngModulus} MPa</span>
+                        <span className="text-muted-foreground">ε máx:</span>
+                        <span className="font-semibold text-foreground">
+                          {run.maxStrain !== null ? `${strainFormatter.format(run.maxStrain)} mm/mm` : "—"}
+                        </span>
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <span className="text-muted-foreground">ε:</span>
-                        <span className="font-semibold text-foreground">{sim.elongation}%</span>
+                        <span className="text-muted-foreground">Pontos:</span>
+                        <span className="font-semibold text-foreground">{countFormatter.format(run.pointCount)}</span>
                       </div>
                     </div>
                   </div>
@@ -211,7 +199,8 @@ export default function HistoryPage() {
                   </div>
                 </div>
               ))}
-            </div>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

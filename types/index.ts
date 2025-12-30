@@ -16,6 +16,22 @@ export interface RambergOsgoodParams {
 }
 
 /**
+ * Dados reais de treinamento para Ramberg-Osgood
+ */
+export interface RambergOsgoodTrainingPoint {
+  profile: string
+  temperature: number
+  speed: number
+  E: number
+  sigma_0: number
+  n: number
+  maxStrain: number
+  rmse: number
+  pointsUsed: number
+  validationPoints?: StressStrainPoint[]
+}
+
+/**
  * Propriedades mecânicas calculadas
  */
 export interface MechanicalProperties {

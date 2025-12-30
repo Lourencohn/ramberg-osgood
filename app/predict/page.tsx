@@ -1,10 +1,14 @@
 import { DashboardLayout } from "@/components/layout/dashboard-layout"
-import { PredictionForm } from "@/components/prediction-form"
-import { ResultsDisplay } from "@/components/results-display"
+import { PredictionWorkspace } from "@/components/prediction/prediction-workspace"
+import { getRambergOsgoodTrainingData } from "@/lib/prediction-data"
 import { Sparkles, Info } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 
-export default function PredictPage() {
+export const dynamic = "force-dynamic"
+
+export default async function PredictPage() {
+  const trainingData = await getRambergOsgoodTrainingData()
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
@@ -30,20 +34,12 @@ export default function PredictPage() {
           <Info className="size-4 text-foreground" />
           <AlertDescription className="text-sm">
             Insira a temperatura e velocidade de impressão para calcular as propriedades mecânicas
-            do material PLA usando o modelo de Ramberg-Osgood.
+            do material PLA usando o modelo de Ramberg-Osgood ajustado com ensaios reais.
           </AlertDescription>
         </Alert>
 
         {/* Main Content */}
-        <div className="grid gap-6 lg:grid-cols-2">
-          <section>
-            <PredictionForm />
-          </section>
-
-          <section>
-            <ResultsDisplay />
-          </section>
-        </div>
+        <PredictionWorkspace trainingData={trainingData} />
       </div>
     </DashboardLayout>
   )

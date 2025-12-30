@@ -8,10 +8,15 @@ import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { validateInputs } from "@/lib/validation"
 import { predictProperties } from "@/lib/prediction"
-import type { PredictionInput } from "@/types"
+import type { PredictionInput, PredictionResult, RambergOsgoodTrainingPoint } from "@/types"
 import { Thermometer, Gauge, Calculator, AlertCircle, Loader2 } from "lucide-react"
 
-export function PredictionForm() {
+type PredictionFormProps = {
+  trainingData: RambergOsgoodTrainingPoint[]
+  onResult: (result: PredictionResult) => void
+}
+
+export function PredictionForm({ trainingData, onResult }: PredictionFormProps) {
   const [temperature, setTemperature] = useState("205")
   const [speed, setSpeed] = useState("95")
   const [errors, setErrors] = useState<string[]>([])
@@ -29,13 +34,17 @@ export function PredictionForm() {
       return
     }
 
+    if (!trainingData.length) {
+      setErrors(["Não há dados reais suficientes para gerar a previsão."])
+      return
+    }
+
     setErrors([])
     setIsCalculating(true)
 
     try {
-      const results = await predictProperties(input)
-      // Trigger results display update via global state or callback
-      console.log("Results:", results)
+      const results = await predictProperties(input, trainingData)
+      onResult(results)
     } catch (error) {
       setErrors(["Erro ao calcular propriedades"])
     } finally {
@@ -119,6 +128,12 @@ export function PredictionForm() {
             </AlertDescription>
           </Alert>
         )}
+
+        <p className="text-xs text-muted-foreground">
+          {trainingData.length > 0
+            ? `Baseado em ${trainingData.length} perfis reais com ajuste Ramberg-Osgood.`
+            : "Nenhum perfil com dados suficientes para ajuste foi encontrado."}
+        </p>
 
         {/* Submit Button */}
         <Button

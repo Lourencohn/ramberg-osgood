@@ -1,27 +1,98 @@
-import type { PredictionInput, RambergOsgoodParams } from "@/types"
+import type { PredictionInput, RambergOsgoodParams, RambergOsgoodTrainingPoint } from "@/types"
 
-/**
- * Ponto de dado experimental para interpolação
- */
-interface ExperimentalPoint {
-  temperature: number
-  speed: number
-  E: number
-  sigma_0: number
-  n: number
+type InterpolationResult = RambergOsgoodParams & { maxStrain: number }
+
+function normalize(value: number, min: number, max: number) {
+  if (max === min) return 0
+  return (value - min) / (max - min)
 }
 
-/**
- * Dados experimentais base (exemplo - substituir por dados reais)
- */
-const EXPERIMENTAL_DATA: ExperimentalPoint[] = [
-  { temperature: 190, speed: 90, E: 2800, sigma_0: 45, n: 8.5 },
-  { temperature: 190, speed: 100, E: 2750, sigma_0: 43, n: 8.8 },
-  { temperature: 205, speed: 90, E: 2900, sigma_0: 48, n: 8.2 },
-  { temperature: 205, speed: 100, E: 2850, sigma_0: 46, n: 8.4 },
-  { temperature: 220, speed: 90, E: 2700, sigma_0: 42, n: 9.0 },
-  { temperature: 220, speed: 100, E: 2650, sigma_0: 40, n: 9.2 },
-]
+function clamp(value: number, min: number, max: number) {
+  return Math.min(Math.max(value, min), max)
+}
+
+function computeRanges(points: RambergOsgoodTrainingPoint[]) {
+  const temperatures = points.map((point) => point.temperature)
+  const speeds = points.map((point) => point.speed)
+  return {
+    tempMin: Math.min(...temperatures),
+    tempMax: Math.max(...temperatures),
+    speedMin: Math.min(...speeds),
+    speedMax: Math.max(...speeds),
+  }
+}
+
+function computeBounds(points: RambergOsgoodTrainingPoint[]) {
+  const values = {
+    E: points.map((point) => point.E),
+    sigma_0: points.map((point) => point.sigma_0),
+    n: points.map((point) => point.n),
+    maxStrain: points.map((point) => point.maxStrain),
+  }
+
+  return {
+    E: [Math.min(...values.E), Math.max(...values.E)] as const,
+    sigma_0: [Math.min(...values.sigma_0), Math.max(...values.sigma_0)] as const,
+    n: [Math.min(...values.n), Math.max(...values.n)] as const,
+    maxStrain: [Math.min(...values.maxStrain), Math.max(...values.maxStrain)] as const,
+  }
+}
+
+function computeEpsilon(
+  points: RambergOsgoodTrainingPoint[],
+  ranges: ReturnType<typeof computeRanges>,
+) {
+  if (points.length < 2) return 1
+  let sum = 0
+  let count = 0
+  for (let i = 0; i < points.length; i += 1) {
+    for (let j = i + 1; j < points.length; j += 1) {
+      const dx =
+        normalize(points[i].temperature, ranges.tempMin, ranges.tempMax) -
+        normalize(points[j].temperature, ranges.tempMin, ranges.tempMax)
+      const dy =
+        normalize(points[i].speed, ranges.speedMin, ranges.speedMax) -
+        normalize(points[j].speed, ranges.speedMin, ranges.speedMax)
+      sum += Math.sqrt(dx * dx + dy * dy)
+      count += 1
+    }
+  }
+  const meanDist = count ? sum / count : 1
+  return meanDist > 0 ? 1 / meanDist : 1
+}
+
+function rbfWeights(
+  input: PredictionInput,
+  points: RambergOsgoodTrainingPoint[],
+) {
+  if (!points.length) return []
+  const ranges = computeRanges(points)
+  const inputTemp = normalize(input.temperature, ranges.tempMin, ranges.tempMax)
+  const inputSpeed = normalize(input.speed, ranges.speedMin, ranges.speedMax)
+  const epsilon = computeEpsilon(points, ranges)
+
+  return points.map((point) => {
+    const dx = inputTemp - normalize(point.temperature, ranges.tempMin, ranges.tempMax)
+    const dy = inputSpeed - normalize(point.speed, ranges.speedMin, ranges.speedMax)
+    const dist = Math.sqrt(dx * dx + dy * dy)
+    return Math.exp(-Math.pow(epsilon * dist, 2))
+  })
+}
+
+function interpolateValue(
+  points: RambergOsgoodTrainingPoint[],
+  weights: number[],
+  getter: (point: RambergOsgoodTrainingPoint) => number,
+  min: number,
+  max: number,
+) {
+  if (!points.length) return min
+  const weightSum = weights.reduce((sum, weight) => sum + weight, 0)
+  if (!weightSum) return clamp(getter(points[0]), min, max)
+  const value =
+    points.reduce((sum, point, index) => sum + getter(point) * weights[index], 0) / weightSum
+  return clamp(value, min, max)
+}
 
 /**
  * Interpola parâmetros usando regressão polinomial de grau 2
@@ -29,22 +100,11 @@ const EXPERIMENTAL_DATA: ExperimentalPoint[] = [
  * @param input - Parâmetros de entrada (temperatura e velocidade)
  * @returns Parâmetros de Ramberg-Osgood interpolados
  */
-export function polynomialInterpolation(input: PredictionInput): RambergOsgoodParams {
-  // Implementação simplificada - usar biblioteca de regressão real
-  // Por enquanto, retorna valores estimados
-
-  const { temperature, speed } = input
-
-  // Normalizar entradas
-  const tempNorm = (temperature - 205) / 15 // Centro em 205, escala ±15
-  const speedNorm = (speed - 95) / 5 // Centro em 95, escala ±5
-
-  // Coeficientes de exemplo (substituir por regressão real)
-  const E = 2850 - 50 * tempNorm + 25 * speedNorm
-  const sigma_0 = 46 - 2 * tempNorm + 1.5 * speedNorm
-  const n = 8.4 + 0.3 * tempNorm - 0.2 * speedNorm
-
-  return { E, sigma_0, n }
+export function polynomialInterpolation(
+  input: PredictionInput,
+  data: RambergOsgoodTrainingPoint[],
+): InterpolationResult {
+  return rbfInterpolation(input, data)
 }
 
 /**
@@ -53,34 +113,39 @@ export function polynomialInterpolation(input: PredictionInput): RambergOsgoodPa
  * @param input - Parâmetros de entrada (temperatura e velocidade)
  * @returns Parâmetros de Ramberg-Osgood interpolados
  */
-export function rbfInterpolation(input: PredictionInput): RambergOsgoodParams {
-  const { temperature, speed } = input
-
-  // Função de base radial gaussiana
-  const rbf = (dist: number, epsilon = 0.1): number => {
-    return Math.exp(-Math.pow(epsilon * dist, 2))
+export function rbfInterpolation(
+  input: PredictionInput,
+  data: RambergOsgoodTrainingPoint[],
+): InterpolationResult {
+  if (!data.length) {
+    return { E: 3000, sigma_0: 50, n: 8, maxStrain: 0.08 }
   }
 
-  let E = 0,
-    sigma_0 = 0,
-    n = 0
-  let weightSum = 0
-
-  for (const point of EXPERIMENTAL_DATA) {
-    // Calcular distância euclidiana
-    const dist = Math.sqrt(Math.pow(temperature - point.temperature, 2) + Math.pow(speed - point.speed, 2))
-
-    const weight = rbf(dist)
-    weightSum += weight
-
-    E += weight * point.E
-    sigma_0 += weight * point.sigma_0
-    n += weight * point.n
+  const exactMatch = data.find(
+    (point) => point.temperature === input.temperature && point.speed === input.speed,
+  )
+  if (exactMatch) {
+    return {
+      E: exactMatch.E,
+      sigma_0: exactMatch.sigma_0,
+      n: exactMatch.n,
+      maxStrain: exactMatch.maxStrain,
+    }
   }
+
+  const weights = rbfWeights(input, data)
+  const bounds = computeBounds(data)
 
   return {
-    E: E / weightSum,
-    sigma_0: sigma_0 / weightSum,
-    n: n / weightSum,
+    E: interpolateValue(data, weights, (point) => point.E, bounds.E[0], bounds.E[1]),
+    sigma_0: interpolateValue(data, weights, (point) => point.sigma_0, bounds.sigma_0[0], bounds.sigma_0[1]),
+    n: interpolateValue(data, weights, (point) => point.n, bounds.n[0], bounds.n[1]),
+    maxStrain: interpolateValue(
+      data,
+      weights,
+      (point) => point.maxStrain,
+      bounds.maxStrain[0],
+      bounds.maxStrain[1],
+    ),
   }
 }

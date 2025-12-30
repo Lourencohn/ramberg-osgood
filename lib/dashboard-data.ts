@@ -1,4 +1,5 @@
 import { query } from "@/lib/db"
+import { formatProfileLabel } from "@/lib/formatters"
 
 const STRAIN_EXPRESSION = "COALESCE(m.deformacao_mm_mm, m.alongamento_mm_mm)"
 
@@ -136,7 +137,7 @@ function buildStressDistribution(values: number[], bucketCount = 5): StressHisto
   return bins.filter((bin) => bin.count > 0)
 }
 
-function groupProfileAverages(metrics: RunMetrics[]): ProfileAverages[] {
+export function buildProfileAverages(metrics: RunMetrics[]): ProfileAverages[] {
   const grouped = new Map<string, ProfileAverages & {
     stressSum: number
     stressCount: number
@@ -243,10 +244,6 @@ function cleanCurve(points: StressPoint[]): StressPoint[] {
   return points
 }
 
-function formatProfileLabel(temperature: number, speed: number) {
-  return `Temperatura ${temperature}°C · Velocidade ${speed} mm/s`
-}
-
 function buildProfileDetails(
   metrics: RunMetrics[],
   pointsMap: Map<number, StressPoint[]>,
@@ -268,7 +265,7 @@ function buildProfileDetails(
 
       current.tests.push({
         id: metric.id,
-        label: `Teste ${metric.testNumber}`,
+        label: `Ensaio ${metric.testNumber}`,
         testCode: metric.testCode,
         testNumber: metric.testNumber,
         source: metric.source,
@@ -289,7 +286,7 @@ function buildProfileDetails(
     .sort((a, b) => (a.temperature !== b.temperature ? a.temperature - b.temperature : a.speed - b.speed))
 }
 
-async function fetchRunMetrics(): Promise<RunMetrics[]> {
+export async function getRunMetrics(): Promise<RunMetrics[]> {
   const { rows } = await query<RunMetricsRow>(
     `
       SELECT
@@ -378,7 +375,7 @@ async function fetchTestPoints(): Promise<Map<number, StressPoint[]>> {
 }
 
 export async function getDashboardData(): Promise<DashboardData> {
-  const [metrics, counts, pointsMap] = await Promise.all([fetchRunMetrics(), fetchCounts(), fetchTestPoints()])
+  const [metrics, counts, pointsMap] = await Promise.all([getRunMetrics(), fetchCounts(), fetchTestPoints()])
   const stressValues = metrics.filter((metric) => metric.maxStress !== null).map((metric) => metric.maxStress as number)
 
   const recentRuns = [...metrics].sort(
@@ -395,7 +392,7 @@ export async function getDashboardData(): Promise<DashboardData> {
 
   return {
     stats,
-    profileAverages: groupProfileAverages(metrics).filter((item) => item.avgMaxStress !== null),
+    profileAverages: buildProfileAverages(metrics).filter((item) => item.avgMaxStress !== null),
     temperatureUsage: groupTemperatureUsage(metrics),
     stressDistribution: buildStressDistribution(stressValues),
     speedPerformance: buildSpeedPerformance(metrics),
