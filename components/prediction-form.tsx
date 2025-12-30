@@ -59,7 +59,7 @@ export function PredictionForm({ trainingData, onResult }: PredictionFormProps) 
         <CardDescription>Defina temperatura e velocidade para a simulação</CardDescription>
       </CardHeader>
       <CardContent className="space-y-5">
-        {/* Temperature Input */}
+
         <div className="space-y-3">
           <Label htmlFor="temperature" className="flex items-center gap-2 text-sm font-medium">
             <Thermometer className="size-4 text-foreground" />
@@ -87,7 +87,7 @@ export function PredictionForm({ trainingData, onResult }: PredictionFormProps) 
           </div>
         </div>
 
-        {/* Speed Input */}
+
         <div className="space-y-3">
           <Label htmlFor="speed" className="flex items-center gap-2 text-sm font-medium">
             <Gauge className="size-4 text-foreground" />
@@ -115,7 +115,7 @@ export function PredictionForm({ trainingData, onResult }: PredictionFormProps) 
           </div>
         </div>
 
-        {/* Errors */}
+
         {errors.length > 0 && (
           <Alert variant="destructive" className="border-destructive/50">
             <AlertCircle className="size-4" />
@@ -135,7 +135,7 @@ export function PredictionForm({ trainingData, onResult }: PredictionFormProps) 
             : "Nenhum perfil com dados suficientes para ajuste foi encontrado."}
         </p>
 
-        {/* Submit Button */}
+
         <Button
           onClick={handleCalculate}
           className="w-full h-12 text-base font-semibold gap-2 shadow-md hover:shadow-lg transition-all"

@@ -35,7 +35,7 @@ export default async function Home() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        {/* Header */}
+
         <div className="flex flex-col gap-1">
           <h1 className="text-2xl font-bold tracking-tight md:text-3xl">Dashboard</h1>
           <p className="text-muted-foreground">
@@ -43,7 +43,7 @@ export default async function Home() {
           </p>
         </div>
 
-        {/* Stats Grid */}
+
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <StatsCard
             title="Ensaios registrados"
@@ -72,22 +72,22 @@ export default async function Home() {
           />
         </div>
 
-        {/* Charts Row 1 */}
+
         <div className="grid gap-6 lg:grid-cols-2">
           <SimulationsTrendChart data={profileAverages} />
           <ParametersUsageChart data={temperatureUsage} />
         </div>
 
-        {/* Charts Row 2 */}
+
         <div className="grid gap-6 lg:grid-cols-2">
           <PropertiesDistributionChart data={stressDistribution} />
           <PerformanceComparisonChart performance={speedPerformance} />
         </div>
 
-        {/* Per-Profile Analysis */}
+
         <ProfileTests profiles={profileDetails} />
 
-        {/* Recent */}
+
         <div>
           <RecentSimulations runs={recentRuns} />
         </div>

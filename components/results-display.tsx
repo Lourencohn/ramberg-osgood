@@ -90,7 +90,7 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
           </TabsList>
 
           <TabsContent value="properties" className="space-y-4 mt-4">
-            {/* Ramberg-Osgood Parameters */}
+
             <div className="rounded-xl border border-foreground/20 bg-gradient-to-br from-foreground/5 to-foreground/10 p-4">
               <div className="flex items-center gap-2 mb-4">
                 <div className="flex size-8 items-center justify-center rounded-lg bg-foreground/10">
@@ -124,7 +124,7 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
               </div>
             </div>
 
-            {/* Mechanical Properties */}
+
             <div className="rounded-xl border border-border bg-card p-4">
               <div className="flex items-center gap-2 mb-4">
                 <div className="flex size-8 items-center justify-center rounded-lg bg-muted">

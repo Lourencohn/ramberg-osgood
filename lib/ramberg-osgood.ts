@@ -1,14 +1,6 @@
 import type { RambergOsgoodParams, StressStrainPoint } from "@/types"
 
-/**
- * Calcula a deformação usando a equação de Ramberg-Osgood
- *
- * Equação: ε = σ/E + 0.002 * (σ/σ₀)^n
- *
- * @param stress - Tensão aplicada σ (MPa)
- * @param params - Parâmetros do modelo (E, σ₀, n)
- * @returns Deformação total ε
- */
+
 export function calculateStrain(stress: number, params: RambergOsgoodParams): number {
   const { E, sigma_0, n } = params
 
@@ -18,20 +10,13 @@ export function calculateStrain(stress: number, params: RambergOsgoodParams): nu
   return elasticStrain + plasticStrain
 }
 
-/**
- * Calcula a tensão usando a equação de Ramberg-Osgood invertida
- * (Método iterativo de Newton-Raphson)
- *
- * @param strain - Deformação desejada ε
- * @param params - Parâmetros do modelo (E, σ₀, n)
- * @returns Tensão σ (MPa)
- */
+
 export function calculateStress(strain: number, params: RambergOsgoodParams): number {
   const { E, sigma_0, n } = params
   const tolerance = 1e-6
   const maxIterations = 100
 
-  // Estimativa inicial
+
   let stress = E * strain
 
   for (let i = 0; i < maxIterations; i++) {
@@ -50,14 +35,7 @@ export function calculateStress(strain: number, params: RambergOsgoodParams): nu
   return stress
 }
 
-/**
- * Gera a curva tensão-deformação completa
- *
- * @param params - Parâmetros do modelo Ramberg-Osgood
- * @param maxStrain - Deformação máxima (padrão: 0.1 = 10%)
- * @param points - Número de pontos na curva (padrão: 100)
- * @returns Array de pontos da curva
- */
+
 export function generateStressStrainCurve(
   params: RambergOsgoodParams,
   maxStrain = 0.1,

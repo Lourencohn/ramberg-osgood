@@ -12,7 +12,7 @@ export default async function PredictPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        {/* Header */}
+
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <div className="flex items-center gap-3">
@@ -29,7 +29,7 @@ export default async function PredictPage() {
           </div>
         </div>
 
-        {/* Info Alert */}
+
         <Alert className="border-foreground/20 bg-foreground/5">
           <Info className="size-4 text-foreground" />
           <AlertDescription className="text-sm">
@@ -38,7 +38,7 @@ export default async function PredictPage() {
           </AlertDescription>
         </Alert>
 
-        {/* Main Content */}
+
         <PredictionWorkspace trainingData={trainingData} />
       </div>
     </DashboardLayout>

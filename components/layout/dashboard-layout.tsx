@@ -36,7 +36,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
-  // Persist sidebar state in localStorage
+
   useEffect(() => {
     const saved = localStorage.getItem("sidebar-collapsed")
     if (saved !== null) {
@@ -54,7 +54,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-screen bg-background">
-      {/* Desktop Sidebar */}
+
       <aside
         className={cn(
           "hidden border-r border-sidebar-border bg-sidebar lg:block transition-all duration-300 ease-in-out",
@@ -62,7 +62,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         )}
       >
         <div className="flex h-full flex-col sticky top-0">
-          {/* Logo/Header */}
+
           <div className={cn(
             "flex h-16 items-center border-b border-sidebar-border transition-all duration-300",
             sidebarCollapsed ? "px-3 justify-center" : "px-6"
@@ -80,7 +80,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             </Link>
           </div>
 
-          {/* Toggle Button */}
+
           <div className={cn(
             "flex py-3 border-b border-sidebar-border",
             sidebarCollapsed ? "justify-center px-3" : "justify-start px-4"
@@ -102,7 +102,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             </Button>
           </div>
 
-          {/* Navigation */}
+
           <nav className={cn(
             "flex-1 space-y-1 py-4",
             sidebarCollapsed ? "px-2" : "px-3"
@@ -134,7 +134,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             })}
           </nav>
 
-          {/* Footer */}
+
           <div className={cn(
             "border-t border-sidebar-border p-4",
             sidebarCollapsed && "px-2"
@@ -155,9 +155,9 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         </div>
       </aside>
 
-      {/* Mobile header and content */}
+
       <div className="flex flex-1 flex-col min-w-0">
-        {/* Mobile header */}
+
         <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80 px-4 lg:hidden">
           <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
             <SheetTrigger asChild>
@@ -201,7 +201,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                     )
                   })}
                 </nav>
-                {/* Mobile Footer */}
+
                 <div className="border-t border-border p-4">
                   <div className="rounded-lg bg-gradient-to-br from-primary/10 to-primary/5 p-3">
                     <p className="text-sm font-semibold text-foreground">ResistencIA 2.0</p>
@@ -219,7 +219,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           </Link>
         </header>
 
-        {/* Main content */}
+
         <main className="flex-1 p-4 md:p-6 lg:p-8">{children}</main>
       </div>
     </div>

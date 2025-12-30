@@ -26,7 +26,7 @@ export default function SettingsPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        {/* Header */}
+
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
             <div className="flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-foreground to-foreground/80 text-background shadow-md">
@@ -42,7 +42,7 @@ export default function SettingsPage() {
         </div>
 
         <div className="grid gap-6 lg:grid-cols-2">
-          {/* Calculation Preferences */}
+
           <Card>
             <CardHeader className="pb-4">
               <div className="flex items-center gap-3">
@@ -99,7 +99,7 @@ export default function SettingsPage() {
             </CardContent>
           </Card>
 
-          {/* Interface */}
+
           <Card>
             <CardHeader className="pb-4">
               <div className="flex items-center gap-3">
@@ -168,7 +168,7 @@ export default function SettingsPage() {
             </CardContent>
           </Card>
 
-          {/* Export */}
+
           <Card>
             <CardHeader className="pb-4">
               <div className="flex items-center gap-3">
@@ -223,7 +223,7 @@ export default function SettingsPage() {
             </CardContent>
           </Card>
 
-          {/* Advanced */}
+
           <Card>
             <CardHeader className="pb-4">
               <div className="flex items-center gap-3">
@@ -269,7 +269,7 @@ export default function SettingsPage() {
           </Card>
         </div>
 
-        {/* Action Buttons */}
+
         <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
           <Button variant="outline" className="gap-2">
             <X className="size-4" />

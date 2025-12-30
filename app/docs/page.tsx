@@ -22,7 +22,7 @@ export default function DocsPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        {/* Header */}
+
         <div className="flex items-center gap-3">
           <div className="flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-foreground to-foreground/80 text-background shadow-md">
             <BookOpen className="size-5" />
@@ -59,7 +59,7 @@ export default function DocsPage() {
             </TabsTrigger>
           </TabsList>
 
-          {/* Overview Tab */}
+
           <TabsContent value="overview" className="space-y-4">
             <Card>
               <CardHeader className="pb-4">
@@ -105,7 +105,7 @@ export default function DocsPage() {
             </Alert>
           </TabsContent>
 
-          {/* Model Tab */}
+
           <TabsContent value="model" className="space-y-4">
             <Card>
               <CardHeader className="pb-4">
@@ -125,12 +125,12 @@ export default function DocsPage() {
                   com plasticidade.
                 </p>
 
-                {/* Equation Card */}
+
                 <div className="rounded-xl bg-gradient-to-br from-foreground/10 to-foreground/5 border border-foreground/20 p-6 text-center">
                   <p className="font-mono text-lg font-semibold text-foreground">ε = σ/E + (σ/K)^(1/n)</p>
                 </div>
 
-                {/* Variables Grid */}
+
                 <div className="grid gap-2 sm:grid-cols-2">
                   {[
                     { symbol: "ε", name: "Deformação total" },
@@ -176,7 +176,7 @@ export default function DocsPage() {
             </Card>
           </TabsContent>
 
-          {/* Parameters Tab */}
+
           <TabsContent value="parameters" className="space-y-4">
             <Card>
               <CardHeader className="pb-4">
@@ -191,7 +191,7 @@ export default function DocsPage() {
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
-                {/* Temperature */}
+
                 <div className="rounded-xl border border-foreground/20 bg-foreground/5 p-5">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="flex size-10 items-center justify-center rounded-lg bg-foreground/10">
@@ -214,7 +214,7 @@ export default function DocsPage() {
                   </p>
                 </div>
 
-                {/* Speed */}
+
                 <div className="rounded-xl border border-foreground/20 bg-muted p-5">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="flex size-10 items-center justify-center rounded-lg bg-foreground/10">
@@ -240,7 +240,7 @@ export default function DocsPage() {
             </Card>
           </TabsContent>
 
-          {/* Interpretation Tab */}
+
           <TabsContent value="interpretation" className="space-y-4">
             <Card>
               <CardHeader className="pb-4">

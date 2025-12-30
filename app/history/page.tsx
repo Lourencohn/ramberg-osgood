@@ -35,7 +35,7 @@ export default async function HistoryPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        {/* Header */}
+
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-2xl font-bold tracking-tight md:text-3xl">Histórico de Ensaios</h1>
@@ -49,7 +49,7 @@ export default async function HistoryPage() {
           </Button>
         </div>
 
-        {/* Stats Summary */}
+
         <div className="grid gap-4 sm:grid-cols-3">
           <Card className="bg-gradient-to-br from-foreground to-foreground/90 text-background border-foreground">
             <CardContent className="p-4">
@@ -92,7 +92,7 @@ export default async function HistoryPage() {
           </Card>
         </div>
 
-        {/* Main Content */}
+
         <Card>
           <CardHeader className="pb-4">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
@@ -122,7 +122,7 @@ export default async function HistoryPage() {
                   className="group flex flex-col gap-4 rounded-xl border border-border bg-card p-4 transition-all duration-200 hover:border-foreground/20 hover:bg-muted/30 hover:shadow-sm sm:flex-row sm:items-center sm:justify-between"
                 >
                   <div className="flex-1 space-y-3">
-                    {/* ID and Status Row */}
+
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="inline-flex items-center rounded-md bg-foreground text-background px-2.5 py-1 font-mono text-sm font-semibold">
                         Ensaio {run.testNumber}
@@ -143,7 +143,7 @@ export default async function HistoryPage() {
                       </span>
                     </div>
 
-                    {/* Parameters Row */}
+
                     <div className="flex flex-wrap gap-4">
                       <div className="flex items-center gap-2 rounded-lg bg-muted px-3 py-1.5">
                         <Thermometer className="size-4 text-foreground" />
@@ -161,7 +161,7 @@ export default async function HistoryPage() {
                       </div>
                     </div>
 
-                    {/* Results Row */}
+
                     <div className="flex flex-wrap gap-4 text-sm">
                       <div className="flex items-center gap-1.5">
                         <span className="text-muted-foreground">σ máx:</span>
@@ -182,7 +182,7 @@ export default async function HistoryPage() {
                     </div>
                   </div>
 
-                  {/* Actions */}
+
                   <div className="flex gap-1 sm:gap-2">
                     <Button variant="ghost" size="icon" className="h-9 w-9 hover:bg-foreground/10 hover:text-foreground">
                       <Eye className="size-4" />

@@ -94,12 +94,7 @@ function interpolateValue(
   return clamp(value, min, max)
 }
 
-/**
- * Interpola parâmetros usando regressão polinomial de grau 2
- *
- * @param input - Parâmetros de entrada (temperatura e velocidade)
- * @returns Parâmetros de Ramberg-Osgood interpolados
- */
+
 export function polynomialInterpolation(
   input: PredictionInput,
   data: RambergOsgoodTrainingPoint[],
@@ -107,12 +102,7 @@ export function polynomialInterpolation(
   return rbfInterpolation(input, data)
 }
 
-/**
- * Interpola parâmetros usando funções de base radial (RBF)
- *
- * @param input - Parâmetros de entrada (temperatura e velocidade)
- * @returns Parâmetros de Ramberg-Osgood interpolados
- */
+
 export function rbfInterpolation(
   input: PredictionInput,
   data: RambergOsgoodTrainingPoint[],
