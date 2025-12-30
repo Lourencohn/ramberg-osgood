@@ -1,14 +1,37 @@
+import { format } from "date-fns"
 import { DashboardLayout } from "@/components/layout/dashboard-layout"
 import { StatsCard } from "@/components/dashboard/stats-card"
 import { RecentSimulations } from "@/components/dashboard/recent-simulations"
-import { QuickActions } from "@/components/dashboard/quick-actions"
 import { SimulationsTrendChart } from "@/components/dashboard/simulations-trend-chart"
 import { PropertiesDistributionChart } from "@/components/dashboard/properties-distribution-chart"
 import { ParametersUsageChart } from "@/components/dashboard/parameters-usage-chart"
 import { PerformanceComparisonChart } from "@/components/dashboard/performance-comparison-chart"
+import { ProfileTests } from "@/components/dashboard/profile-tests"
 import { Activity, Beaker, Baseline as ChartLine, History } from "lucide-react"
+import { getDashboardData } from "@/lib/dashboard-data"
 
-export default function Home() {
+export const dynamic = "force-dynamic"
+
+export default async function Home() {
+  const dashboardData = await getDashboardData()
+  const {
+    stats,
+    profileAverages,
+    temperatureUsage,
+    stressDistribution,
+    speedPerformance,
+    recentRuns,
+    profileDetails,
+  } = dashboardData
+
+  const numberFormatter = new Intl.NumberFormat("pt-BR")
+  const avgPoints = stats.totalTests ? Math.round(stats.totalMeasurements / stats.totalTests) : 0
+  const stressShare = stats.totalTests ? Math.round((stats.testsWithStress / stats.totalTests) * 100) : 0
+  const lastTestValue = stats.lastTest ? format(new Date(stats.lastTest.createdAt), "dd/MM/yyyy HH:mm") : "—"
+  const lastTestDescription = stats.lastTest
+    ? `${stats.lastTest.profileCode} • ${stats.lastTest.temperature}°C / ${stats.lastTest.speed}mm/s`
+    : "Nenhum ensaio registrado"
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
@@ -23,52 +46,50 @@ export default function Home() {
         {/* Stats Grid */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <StatsCard
-            title="Total de Simulações"
-            value="147"
+            title="Ensaios registrados"
+            value={numberFormatter.format(stats.totalTests)}
             icon={<Activity className="size-5 text-background" />}
-            trend={{ value: 12, label: "vs. mês anterior" }}
+            trend={{ value: stressShare, label: "com tensão calculada" }}
             variant="primary"
           />
           <StatsCard
             title="Última Simulação"
-            value="2h atrás"
+            value={lastTestValue}
             icon={<History className="size-5 text-foreground" />}
-            description="210°C / 45mm/s"
+            description={lastTestDescription}
           />
           <StatsCard
-            title="Parâmetros Salvos"
-            value="23"
+            title="Perfis de Impressão"
+            value={numberFormatter.format(stats.totalProfiles)}
             icon={<Beaker className="size-5 text-foreground" />}
-            trend={{ value: 3, label: "novos esta semana" }}
+            description="Combinações de temperatura/velocidade"
           />
           <StatsCard
-            title="Comparações Ativas"
-            value="8"
+            title="Pontos Medidos"
+            value={numberFormatter.format(stats.totalMeasurements)}
             icon={<ChartLine className="size-5 text-foreground" />}
-            description="análises em andamento"
+            description={`~${numberFormatter.format(avgPoints)} pontos por ensaio`}
           />
         </div>
 
         {/* Charts Row 1 */}
         <div className="grid gap-6 lg:grid-cols-2">
-          <SimulationsTrendChart />
-          <ParametersUsageChart />
+          <SimulationsTrendChart data={profileAverages} />
+          <ParametersUsageChart data={temperatureUsage} />
         </div>
 
         {/* Charts Row 2 */}
         <div className="grid gap-6 lg:grid-cols-2">
-          <PropertiesDistributionChart />
-          <PerformanceComparisonChart />
+          <PropertiesDistributionChart data={stressDistribution} />
+          <PerformanceComparisonChart performance={speedPerformance} />
         </div>
 
-        {/* Recent & Quick Actions */}
-        <div className="grid gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-2">
-            <RecentSimulations />
-          </div>
-          <div>
-            <QuickActions />
-          </div>
+        {/* Per-Profile Analysis */}
+        <ProfileTests profiles={profileDetails} />
+
+        {/* Recent */}
+        <div>
+          <RecentSimulations runs={recentRuns} />
         </div>
       </div>
     </DashboardLayout>
