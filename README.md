@@ -39,6 +39,36 @@ Aplicação web para previsão de curvas tensão‑deformação do PLA usando o 
    DATABASE_URL="postgresql://seu_usuario@localhost:5432/ramberg_osgood" node scripts/import-data.js --dry-run
    ```
 
+## Importacao manual (CSV/TXT)
+
+Para importar arquivos individuais com formatos variados (CSV/TXT), use o importador manual:
+
+```bash
+DATABASE_URL="postgresql://seu_usuario@localhost:5432/ramberg_osgood" \
+  npm run db:import:manual -- \
+  --file 01_ABS_BLACK.txt \
+  --material ABS \
+  --temperature 235 \
+  --speed 60
+```
+
+Opcoes uteis:
+
+- `--dry-run` para validar parsing sem gravar no banco.
+- `--delimiter` para forcar separador (`,`, `;`, `tab`, `space`).
+- `--columns` para arquivos sem cabecalho (ex.: `tempo_s,deformacao_mm_mm,tensao_mpa`).
+- `--specimen-area` ou `--specimen-width/--specimen-thickness` para calcular tensao a partir da forca.
+- `--temperature`, `--speed` e `--layer-height` sao opcionais e podem ficar vazios.
+
+## Importacao via frontend
+
+Acesse `/import` para enviar arquivos diretamente pelo navegador. O formulario permite:
+
+- Importacao unica ou em lote (mesma configuracao para varios arquivos).
+- Temperatura, velocidade e altura de camada sao opcionais.
+- Ajuste de colunas/delimitador para arquivos sem cabecalho.
+- Calculo de tensao/deformacao a partir da geometria do corpo de prova.
+
 ## Rodar o projeto
 
 ```bash
@@ -81,4 +111,5 @@ SELECT * FROM v_measurements_export LIMIT 5;
 
 - `npm run db:schema` aplica o schema do PostgreSQL.
 - `npm run db:import` importa os ensaios em `data/`.
+- `npm run db:import:manual` importa arquivos CSV/TXT individuais.
 - `npm run dev` inicia o Next.js em modo desenvolvimento.

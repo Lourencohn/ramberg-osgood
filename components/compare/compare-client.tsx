@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react"
 import type { ProfileAverages, RunMetrics } from "@/lib/dashboard-data"
-import { formatDataSource, formatProfileLabel } from "@/lib/formatters"
+import { formatDataSource, formatProfileLabel, formatSpeed, formatTemperature } from "@/lib/formatters"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Label } from "@/components/ui/label"
@@ -144,7 +144,7 @@ function RunComparison({ left, right }: { left: RunMetrics; right: RunMetrics })
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground">Temperatura</p>
-                    <p className="text-lg font-bold">{run.temperature}°C</p>
+                    <p className="text-lg font-bold">{formatTemperature(run.temperature)}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 rounded-xl bg-muted p-4">
@@ -153,7 +153,7 @@ function RunComparison({ left, right }: { left: RunMetrics; right: RunMetrics })
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground">Velocidade</p>
-                    <p className="text-lg font-bold">{run.speed} mm/s</p>
+                    <p className="text-lg font-bold">{formatSpeed(run.speed)}</p>
                   </div>
                 </div>
               </div>
@@ -255,7 +255,7 @@ function AverageComparison({ left, right }: { left: ProfileAverages; right: Prof
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground">Temperatura</p>
-                    <p className="text-lg font-bold">{profile.temperature}°C</p>
+                    <p className="text-lg font-bold">{formatTemperature(profile.temperature)}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 rounded-xl bg-muted p-4">
@@ -264,7 +264,7 @@ function AverageComparison({ left, right }: { left: ProfileAverages; right: Prof
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground">Velocidade</p>
-                    <p className="text-lg font-bold">{profile.speed} mm/s</p>
+                    <p className="text-lg font-bold">{formatSpeed(profile.speed)}</p>
                   </div>
                 </div>
               </div>
@@ -330,7 +330,7 @@ export function CompareClient({ runs, profileAverages }: CompareClientProps) {
     () =>
       orderedRuns.map((run) => ({
         value: String(run.id),
-        label: `Ensaio ${run.testNumber} · ${run.temperature}°C / ${run.speed}mm/s · ${dateFormatter.format(
+        label: `Ensaio ${run.testNumber} · ${formatProfileLabel(run.temperature, run.speed)} · ${dateFormatter.format(
           new Date(run.createdAt),
         )}`,
       })),
@@ -344,9 +344,14 @@ export function CompareClient({ runs, profileAverages }: CompareClientProps) {
   )
   const orderedProfiles = useMemo(
     () =>
-      [...profilesWithData].sort((a, b) =>
-        a.temperature !== b.temperature ? a.temperature - b.temperature : a.speed - b.speed,
-      ),
+      [...profilesWithData].sort((a, b) => {
+        const tempA = a.temperature > 0 ? a.temperature : Number.POSITIVE_INFINITY
+        const tempB = b.temperature > 0 ? b.temperature : Number.POSITIVE_INFINITY
+        if (tempA !== tempB) return tempA - tempB
+        const speedA = a.speed > 0 ? a.speed : Number.POSITIVE_INFINITY
+        const speedB = b.speed > 0 ? b.speed : Number.POSITIVE_INFINITY
+        return speedA - speedB
+      }),
     [profilesWithData],
   )
   const profileOptions = useMemo(

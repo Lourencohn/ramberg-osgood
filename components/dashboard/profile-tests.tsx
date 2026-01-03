@@ -80,7 +80,7 @@ export function ProfileTests({ profiles }: ProfileTestsProps) {
       <CardHeader className="pb-4">
         <CardTitle>Análise individual por perfil</CardTitle>
         <CardDescription>
-          Consulte cada combinação de temperatura e velocidade e os ensaios realizados.
+          Consulte cada perfil importado e os ensaios realizados.
         </CardDescription>
         <p className="text-xs text-muted-foreground">
           Nota: os primeiros milissegundos dos ensaios podem conter ruído da máquina; observe a curva a partir do início da carga.

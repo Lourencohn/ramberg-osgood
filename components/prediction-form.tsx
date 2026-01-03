@@ -1,12 +1,12 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { validateInputs } from "@/lib/validation"
+import { DEFAULT_LIMITS, validateInputs, type PredictionLimits } from "@/lib/validation"
 import { predictProperties } from "@/lib/prediction"
 import type { PredictionInput, PredictionResult, RambergOsgoodTrainingPoint } from "@/types"
 import { Thermometer, Gauge, Calculator, AlertCircle, Loader2 } from "lucide-react"
@@ -21,6 +21,20 @@ export function PredictionForm({ trainingData, onResult }: PredictionFormProps) 
   const [speed, setSpeed] = useState("95")
   const [errors, setErrors] = useState<string[]>([])
   const [isCalculating, setIsCalculating] = useState(false)
+  const limits = useMemo<PredictionLimits>(() => {
+    if (!trainingData.length) return DEFAULT_LIMITS
+    const temps = trainingData
+      .map((point) => point.temperature)
+      .filter((value) => Number.isFinite(value) && value > 0)
+    const speeds = trainingData
+      .map((point) => point.speed)
+      .filter((value) => Number.isFinite(value) && value > 0)
+    if (!temps.length || !speeds.length) return DEFAULT_LIMITS
+    return {
+      temperature: { min: Math.min(...temps), max: Math.max(...temps) },
+      speed: { min: Math.min(...speeds), max: Math.max(...speeds) },
+    }
+  }, [trainingData])
 
   const handleCalculate = async () => {
     const input: PredictionInput = {
@@ -28,7 +42,7 @@ export function PredictionForm({ trainingData, onResult }: PredictionFormProps) 
       speed: Number.parseFloat(speed),
     }
 
-    const validation = validateInputs(input)
+    const validation = validateInputs(input, limits)
     if (!validation.valid) {
       setErrors(validation.errors)
       return
@@ -53,106 +67,106 @@ export function PredictionForm({ trainingData, onResult }: PredictionFormProps) 
   }
 
   return (
-    <Card className="h-full">
+    <Card className="h-full flex flex-col">
       <CardHeader className="pb-4">
         <CardTitle className="text-lg">Parâmetros de Impressão</CardTitle>
-        <CardDescription>Defina temperatura e velocidade para a simulação</CardDescription>
+        <CardDescription>Informe as condições para estimar as propriedades mecânicas.</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-5">
-
-        <div className="space-y-3">
-          <Label htmlFor="temperature" className="flex items-center gap-2 text-sm font-medium">
-            <Thermometer className="size-4 text-foreground" />
-            Temperatura de Impressão
-          </Label>
-          <div className="relative">
-            <Input
-              id="temperature"
-              type="number"
-              min="190"
-              max="220"
-              step="1"
-              value={temperature}
-              onChange={(e) => setTemperature(e.target.value)}
-              placeholder="205"
-              className="pr-12 text-lg font-semibold h-12"
-            />
-            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">
-              °C
-            </span>
+      <CardContent className="flex-1 flex flex-col justify-between">
+        <div className="space-y-6">
+          <div className="space-y-3">
+            <Label htmlFor="temperature" className="flex items-center gap-2 text-sm font-medium">
+              <Thermometer className="size-4 text-foreground" />
+              Temperatura de Impressão
+            </Label>
+            <div className="relative">
+              <Input
+                id="temperature"
+                type="number"
+                min={limits.temperature.min}
+                max={limits.temperature.max}
+                step="1"
+                value={temperature}
+                onChange={(e) => setTemperature(e.target.value)}
+                placeholder={`${Math.round((limits.temperature.min + limits.temperature.max) / 2)}`}
+                className="pr-12 text-lg font-semibold h-12"
+              />
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">
+                °C
+              </span>
+            </div>
+            <div className="flex items-center justify-between text-xs text-muted-foreground">
+              <span>Mínimo: {limits.temperature.min}°C</span>
+              <span>Máximo: {limits.temperature.max}°C</span>
+            </div>
           </div>
-          <div className="flex items-center justify-between text-xs text-muted-foreground">
-            <span>Mínimo: 190°C</span>
-            <span>Máximo: 220°C</span>
+
+          <div className="space-y-3">
+            <Label htmlFor="speed" className="flex items-center gap-2 text-sm font-medium">
+              <Gauge className="size-4 text-foreground" />
+              Velocidade de Impressão
+            </Label>
+            <div className="relative">
+              <Input
+                id="speed"
+                type="number"
+                min={limits.speed.min}
+                max={limits.speed.max}
+                step="1"
+                value={speed}
+                onChange={(e) => setSpeed(e.target.value)}
+                placeholder={`${Math.round((limits.speed.min + limits.speed.max) / 2)}`}
+                className="pr-16 text-lg font-semibold h-12"
+              />
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">
+                mm/s
+              </span>
+            </div>
+            <div className="flex items-center justify-between text-xs text-muted-foreground">
+              <span>Mínimo: {limits.speed.min} mm/s</span>
+              <span>Máximo: {limits.speed.max} mm/s</span>
+            </div>
           </div>
-        </div>
 
-
-        <div className="space-y-3">
-          <Label htmlFor="speed" className="flex items-center gap-2 text-sm font-medium">
-            <Gauge className="size-4 text-foreground" />
-            Velocidade de Impressão
-          </Label>
-          <div className="relative">
-            <Input
-              id="speed"
-              type="number"
-              min="90"
-              max="100"
-              step="1"
-              value={speed}
-              onChange={(e) => setSpeed(e.target.value)}
-              placeholder="95"
-              className="pr-16 text-lg font-semibold h-12"
-            />
-            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">
-              mm/s
-            </span>
-          </div>
-          <div className="flex items-center justify-between text-xs text-muted-foreground">
-            <span>Mínimo: 90 mm/s</span>
-            <span>Máximo: 100 mm/s</span>
-          </div>
-        </div>
-
-
-        {errors.length > 0 && (
-          <Alert variant="destructive" className="border-destructive/50">
-            <AlertCircle className="size-4" />
-            <AlertDescription>
-              <ul className="list-disc list-inside space-y-1 text-sm">
-                {errors.map((error, index) => (
-                  <li key={index}>{error}</li>
-                ))}
-              </ul>
-            </AlertDescription>
-          </Alert>
-        )}
-
-        <p className="text-xs text-muted-foreground">
-          {trainingData.length > 0
-            ? `Baseado em ${trainingData.length} perfis reais com ajuste Ramberg-Osgood.`
-            : "Nenhum perfil com dados suficientes para ajuste foi encontrado."}
-        </p>
-
-
-        <Button
-          onClick={handleCalculate}
-          className="w-full h-12 text-base font-semibold gap-2 shadow-md hover:shadow-lg transition-all"
-          disabled={isCalculating}
-        >
-          {isCalculating ? (
-            <>
-              <Loader2 className="size-5 animate-spin" />
-              Calculando...
-            </>
-          ) : (
-            <>
-              <Calculator className="size-5" />
-              Calcular Propriedades
-            </>
+          {errors.length > 0 && (
+            <Alert variant="destructive" className="border-destructive/50">
+              <AlertCircle className="size-4" />
+              <AlertDescription>
+                <ul className="list-disc list-inside space-y-1 text-sm">
+                  {errors.map((error, index) => (
+                    <li key={index}>{error}</li>
+                  ))}
+                </ul>
+              </AlertDescription>
+            </Alert>
           )}
-        </Button>
+        </div>
+
+        <div className="space-y-4 pt-6">
+          <p className="text-xs text-muted-foreground">
+            {trainingData.length > 0
+              ? `Baseado em ${trainingData.length} perfis reais com ajuste Ramberg-Osgood.`
+              : "Nenhum perfil com dados suficientes para ajuste foi encontrado."}
+          </p>
+
+          <Button
+            onClick={handleCalculate}
+            className="w-full h-12 text-base font-semibold gap-2 shadow-md hover:shadow-lg transition-all"
+            disabled={isCalculating}
+          >
+            {isCalculating ? (
+              <>
+                <Loader2 className="size-5 animate-spin" />
+                Calculando...
+              </>
+            ) : (
+              <>
+                <Calculator className="size-5" />
+                Calcular Propriedades
+              </>
+            )}
+          </Button>
+        </div>
       </CardContent>
     </Card>
   )

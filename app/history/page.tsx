@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { getRunMetrics } from "@/lib/dashboard-data"
-import { formatDataSource } from "@/lib/formatters"
+import { formatDataSource, formatSpeed, formatTemperature } from "@/lib/formatters"
 import { Search, Download, Trash2, Eye, Filter, Thermometer, Gauge, CheckCircle2, Calendar, FileSpreadsheet } from "lucide-react"
 
 const dateFormatter = new Intl.DateTimeFormat("pt-BR", {
@@ -149,14 +149,14 @@ export default async function HistoryPage() {
                         <Thermometer className="size-4 text-foreground" />
                         <span className="text-sm">
                           <span className="text-muted-foreground">Temp:</span>{" "}
-                          <span className="font-semibold">{run.temperature}°C</span>
+                          <span className="font-semibold">{formatTemperature(run.temperature)}</span>
                         </span>
                       </div>
                       <div className="flex items-center gap-2 rounded-lg bg-muted px-3 py-1.5">
                         <Gauge className="size-4 text-foreground" />
                         <span className="text-sm">
                           <span className="text-muted-foreground">Vel:</span>{" "}
-                          <span className="font-semibold">{run.speed}mm/s</span>
+                          <span className="font-semibold">{formatSpeed(run.speed)}</span>
                         </span>
                       </div>
                     </div>

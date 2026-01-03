@@ -8,6 +8,7 @@ import { PerformanceComparisonChart } from "@/components/dashboard/performance-c
 import { ProfileTests } from "@/components/dashboard/profile-tests"
 import { Activity, Beaker, Baseline as ChartLine, History } from "lucide-react"
 import { getDashboardData } from "@/lib/dashboard-data"
+import { formatProfileLabel } from "@/lib/formatters"
 
 export const dynamic = "force-dynamic"
 
@@ -27,7 +28,7 @@ export default async function DashboardPage() {
   const stressShare = stats.totalTests ? Math.round((stats.testsWithStress / stats.totalTests) * 100) : 0
   const lastTestValue = stats.lastTest ? format(new Date(stats.lastTest.createdAt), "dd/MM/yyyy HH:mm") : "—"
   const lastTestDescription = stats.lastTest
-    ? `${stats.lastTest.profileCode} • ${stats.lastTest.temperature}°C / ${stats.lastTest.speed}mm/s`
+    ? `${stats.lastTest.profileCode} • ${formatProfileLabel(stats.lastTest.temperature, stats.lastTest.speed)}`
     : "Nenhum ensaio registrado"
 
   return (
@@ -58,7 +59,7 @@ export default async function DashboardPage() {
             title="Perfis de Impressão"
             value={numberFormatter.format(stats.totalProfiles)}
             icon={<Beaker className="size-5 text-foreground" />}
-            description="Combinações de temperatura/velocidade"
+            description="Perfis cadastrados (parametros opcionais)"
           />
           <StatsCard
             title="Pontos Medidos"

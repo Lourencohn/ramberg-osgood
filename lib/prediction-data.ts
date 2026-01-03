@@ -69,6 +69,10 @@ export async function getRambergOsgoodTrainingData(): Promise<RambergOsgoodTrain
       JOIN test_measurements m ON m.test_run_id = t.id
       WHERE m.tensao_mpa IS NOT NULL
         AND COALESCE(m.deformacao_mm_mm, m.alongamento_mm_mm) IS NOT NULL
+        AND p.temperature_c IS NOT NULL
+        AND p.temperature_c > 0
+        AND p.speed_mm_s IS NOT NULL
+        AND p.speed_mm_s > 0
       ORDER BY p.code, t.id, m.point_index
     `,
   )

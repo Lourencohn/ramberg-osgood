@@ -3,6 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import type { ProfileAverages } from "@/lib/dashboard-data"
+import { formatProfileLabel } from "@/lib/formatters"
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer } from "recharts"
 
 type SimulationsTrendChartProps = {
@@ -63,7 +64,7 @@ export function SimulationsTrendChart({ data }: SimulationsTrendChartProps) {
                             </div>
                             {entry ? (
                               <div className="text-xs text-muted-foreground">
-                                {entry.temperature}°C / {entry.speed}mm/s · {entry.tests} ensaios
+                                {formatProfileLabel(entry.temperature, entry.speed)} · {entry.tests} ensaios
                               </div>
                             ) : null}
                           </>

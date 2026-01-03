@@ -4,7 +4,7 @@ import type React from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { FileText, GitCompare, History, Home, Search, Settings, Sparkles } from "lucide-react"
+import { FileText, GitCompare, History, Home, Search, Settings, Sparkles, UploadCloud } from "lucide-react"
 
 import { NavUser } from "@/components/nav-user"
 import { Label } from "@/components/ui/label"
@@ -37,6 +37,7 @@ const navigation = [
       { title: "Dashboard", href: "/dashboard", icon: Home },
       { title: "Nova Predição", href: "/predict", icon: Sparkles },
       { title: "Histórico", href: "/history", icon: History },
+      { title: "Importar", href: "/import", icon: UploadCloud },
       { title: "Comparar", href: "/compare", icon: GitCompare },
     ],
   },

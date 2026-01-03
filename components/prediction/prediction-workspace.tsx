@@ -13,12 +13,12 @@ export function PredictionWorkspace({ trainingData }: PredictionWorkspaceProps) 
   const [result, setResult] = useState<PredictionResult | null>(null)
 
   return (
-    <div className="grid gap-6 lg:grid-cols-2">
-      <section>
+    <div className="grid gap-6 lg:grid-cols-[minmax(0,360px)_minmax(0,1fr)]">
+      <section className="h-full">
         <PredictionForm trainingData={trainingData} onResult={setResult} />
       </section>
 
-      <section>
+      <section className="h-full">
         <ResultsDisplay result={result} trainingData={trainingData} />
       </section>
     </div>

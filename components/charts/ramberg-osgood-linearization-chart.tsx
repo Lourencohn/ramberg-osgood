@@ -154,8 +154,8 @@ export function RambergOsgoodLinearizationChart({ points }: RambergOsgoodLineari
   return (
     <div className="space-y-2">
       <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-        <span>Reta ajustada por regressão linear (log‑log)</span>
-        {r2 !== null ? <span>• R²: {r2.toFixed(3)}</span> : null}
+        <span>Reta ajustada por regressao linear (log-log)</span>
+        {r2 !== null ? <span>• R2: {r2.toFixed(3)}</span> : null}
         {estimatedE !== null ? <span>• E estimado: {Math.round(estimatedE)} MPa</span> : null}
       </div>
       <ChartContainer
@@ -184,7 +184,7 @@ export function RambergOsgoodLinearizationChart({ points }: RambergOsgoodLineari
               padding={{ left: 6, right: 6 }}
               tickFormatter={(value) => axisFormatter.format(value)}
               className="text-xs"
-              name="log σ"
+              name="log tensao"
             />
             <YAxis
               type="number"
@@ -192,7 +192,7 @@ export function RambergOsgoodLinearizationChart({ points }: RambergOsgoodLineari
               domain={yDomain ?? undefined}
               tickFormatter={(value) => axisFormatter.format(value)}
               className="text-xs"
-              name="log εp"
+              name="log deformacao plastica"
             />
             <ChartTooltip
               content={
@@ -203,11 +203,11 @@ export function RambergOsgoodLinearizationChart({ points }: RambergOsgoodLineari
                     return (
                       <div className="space-y-1">
                         <div className="flex items-center justify-between gap-2">
-                          <span className="text-muted-foreground">log σ</span>
+                          <span className="text-muted-foreground">log tensao</span>
                           <span className="font-mono font-semibold">{axisFormatter.format(entry.logStress)}</span>
                         </div>
                         <div className="flex items-center justify-between gap-2">
-                          <span className="text-muted-foreground">log εp</span>
+                          <span className="text-muted-foreground">log deformacao plastica</span>
                           <span className="font-mono font-semibold">
                             {axisFormatter.format(entry.logPlasticStrain)}
                           </span>

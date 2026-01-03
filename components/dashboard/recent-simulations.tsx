@@ -2,7 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import type { RunMetrics } from "@/lib/dashboard-data"
-import { formatDataSource } from "@/lib/formatters"
+import { formatDataSource, formatSpeed, formatTemperature } from "@/lib/formatters"
 import { ArrowRight, Thermometer, Gauge, CheckCircle2, FileText } from "lucide-react"
 import Link from "next/link"
 
@@ -55,12 +55,12 @@ export function RecentSimulations({ runs }: RecentSimulationsProps) {
                   <div className="flex items-center gap-2">
                     <div className="flex items-center gap-1.5 text-sm font-medium">
                       <Thermometer className="size-3.5 text-foreground" />
-                      <span>{run.temperature}°C</span>
+                      <span>{formatTemperature(run.temperature)}</span>
                     </div>
                     <span className="text-muted-foreground">/</span>
                     <div className="flex items-center gap-1.5 text-sm font-medium">
                       <Gauge className="size-3.5 text-foreground" />
-                      <span>{run.speed}mm/s</span>
+                      <span>{formatSpeed(run.speed)}</span>
                     </div>
                     <Badge variant="secondary" className="ml-2 gap-1 text-xs font-normal">
                       <CheckCircle2 className="size-3 text-foreground" />

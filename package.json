@@ -5,6 +5,7 @@
   "scripts": {
     "build": "next build",
     "db:import": "node scripts/import-data.js",
+    "db:import:manual": "node scripts/import-manual.js",
     "db:schema": "psql $DATABASE_URL -f db/schema.sql",
     "dev": "next dev",
     "lint": "eslint .",

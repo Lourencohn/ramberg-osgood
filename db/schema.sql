@@ -14,15 +14,46 @@ CREATE TABLE IF NOT EXISTS print_profiles (
   id bigserial PRIMARY KEY,
   material_id bigint REFERENCES materials(id) ON DELETE SET NULL,
   code text NOT NULL UNIQUE,
-  temperature_c double precision NOT NULL,
-  speed_mm_s double precision NOT NULL,
-  layer_height_mm double precision NOT NULL DEFAULT 0.5,
+  temperature_c double precision,
+  speed_mm_s double precision,
+  layer_height_mm double precision DEFAULT 0.5,
   extra_params jsonb NOT NULL DEFAULT '{}'::jsonb,
   created_at timestamptz NOT NULL DEFAULT now(),
-  CHECK (temperature_c > 0),
-  CHECK (speed_mm_s > 0),
-  CHECK (layer_height_mm > 0)
+  CHECK (temperature_c IS NULL OR temperature_c >= 0),
+  CHECK (speed_mm_s IS NULL OR speed_mm_s >= 0),
+  CHECK (layer_height_mm IS NULL OR layer_height_mm >= 0)
 );
+
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1
+    FROM pg_attribute
+    WHERE attrelid = 'print_profiles'::regclass
+      AND attname = 'temperature_c'
+      AND attnotnull
+  ) THEN
+    ALTER TABLE print_profiles ALTER COLUMN temperature_c DROP NOT NULL;
+  END IF;
+  IF EXISTS (
+    SELECT 1
+    FROM pg_attribute
+    WHERE attrelid = 'print_profiles'::regclass
+      AND attname = 'speed_mm_s'
+      AND attnotnull
+  ) THEN
+    ALTER TABLE print_profiles ALTER COLUMN speed_mm_s DROP NOT NULL;
+  END IF;
+  IF EXISTS (
+    SELECT 1
+    FROM pg_attribute
+    WHERE attrelid = 'print_profiles'::regclass
+      AND attname = 'layer_height_mm'
+      AND attnotnull
+  ) THEN
+    ALTER TABLE print_profiles ALTER COLUMN layer_height_mm DROP NOT NULL;
+  END IF;
+END $$;
 
 CREATE TABLE IF NOT EXISTS test_runs (
   id bigserial PRIMARY KEY,

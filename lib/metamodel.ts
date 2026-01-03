@@ -107,11 +107,26 @@ export function rbfInterpolation(
   input: PredictionInput,
   data: RambergOsgoodTrainingPoint[],
 ): InterpolationResult {
-  if (!data.length) {
+  const validData = data.filter((point) =>
+    Number.isFinite(point.temperature) &&
+    point.temperature > 0 &&
+    Number.isFinite(point.speed) &&
+    point.speed > 0 &&
+    Number.isFinite(point.E) &&
+    point.E > 0 &&
+    Number.isFinite(point.sigma_0) &&
+    point.sigma_0 > 0 &&
+    Number.isFinite(point.n) &&
+    point.n > 0 &&
+    Number.isFinite(point.maxStrain) &&
+    point.maxStrain > 0,
+  )
+
+  if (!validData.length) {
     return { E: 3000, sigma_0: 50, n: 8, maxStrain: 0.08 }
   }
 
-  const exactMatch = data.find(
+  const exactMatch = validData.find(
     (point) => point.temperature === input.temperature && point.speed === input.speed,
   )
   if (exactMatch) {
@@ -123,15 +138,15 @@ export function rbfInterpolation(
     }
   }
 
-  const weights = rbfWeights(input, data)
-  const bounds = computeBounds(data)
+  const weights = rbfWeights(input, validData)
+  const bounds = computeBounds(validData)
 
   return {
-    E: interpolateValue(data, weights, (point) => point.E, bounds.E[0], bounds.E[1]),
-    sigma_0: interpolateValue(data, weights, (point) => point.sigma_0, bounds.sigma_0[0], bounds.sigma_0[1]),
-    n: interpolateValue(data, weights, (point) => point.n, bounds.n[0], bounds.n[1]),
+    E: interpolateValue(validData, weights, (point) => point.E, bounds.E[0], bounds.E[1]),
+    sigma_0: interpolateValue(validData, weights, (point) => point.sigma_0, bounds.sigma_0[0], bounds.sigma_0[1]),
+    n: interpolateValue(validData, weights, (point) => point.n, bounds.n[0], bounds.n[1]),
     maxStrain: interpolateValue(
-      data,
+      validData,
       weights,
       (point) => point.maxStrain,
       bounds.maxStrain[0],

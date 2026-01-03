@@ -22,7 +22,7 @@ export function StressStrainChart({ curve }: StressStrainChartProps) {
   if (!curve.length) {
     return (
       <div className="h-80 flex items-center justify-center border-2 border-dashed border-border rounded-lg">
-        <p className="text-muted-foreground">Insira parâmetros para gerar a curva σ-ε</p>
+        <p className="text-muted-foreground">Insira parametros para gerar a curva tensao x deformacao.</p>
       </div>
     )
   }
@@ -31,7 +31,7 @@ export function StressStrainChart({ curve }: StressStrainChartProps) {
     <ChartContainer
       config={{
         stress: {
-          label: "σ (MPa)",
+          label: "Tensao (MPa)",
           color: "var(--chart-1)",
         },
       }}
@@ -44,12 +44,12 @@ export function StressStrainChart({ curve }: StressStrainChartProps) {
             dataKey="strain"
             tickFormatter={(value) => strainFormatter.format(value)}
             className="text-xs"
-            name="ε"
+            name="Deformacao (mm/mm)"
           />
           <YAxis
             tickFormatter={(value) => stressFormatter.format(value)}
             className="text-xs"
-            name="σ"
+            name="Tensao (MPa)"
           />
           <ChartTooltip
             content={
@@ -60,13 +60,13 @@ export function StressStrainChart({ curve }: StressStrainChartProps) {
                   return (
                     <div className="space-y-1">
                       <div className="flex items-center justify-between gap-2">
-                        <span className="text-muted-foreground">ε</span>
+                        <span className="text-muted-foreground">Deformacao</span>
                         <span className="font-mono font-semibold">
                           {strainFormatter.format(entry.strain)}
                         </span>
                       </div>
                       <div className="flex items-center justify-between gap-2">
-                        <span className="text-muted-foreground">σ</span>
+                        <span className="text-muted-foreground">Tensao</span>
                         <span className="font-mono font-semibold">
                           {stressFormatter.format(entry.stress)} MPa
                         </span>

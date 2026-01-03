@@ -1,5 +1,5 @@
 import { query } from "@/lib/db"
-import { formatProfileLabel } from "@/lib/formatters"
+import { formatProfileLabel, hasValidPrintParams } from "@/lib/formatters"
 
 const STRAIN_EXPRESSION = "COALESCE(m.deformacao_mm_mm, m.alongamento_mm_mm)"
 
@@ -191,6 +191,7 @@ function groupTemperatureUsage(metrics: RunMetrics[]): TemperatureUsage[] {
   const grouped = new Map<number, number>()
 
   for (const metric of metrics) {
+    if (!Number.isFinite(metric.temperature) || metric.temperature <= 0) continue
     grouped.set(metric.temperature, (grouped.get(metric.temperature) ?? 0) + 1)
   }
 
@@ -200,7 +201,9 @@ function groupTemperatureUsage(metrics: RunMetrics[]): TemperatureUsage[] {
 }
 
 function buildSpeedPerformance(metrics: RunMetrics[]): SpeedPerformance {
-  const validMetrics = metrics.filter((metric) => metric.maxStress !== null)
+  const validMetrics = metrics.filter(
+    (metric) => metric.maxStress !== null && hasValidPrintParams(metric.temperature, metric.speed),
+  )
   const temperatures = Array.from(new Set(validMetrics.map((metric) => metric.temperature))).sort((a, b) => a - b)
 
   const grouped = new Map<

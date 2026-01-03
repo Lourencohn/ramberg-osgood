@@ -49,12 +49,12 @@ export function StressStrainValidationChart({ curve, points }: StressStrainValid
             dataKey="strain"
             tickFormatter={(value) => strainFormatter.format(value)}
             className="text-xs"
-            name="ε"
+            name="Deformacao (mm/mm)"
           />
           <YAxis
             tickFormatter={(value) => stressFormatter.format(value)}
             className="text-xs"
-            name="σ"
+            name="Tensao (MPa)"
           />
           <ChartTooltip content={<ChartTooltipContent />} />
           <Legend />
