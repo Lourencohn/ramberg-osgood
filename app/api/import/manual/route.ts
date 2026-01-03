@@ -1,4 +1,5 @@
-import { pool } from '@/lib/db'
+import type { PoolClient } from 'pg'
+import { getPool } from '@/lib/db'
 import manualParser from '@/lib/import/manual-parser'
 
 export const runtime = 'nodejs'
@@ -83,7 +84,7 @@ function getNumericField(formData: FormData, key: string) {
 }
 
 async function ensureMaterial(
-  client: Awaited<ReturnType<typeof pool.connect>>,
+  client: PoolClient,
   payload: MaterialPayload
 ) {
   const result = await client.query<{ id: number }>(
@@ -100,7 +101,7 @@ async function ensureMaterial(
 }
 
 async function upsertPrintProfile(
-  client: Awaited<ReturnType<typeof pool.connect>>,
+  client: PoolClient,
   payload: ProfilePayload
 ) {
   const result = await client.query<{ id: number }>(
@@ -127,7 +128,7 @@ async function upsertPrintProfile(
 }
 
 async function upsertTestRun(
-  client: Awaited<ReturnType<typeof pool.connect>>,
+  client: PoolClient,
   payload: TestRunPayload
 ) {
   const result = await client.query<{ id: number }>(
@@ -166,7 +167,7 @@ async function upsertTestRun(
 }
 
 async function insertMeasurements(
-  client: Awaited<ReturnType<typeof pool.connect>>,
+  client: PoolClient,
   testRunId: number,
   rows: Record<string, unknown>[]
 ) {
@@ -258,7 +259,7 @@ export async function POST(request: Request) {
       notes: getTextField(formData, 'materialNotes') || null,
     }
 
-    const client = await pool.connect()
+    const client = await getPool().connect()
     const results: ImportResult[] = []
 
     try {
