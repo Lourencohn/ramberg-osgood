@@ -1,26 +1,29 @@
-import type { RambergOsgoodParams, MechanicalProperties, StressStrainPoint } from "@/types"
-
+import type { RambergOsgoodParams, MechanicalProperties } from "@/types"
+import { calculateStress } from "@/lib/ramberg-osgood"
 
 export function calculateMechanicalProperties(
   params: RambergOsgoodParams,
-  curve: StressStrainPoint[],
+  maxStrain: number,
 ): MechanicalProperties {
-  const { E, sigma_0 } = params
+  const { E, sigma_0, n } = params
+  const safeMaxStrain = Number.isFinite(maxStrain) ? Math.max(maxStrain, 0) : 0
 
+  if (!Number.isFinite(E) || !Number.isFinite(sigma_0) || !Number.isFinite(n) || E <= 0 || sigma_0 <= 0) {
+    return {
+      yieldStress: 0,
+      ultimateStress: 0,
+      ductility: 0,
+      resilience: 0,
+      toughness: 0,
+    }
+  }
 
-  const yieldStress = calculateYieldStress(curve, 0.002)
+  const ultimateStress = calculateStress(safeMaxStrain, params)
+  const yieldStress = sigma_0
+  const ductility = safeMaxStrain * 100
 
-
-  const ultimateStress = curve[curve.length - 1].stress
-
-
-  const ductility = curve[curve.length - 1].strain * 100
-
-
-  const resilience = calculateAreaUnderCurve(curve.filter((p) => p.stress <= yieldStress))
-
-
-  const toughness = calculateAreaUnderCurve(curve)
+  const resilience = calculateEnergy(params, sigma_0)
+  const toughness = calculateEnergy(params, ultimateStress)
 
   return {
     yieldStress,
@@ -31,28 +34,11 @@ export function calculateMechanicalProperties(
   }
 }
 
-
-function calculateYieldStress(curve: StressStrainPoint[], offset = 0.002): number {
-
-  for (let i = 1; i < curve.length; i++) {
-    const linearStrain = curve[i].strain - offset
-    if (linearStrain > 0) {
-      return curve[i].stress
-    }
-  }
-
-  return curve[curve.length - 1].stress
-}
-
-
-function calculateAreaUnderCurve(curve: StressStrainPoint[]): number {
-  let area = 0
-
-  for (let i = 1; i < curve.length; i++) {
-    const deltaStrain = curve[i].strain - curve[i - 1].strain
-    const avgStress = (curve[i].stress + curve[i - 1].stress) / 2
-    area += avgStress * deltaStrain
-  }
-
-  return area
+function calculateEnergy(params: RambergOsgoodParams, stressLimit: number) {
+  const { E, sigma_0, n } = params
+  if (!Number.isFinite(stressLimit) || stressLimit <= 0) return 0
+  const elasticTerm = (stressLimit * stressLimit) / (2 * E)
+  const plasticTerm =
+    (0.002 * n * Math.pow(stressLimit, n + 1)) / ((n + 1) * Math.pow(sigma_0, n))
+  return elasticTerm + plasticTerm
 }

@@ -21,10 +21,10 @@ export async function predictProperties(
 
 
   const maxStrain = interpolation.maxStrain > 0 ? interpolation.maxStrain : 0.08
-  const curve = generateStressStrainCurve(rambergOsgood, maxStrain, 140)
+  const curve = generateStressStrainCurve(rambergOsgood, maxStrain, 180)
 
 
-  const properties = calculateMechanicalProperties(rambergOsgood, curve)
+  const properties = calculateMechanicalProperties(rambergOsgood, maxStrain)
 
   return {
     input,
