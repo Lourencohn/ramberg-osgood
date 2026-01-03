@@ -1,10 +1,10 @@
-"use client"
+'use client'
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import type { SpeedPerformance } from "@/lib/dashboard-data"
-import { useMemo } from "react"
-import { Line, LineChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer, Legend } from "recharts"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
+import type { SpeedPerformance } from '@/lib/dashboard-data'
+import { useMemo } from 'react'
+import { Line, LineChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer, Legend } from 'recharts'
 
 type PerformanceComparisonChartProps = {
   performance: SpeedPerformance
@@ -21,20 +21,24 @@ export function PerformanceComparisonChart({ performance }: PerformanceCompariso
           }
           return acc
         },
-        {} as Record<string, { label: string; color: string }>,
+        {} as Record<string, { label: string; color: string }>
       ),
-    [performance.series],
+    [performance.series]
   )
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Velocidade × tensão máxima</CardTitle>
-        <CardDescription>Tensão máxima média (MPa) por velocidade, separada por temperatura</CardDescription>
+        <CardDescription>
+          Tensão máxima média (MPa) por velocidade, separada por temperatura
+        </CardDescription>
       </CardHeader>
       <CardContent>
         {performance.data.length === 0 || performance.series.length === 0 ? (
-          <p className="text-sm text-muted-foreground">Ainda não há dados suficientes para comparar velocidades.</p>
+          <p className="text-sm text-muted-foreground">
+            Ainda não há dados suficientes para comparar velocidades.
+          </p>
         ) : (
           <ChartContainer config={config} className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">

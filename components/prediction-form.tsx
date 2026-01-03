@@ -1,15 +1,15 @@
-"use client"
+'use client'
 
-import { useMemo, useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { DEFAULT_LIMITS, validateInputs, type PredictionLimits } from "@/lib/validation"
-import { predictProperties } from "@/lib/prediction"
-import type { PredictionInput, PredictionResult, RambergOsgoodTrainingPoint } from "@/types"
-import { Thermometer, Gauge, Calculator, AlertCircle, Loader2 } from "lucide-react"
+import { useMemo, useState } from 'react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Label } from '@/components/ui/label'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { DEFAULT_LIMITS, validateInputs, type PredictionLimits } from '@/lib/validation'
+import { predictProperties } from '@/lib/prediction'
+import type { PredictionInput, PredictionResult, RambergOsgoodTrainingPoint } from '@/types'
+import { Thermometer, Gauge, Calculator, AlertCircle, Loader2 } from 'lucide-react'
 
 type PredictionFormProps = {
   trainingData: RambergOsgoodTrainingPoint[]
@@ -17,8 +17,8 @@ type PredictionFormProps = {
 }
 
 export function PredictionForm({ trainingData, onResult }: PredictionFormProps) {
-  const [temperature, setTemperature] = useState("205")
-  const [speed, setSpeed] = useState("95")
+  const [temperature, setTemperature] = useState('205')
+  const [speed, setSpeed] = useState('95')
   const [errors, setErrors] = useState<string[]>([])
   const [isCalculating, setIsCalculating] = useState(false)
   const limits = useMemo<PredictionLimits>(() => {
@@ -49,7 +49,7 @@ export function PredictionForm({ trainingData, onResult }: PredictionFormProps) 
     }
 
     if (!trainingData.length) {
-      setErrors(["Não há dados reais suficientes para gerar a previsão."])
+      setErrors(['Não há dados reais suficientes para gerar a previsão.'])
       return
     }
 
@@ -60,7 +60,7 @@ export function PredictionForm({ trainingData, onResult }: PredictionFormProps) 
       const results = await predictProperties(input, trainingData)
       onResult(results)
     } catch (error) {
-      setErrors(["Erro ao calcular propriedades"])
+      setErrors(['Erro ao calcular propriedades'])
     } finally {
       setIsCalculating(false)
     }
@@ -70,7 +70,9 @@ export function PredictionForm({ trainingData, onResult }: PredictionFormProps) 
     <Card className="h-full flex flex-col">
       <CardHeader className="pb-4">
         <CardTitle className="text-lg">Parâmetros de Impressão</CardTitle>
-        <CardDescription>Informe as condições para estimar as propriedades mecânicas.</CardDescription>
+        <CardDescription>
+          Informe as condições para estimar as propriedades mecânicas.
+        </CardDescription>
       </CardHeader>
       <CardContent className="flex-1 flex flex-col justify-between">
         <div className="space-y-6">
@@ -146,7 +148,7 @@ export function PredictionForm({ trainingData, onResult }: PredictionFormProps) 
           <p className="text-xs text-muted-foreground">
             {trainingData.length > 0
               ? `Baseado em ${trainingData.length} perfis reais com ajuste Ramberg-Osgood.`
-              : "Nenhum perfil com dados suficientes para ajuste foi encontrado."}
+              : 'Nenhum perfil com dados suficientes para ajuste foi encontrado.'}
           </p>
 
           <Button

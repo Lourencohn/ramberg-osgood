@@ -1,9 +1,9 @@
-"use client"
+'use client'
 
-import { useMemo } from "react"
-import type { StressStrainPoint } from "@/types"
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import { Line, LineChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer, Legend } from "recharts"
+import { useMemo } from 'react'
+import type { StressStrainPoint } from '@/types'
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
+import { Line, LineChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer, Legend } from 'recharts'
 
 type LinearizationPoint = {
   logStress: number
@@ -14,7 +14,7 @@ type RambergOsgoodLinearizationChartProps = {
   points: StressStrainPoint[]
 }
 
-const axisFormatter = new Intl.NumberFormat("pt-BR", {
+const axisFormatter = new Intl.NumberFormat('pt-BR', {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
 })
@@ -117,10 +117,14 @@ export function RambergOsgoodLinearizationChart({ points }: RambergOsgoodLineari
     }
 
     const meanY = sumY / count
-    const ssTot = actual.reduce((sum, point) => sum + Math.pow(point.logPlasticStrain - meanY, 2), 0)
+    const ssTot = actual.reduce(
+      (sum, point) => sum + Math.pow(point.logPlasticStrain - meanY, 2),
+      0
+    )
     const ssRes = actual.reduce(
-      (sum, point) => sum + Math.pow(point.logPlasticStrain - (intercept + slope * point.logStress), 2),
-      0,
+      (sum, point) =>
+        sum + Math.pow(point.logPlasticStrain - (intercept + slope * point.logStress), 2),
+      0
     )
     const r2 = ssTot ? 1 - ssRes / ssTot : null
 
@@ -161,21 +165,18 @@ export function RambergOsgoodLinearizationChart({ points }: RambergOsgoodLineari
       <ChartContainer
         config={{
           linear: {
-            label: "Reta ajustada",
-            color: "var(--chart-2)",
+            label: 'Reta ajustada',
+            color: 'var(--chart-2)',
           },
           points: {
-            label: "Pontos reais",
-            color: "var(--chart-4)",
+            label: 'Pontos reais',
+            color: 'var(--chart-4)',
           },
         }}
         className="h-72 w-full aspect-auto"
       >
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart
-            data={linePoints}
-            margin={{ top: 8, right: 18, left: 10, bottom: 10 }}
-          >
+          <LineChart data={linePoints} margin={{ top: 8, right: 18, left: 10, bottom: 10 }}>
             <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
             <XAxis
               type="number"
@@ -204,7 +205,9 @@ export function RambergOsgoodLinearizationChart({ points }: RambergOsgoodLineari
                       <div className="space-y-1">
                         <div className="flex items-center justify-between gap-2">
                           <span className="text-muted-foreground">log tensao</span>
-                          <span className="font-mono font-semibold">{axisFormatter.format(entry.logStress)}</span>
+                          <span className="font-mono font-semibold">
+                            {axisFormatter.format(entry.logStress)}
+                          </span>
                         </div>
                         <div className="flex items-center justify-between gap-2">
                           <span className="text-muted-foreground">log deformacao plastica</span>
@@ -234,14 +237,14 @@ export function RambergOsgoodLinearizationChart({ points }: RambergOsgoodLineari
               stroke="transparent"
               dot={{
                 r: 2,
-                fill: "var(--chart-4)",
-                stroke: "var(--chart-4)",
+                fill: 'var(--chart-4)',
+                stroke: 'var(--chart-4)',
                 strokeWidth: 1,
               }}
               activeDot={{
                 r: 3,
-                fill: "var(--chart-4)",
-                stroke: "var(--chart-4)",
+                fill: 'var(--chart-4)',
+                stroke: 'var(--chart-4)',
                 strokeWidth: 1,
               }}
             />

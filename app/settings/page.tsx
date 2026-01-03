@@ -1,10 +1,16 @@
-import { DashboardLayout } from "@/components/layout/dashboard-layout"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Switch } from "@/components/ui/switch"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { DashboardLayout } from '@/components/layout/dashboard-layout'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Label } from '@/components/ui/label'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Switch } from '@/components/ui/switch'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import {
   Settings,
   Calculator,
@@ -19,14 +25,13 @@ import {
   LineChart,
   Moon,
   Sun,
-  Monitor
-} from "lucide-react"
+  Monitor,
+} from 'lucide-react'
 
 export default function SettingsPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
             <div className="flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-foreground to-foreground/80 text-background shadow-md">
@@ -42,7 +47,6 @@ export default function SettingsPage() {
         </div>
 
         <div className="grid gap-6 lg:grid-cols-2">
-
           <Card>
             <CardHeader className="pb-4">
               <div className="flex items-center gap-3">
@@ -91,14 +95,15 @@ export default function SettingsPage() {
                   <CheckCircle2 className="size-5 text-foreground" />
                   <div>
                     <Label className="text-sm font-medium">Validação Automática</Label>
-                    <p className="text-xs text-muted-foreground">Verificar limites dos parâmetros</p>
+                    <p className="text-xs text-muted-foreground">
+                      Verificar limites dos parâmetros
+                    </p>
                   </div>
                 </div>
                 <Switch defaultChecked />
               </div>
             </CardContent>
           </Card>
-
 
           <Card>
             <CardHeader className="pb-4">
@@ -114,7 +119,9 @@ export default function SettingsPage() {
             </CardHeader>
             <CardContent className="space-y-5">
               <div className="space-y-2">
-                <Label htmlFor="theme" className="text-sm font-medium">Tema</Label>
+                <Label htmlFor="theme" className="text-sm font-medium">
+                  Tema
+                </Label>
                 <Select defaultValue="system">
                   <SelectTrigger id="theme" className="h-11">
                     <SelectValue />
@@ -143,7 +150,9 @@ export default function SettingsPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="units" className="text-sm font-medium">Sistema de Unidades</Label>
+                <Label htmlFor="units" className="text-sm font-medium">
+                  Sistema de Unidades
+                </Label>
                 <Select defaultValue="si">
                   <SelectTrigger id="units" className="h-11">
                     <SelectValue />
@@ -168,7 +177,6 @@ export default function SettingsPage() {
             </CardContent>
           </Card>
 
-
           <Card>
             <CardHeader className="pb-4">
               <div className="flex items-center gap-3">
@@ -183,7 +191,9 @@ export default function SettingsPage() {
             </CardHeader>
             <CardContent className="space-y-5">
               <div className="space-y-2">
-                <Label htmlFor="export-format" className="text-sm font-medium">Formato Padrão</Label>
+                <Label htmlFor="export-format" className="text-sm font-medium">
+                  Formato Padrão
+                </Label>
                 <Select defaultValue="csv">
                   <SelectTrigger id="export-format" className="h-11">
                     <SelectValue />
@@ -203,7 +213,9 @@ export default function SettingsPage() {
                     <Zap className="size-5 text-foreground" />
                     <div>
                       <Label className="text-sm font-medium">Incluir Gráficos</Label>
-                      <p className="text-xs text-muted-foreground">Adicionar visualizações ao relatório</p>
+                      <p className="text-xs text-muted-foreground">
+                        Adicionar visualizações ao relatório
+                      </p>
                     </div>
                   </div>
                   <Switch defaultChecked />
@@ -214,7 +226,9 @@ export default function SettingsPage() {
                     <Save className="size-5 text-foreground" />
                     <div>
                       <Label className="text-sm font-medium">Auto-salvar Simulações</Label>
-                      <p className="text-xs text-muted-foreground">Salvar automaticamente no histórico</p>
+                      <p className="text-xs text-muted-foreground">
+                        Salvar automaticamente no histórico
+                      </p>
                     </div>
                   </div>
                   <Switch defaultChecked />
@@ -222,7 +236,6 @@ export default function SettingsPage() {
               </div>
             </CardContent>
           </Card>
-
 
           <Card>
             <CardHeader className="pb-4">
@@ -238,7 +251,9 @@ export default function SettingsPage() {
             </CardHeader>
             <CardContent className="space-y-5">
               <div className="space-y-2">
-                <Label htmlFor="cache-size" className="text-sm font-medium">Tamanho do Cache</Label>
+                <Label htmlFor="cache-size" className="text-sm font-medium">
+                  Tamanho do Cache
+                </Label>
                 <Input
                   id="cache-size"
                   type="number"
@@ -247,7 +262,9 @@ export default function SettingsPage() {
                   max="200"
                   className="h-11"
                 />
-                <p className="text-xs text-muted-foreground">Número de simulações mantidas em memória</p>
+                <p className="text-xs text-muted-foreground">
+                  Número de simulações mantidas em memória
+                </p>
               </div>
 
               <div className="flex items-center justify-between rounded-lg border border-border p-4">
@@ -261,14 +278,16 @@ export default function SettingsPage() {
                 <Switch />
               </div>
 
-              <Button variant="outline" className="w-full h-11 gap-2 text-destructive hover:text-destructive hover:bg-destructive/10">
+              <Button
+                variant="outline"
+                className="w-full h-11 gap-2 text-destructive hover:text-destructive hover:bg-destructive/10"
+              >
                 <RotateCcw className="size-4" />
                 Resetar Todas Configurações
               </Button>
             </CardContent>
           </Card>
         </div>
-
 
         <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
           <Button variant="outline" className="gap-2">

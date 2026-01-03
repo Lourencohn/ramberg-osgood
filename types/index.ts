@@ -1,16 +1,13 @@
-
 export interface PredictionInput {
   temperature: number
   speed: number
 }
-
 
 export interface RambergOsgoodParams {
   E: number
   sigma_0: number
   n: number
 }
-
 
 export interface RambergOsgoodTrainingPoint {
   profile: string
@@ -25,7 +22,6 @@ export interface RambergOsgoodTrainingPoint {
   validationPoints?: StressStrainPoint[]
 }
 
-
 export interface MechanicalProperties {
   yieldStress: number
   ultimateStress: number
@@ -34,21 +30,18 @@ export interface MechanicalProperties {
   toughness: number
 }
 
-
 export interface StressStrainPoint {
   strain: number
   stress: number
 }
-
 
 export interface PredictionResult {
   input: PredictionInput
   rambergOsgood: RambergOsgoodParams
   properties: MechanicalProperties
   curve: StressStrainPoint[]
-  interpolationMethod: "polynomial" | "rbf"
+  interpolationMethod: 'polynomial' | 'rbf'
 }
-
 
 export interface ValidationResult {
   valid: boolean

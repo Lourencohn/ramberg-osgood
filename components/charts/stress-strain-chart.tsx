@@ -1,19 +1,19 @@
-"use client"
+'use client'
 
-import type { StressStrainPoint } from "@/types"
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import { Line, LineChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer } from "recharts"
+import type { StressStrainPoint } from '@/types'
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
+import { Line, LineChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer } from 'recharts'
 
 type StressStrainChartProps = {
   curve: StressStrainPoint[]
 }
 
-const strainFormatter = new Intl.NumberFormat("pt-BR", {
+const strainFormatter = new Intl.NumberFormat('pt-BR', {
   minimumFractionDigits: 3,
   maximumFractionDigits: 3,
 })
 
-const stressFormatter = new Intl.NumberFormat("pt-BR", {
+const stressFormatter = new Intl.NumberFormat('pt-BR', {
   minimumFractionDigits: 1,
   maximumFractionDigits: 1,
 })
@@ -22,7 +22,9 @@ export function StressStrainChart({ curve }: StressStrainChartProps) {
   if (!curve.length) {
     return (
       <div className="h-80 flex items-center justify-center border-2 border-dashed border-border rounded-lg">
-        <p className="text-muted-foreground">Insira parametros para gerar a curva tensao x deformacao.</p>
+        <p className="text-muted-foreground">
+          Insira parametros para gerar a curva tensao x deformacao.
+        </p>
       </div>
     )
   }
@@ -31,8 +33,8 @@ export function StressStrainChart({ curve }: StressStrainChartProps) {
     <ChartContainer
       config={{
         stress: {
-          label: "Tensao (MPa)",
-          color: "var(--chart-1)",
+          label: 'Tensao (MPa)',
+          color: 'var(--chart-1)',
         },
       }}
       className="h-80 w-full aspect-auto"

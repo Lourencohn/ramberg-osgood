@@ -1,15 +1,15 @@
-"use client"
+'use client'
 
-import { useMemo, useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Badge } from "@/components/ui/badge"
-import { StressStrainChart } from "@/components/charts/stress-strain-chart"
-import { StressStrainValidationChart } from "@/components/charts/stress-strain-validation-chart"
-import { RambergOsgoodLinearizationChart } from "@/components/charts/ramberg-osgood-linearization-chart"
-import { ResponseSurfaceChart } from "@/components/charts/response-surface-chart"
-import type { PredictionResult, RambergOsgoodTrainingPoint } from "@/types"
-import { formatProfileLabel } from "@/lib/formatters"
+import { useMemo, useState } from 'react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Badge } from '@/components/ui/badge'
+import { StressStrainChart } from '@/components/charts/stress-strain-chart'
+import { StressStrainValidationChart } from '@/components/charts/stress-strain-validation-chart'
+import { RambergOsgoodLinearizationChart } from '@/components/charts/ramberg-osgood-linearization-chart'
+import { ResponseSurfaceChart } from '@/components/charts/response-surface-chart'
+import type { PredictionResult, RambergOsgoodTrainingPoint } from '@/types'
+import { formatProfileLabel } from '@/lib/formatters'
 import {
   BarChart3,
   LineChart,
@@ -22,24 +22,24 @@ import {
   CheckCircle2,
   Thermometer,
   Database,
-} from "lucide-react"
+} from 'lucide-react'
 
 type ResultsDisplayProps = {
   result: PredictionResult | null
   trainingData: RambergOsgoodTrainingPoint[]
 }
 
-const numberFormatter = new Intl.NumberFormat("pt-BR", {
+const numberFormatter = new Intl.NumberFormat('pt-BR', {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
 })
 
-const stressFormatter = new Intl.NumberFormat("pt-BR", {
+const stressFormatter = new Intl.NumberFormat('pt-BR', {
   minimumFractionDigits: 1,
   maximumFractionDigits: 1,
 })
 
-const strainFormatter = new Intl.NumberFormat("pt-BR", {
+const strainFormatter = new Intl.NumberFormat('pt-BR', {
   minimumFractionDigits: 4,
   maximumFractionDigits: 4,
 })
@@ -49,17 +49,17 @@ const clamp = (value: number, min = 0, max = 1) => Math.min(Math.max(value, min)
 const formatWithUnit = (
   value: number | null | undefined,
   formatter: Intl.NumberFormat,
-  unit?: string,
+  unit?: string
 ) => {
   if (value === null || value === undefined || !Number.isFinite(value)) {
-    return unit ? `-- ${unit}` : "--"
+    return unit ? `-- ${unit}` : '--'
   }
   const formatted = formatter.format(value)
   return unit ? `${formatted} ${unit}` : formatted
 }
 
 export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
-  const [activeTab, setActiveTab] = useState("properties")
+  const [activeTab, setActiveTab] = useState('properties')
   const params = result?.rambergOsgood
   const properties = result?.properties
   const validTraining = useMemo(
@@ -77,16 +77,16 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
           Number.isFinite(point.n) &&
           point.n > 0 &&
           Number.isFinite(point.maxStrain) &&
-          point.maxStrain > 0,
+          point.maxStrain > 0
       ),
-    [trainingData],
+    [trainingData]
   )
   const validationProfile = useMemo(() => {
     if (!result || !validTraining.length) return null
 
     const exact = validTraining.find(
       (profile) =>
-        profile.temperature === result.input.temperature && profile.speed === result.input.speed,
+        profile.temperature === result.input.temperature && profile.speed === result.input.speed
     )
     if (exact) {
       return { profile: exact, isExact: true }
@@ -124,7 +124,7 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
     const dy = (result.input.speed - nearestProfile.speed) / speedRange
     const normalizedDistance = Math.min(Math.sqrt(dx * dx + dy * dy) / Math.sqrt(2), 1)
     const confidence =
-      normalizedDistance < 0.2 ? "Alta" : normalizedDistance < 0.45 ? "Moderada" : "Baixa"
+      normalizedDistance < 0.2 ? 'Alta' : normalizedDistance < 0.45 ? 'Moderada' : 'Baixa'
     const withinBounds =
       result.input.temperature >= tempMin &&
       result.input.temperature <= tempMax &&
@@ -144,98 +144,109 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
   }, [result, validTraining, validationProfile])
   const maxStrain = result?.curve?.length ? result.curve[result.curve.length - 1].strain : null
   const methodLabel = result
-    ? result.interpolationMethod === "rbf"
-      ? "RBF Gaussiana"
-      : "Polinomial"
-    : "--"
+    ? result.interpolationMethod === 'rbf'
+      ? 'RBF Gaussiana'
+      : 'Polinomial'
+    : '--'
   const confidenceClass = diagnostics
-    ? diagnostics.confidence === "Alta"
-      ? "border-emerald-200 bg-emerald-50 text-emerald-700"
-      : diagnostics.confidence === "Moderada"
-        ? "border-amber-200 bg-amber-50 text-amber-700"
-        : "border-rose-200 bg-rose-50 text-rose-700"
-    : "border-border bg-muted text-muted-foreground"
-  const tempPosition = result && diagnostics
-    ? clamp((result.input.temperature - diagnostics.tempMin) / (diagnostics.tempMax - diagnostics.tempMin || 1))
-    : null
-  const speedPosition = result && diagnostics
-    ? clamp((result.input.speed - diagnostics.speedMin) / (diagnostics.speedMax - diagnostics.speedMin || 1))
-    : null
-  const tempOutside = diagnostics && result
-    ? result.input.temperature < diagnostics.tempMin || result.input.temperature > diagnostics.tempMax
-    : false
-  const speedOutside = diagnostics && result
-    ? result.input.speed < diagnostics.speedMin || result.input.speed > diagnostics.speedMax
-    : false
+    ? diagnostics.confidence === 'Alta'
+      ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+      : diagnostics.confidence === 'Moderada'
+        ? 'border-amber-200 bg-amber-50 text-amber-700'
+        : 'border-rose-200 bg-rose-50 text-rose-700'
+    : 'border-border bg-muted text-muted-foreground'
+  const tempPosition =
+    result && diagnostics
+      ? clamp(
+          (result.input.temperature - diagnostics.tempMin) /
+            (diagnostics.tempMax - diagnostics.tempMin || 1)
+        )
+      : null
+  const speedPosition =
+    result && diagnostics
+      ? clamp(
+          (result.input.speed - diagnostics.speedMin) /
+            (diagnostics.speedMax - diagnostics.speedMin || 1)
+        )
+      : null
+  const tempOutside =
+    diagnostics && result
+      ? result.input.temperature < diagnostics.tempMin ||
+        result.input.temperature > diagnostics.tempMax
+      : false
+  const speedOutside =
+    diagnostics && result
+      ? result.input.speed < diagnostics.speedMin || result.input.speed > diagnostics.speedMax
+      : false
 
   const modelParameters = [
     {
-      code: "E",
-      label: "Modulo de elasticidade",
-      description: "Rigidez inicial do material.",
+      code: 'E',
+      label: 'Modulo de elasticidade',
+      description: 'Rigidez inicial do material.',
       value: params?.E,
-      unit: "MPa",
+      unit: 'MPa',
       formatter: numberFormatter,
     },
     {
-      code: "sigma0",
-      label: "Tensao de referencia",
-      description: "Marco de escoamento com offset de 0,2%.",
+      code: 'sigma0',
+      label: 'Tensao de referencia',
+      description: 'Marco de escoamento com offset de 0,2%.',
       value: params?.sigma_0,
-      unit: "MPa",
+      unit: 'MPa',
       formatter: stressFormatter,
     },
     {
-      code: "n",
-      label: "Expoente de encruamento",
-      description: "Define a curvatura no regime plastico.",
+      code: 'n',
+      label: 'Expoente de encruamento',
+      description: 'Define a curvatura no regime plastico.',
       value: params?.n,
-      unit: "",
+      unit: '',
       formatter: numberFormatter,
     },
     {
-      code: "limite",
-      label: "Deformacao limite",
-      description: "Maior deformacao observada nos ensaios.",
+      code: 'limite',
+      label: 'Deformacao limite',
+      description: 'Maior deformacao observada nos ensaios.',
       value: maxStrain !== null ? maxStrain * 100 : null,
-      unit: "%",
+      unit: '%',
       formatter: numberFormatter,
     },
   ]
 
   const mechanicalProperties = [
     {
-      label: "Tensao de escoamento (0,2%)",
+      label: 'Tensao de escoamento (0,2%)',
       value: properties?.yieldStress,
-      unit: "MPa",
+      unit: 'MPa',
       formatter: stressFormatter,
       icon: Shield,
     },
     {
-      label: "Tensao maxima",
+      label: 'Tensao maxima',
       value: properties?.ultimateStress,
-      unit: "MPa",
+      unit: 'MPa',
       formatter: stressFormatter,
       icon: Zap,
     },
     {
-      label: "Ductilidade",
+      label: 'Ductilidade',
       value: properties?.ductility,
-      unit: "%",
+      unit: '%',
       formatter: numberFormatter,
       icon: Percent,
     },
     {
-      label: "Resiliencia",
+      label: 'Resiliencia',
       value: properties?.resilience,
-      unit: "MJ/m³",
+      unit: 'MJ/m³',
       formatter: numberFormatter,
       icon: Battery,
     },
     {
-      label: "Tenacidade",
+      label: 'Tenacidade',
       value: properties?.toughness,
-      unit: "MJ/m³",
+      unit: 'MJ/m³',
       formatter: numberFormatter,
       icon: Target,
     },
@@ -243,28 +254,28 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
 
   const glossary = [
     {
-      term: "E",
-      description: "Modulo de elasticidade; indica a rigidez inicial.",
+      term: 'E',
+      description: 'Modulo de elasticidade; indica a rigidez inicial.',
     },
     {
-      term: "sigma0",
-      description: "Tensao de referencia associada ao offset de 0,2%.",
+      term: 'sigma0',
+      description: 'Tensao de referencia associada ao offset de 0,2%.',
     },
     {
-      term: "n",
-      description: "Expoente que controla a curvatura no regime plastico.",
+      term: 'n',
+      description: 'Expoente que controla a curvatura no regime plastico.',
     },
     {
-      term: "RMSE",
-      description: "Erro medio quadratico do ajuste no perfil de referencia.",
+      term: 'RMSE',
+      description: 'Erro medio quadratico do ajuste no perfil de referencia.',
     },
     {
-      term: "Envelope experimental",
-      description: "Faixa de temperatura e velocidade coberta pelos ensaios reais.",
+      term: 'Envelope experimental',
+      description: 'Faixa de temperatura e velocidade coberta pelos ensaios reais.',
     },
     {
-      term: "Interpolacao RBF",
-      description: "Metodo de base radial com normalizacao min-max.",
+      term: 'Interpolacao RBF',
+      description: 'Metodo de base radial com normalizacao min-max.',
     },
   ]
 
@@ -274,7 +285,9 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <CardTitle className="text-lg">Resultados da Previsao</CardTitle>
-            <CardDescription>Leitura tecnica das propriedades calculadas e da confiabilidade.</CardDescription>
+            <CardDescription>
+              Leitura tecnica das propriedades calculadas e da confiabilidade.
+            </CardDescription>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <Badge variant="outline">Modelo Ramberg-Osgood</Badge>
@@ -321,22 +334,22 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
                   <div className="flex items-center justify-between gap-3">
                     <span className="text-muted-foreground">Temperatura</span>
                     <span className="font-mono font-semibold text-foreground">
-                      {result ? `${result.input.temperature}°C` : "--"}
+                      {result ? `${result.input.temperature}°C` : '--'}
                     </span>
                   </div>
                   <div className="flex items-center justify-between gap-3">
                     <span className="text-muted-foreground">Velocidade</span>
                     <span className="font-mono font-semibold text-foreground">
-                      {result ? `${result.input.speed} mm/s` : "--"}
+                      {result ? `${result.input.speed} mm/s` : '--'}
                     </span>
                   </div>
                 </div>
                 <div className="rounded-lg border border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
                   {diagnostics
                     ? diagnostics.withinBounds
-                      ? "Entrada dentro do envelope experimental."
-                      : "Entrada fora da faixa observada; resultados representam extrapolacao."
-                    : "Sem dados suficientes para avaliar o envelope experimental."}
+                      ? 'Entrada dentro do envelope experimental.'
+                      : 'Entrada fora da faixa observada; resultados representam extrapolacao.'
+                    : 'Sem dados suficientes para avaliar o envelope experimental.'}
                 </div>
               </div>
 
@@ -350,14 +363,14 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
                     <div className="flex items-center justify-between">
                       <span>Temperatura (°C)</span>
                       <span className="font-mono text-foreground">
-                        {diagnostics ? `${diagnostics.tempMin}–${diagnostics.tempMax}` : "--"}
+                        {diagnostics ? `${diagnostics.tempMin}–${diagnostics.tempMax}` : '--'}
                       </span>
                     </div>
                     <div className="relative h-2 rounded-full bg-muted">
                       {tempPosition !== null ? (
                         <span
                           className={`absolute top-1/2 -translate-y-1/2 size-3 rounded-full border-2 border-background ${
-                            tempOutside ? "bg-rose-500" : "bg-foreground"
+                            tempOutside ? 'bg-rose-500' : 'bg-foreground'
                           }`}
                           style={{ left: `calc(${tempPosition * 100}% - 6px)` }}
                         />
@@ -375,14 +388,14 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
                     <div className="flex items-center justify-between">
                       <span>Velocidade (mm/s)</span>
                       <span className="font-mono text-foreground">
-                        {diagnostics ? `${diagnostics.speedMin}–${diagnostics.speedMax}` : "--"}
+                        {diagnostics ? `${diagnostics.speedMin}–${diagnostics.speedMax}` : '--'}
                       </span>
                     </div>
                     <div className="relative h-2 rounded-full bg-muted">
                       {speedPosition !== null ? (
                         <span
                           className={`absolute top-1/2 -translate-y-1/2 size-3 rounded-full border-2 border-background ${
-                            speedOutside ? "bg-rose-500" : "bg-foreground"
+                            speedOutside ? 'bg-rose-500' : 'bg-foreground'
                           }`}
                           style={{ left: `calc(${speedPosition * 100}% - 6px)` }}
                         />
@@ -406,14 +419,16 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
                 <div className="space-y-2 text-xs">
                   <div className="flex items-center justify-between gap-3">
                     <span className="text-muted-foreground">Confiabilidade</span>
-                    <span className={`rounded-full border px-2 py-0.5 text-xs font-medium ${confidenceClass}`}>
-                      {diagnostics?.confidence ?? "--"}
+                    <span
+                      className={`rounded-full border px-2 py-0.5 text-xs font-medium ${confidenceClass}`}
+                    >
+                      {diagnostics?.confidence ?? '--'}
                     </span>
                   </div>
                   <div className="flex items-center justify-between gap-3">
                     <span className="text-muted-foreground">Distancia normalizada</span>
                     <span className="font-mono font-semibold text-foreground">
-                      {diagnostics ? strainFormatter.format(diagnostics.normalizedDistance) : "--"}
+                      {diagnostics ? strainFormatter.format(diagnostics.normalizedDistance) : '--'}
                     </span>
                   </div>
                   <div className="flex items-center justify-between gap-3">
@@ -422,27 +437,27 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
                       {diagnostics
                         ? formatProfileLabel(
                             diagnostics.nearestProfile.temperature,
-                            diagnostics.nearestProfile.speed,
+                            diagnostics.nearestProfile.speed
                           )
-                        : "--"}
+                        : '--'}
                     </span>
                   </div>
                   <div className="flex items-center justify-between gap-3">
                     <span className="text-muted-foreground">Pontos no ajuste</span>
                     <span className="font-mono font-semibold text-foreground">
-                      {diagnostics ? diagnostics.nearestProfile.pointsUsed : "--"}
+                      {diagnostics ? diagnostics.nearestProfile.pointsUsed : '--'}
                     </span>
                   </div>
                   <div className="flex items-center justify-between gap-3">
                     <span className="text-muted-foreground">RMSE (deformacao)</span>
                     <span className="font-mono font-semibold text-foreground">
-                      {diagnostics ? strainFormatter.format(diagnostics.nearestProfile.rmse) : "--"}
+                      {diagnostics ? strainFormatter.format(diagnostics.nearestProfile.rmse) : '--'}
                     </span>
                   </div>
                   <div className="flex items-center justify-between gap-3">
                     <span className="text-muted-foreground">Perfis reais</span>
                     <span className="font-mono font-semibold text-foreground">
-                      {validTraining.length || "--"}
+                      {validTraining.length || '--'}
                     </span>
                   </div>
                 </div>
@@ -515,7 +530,8 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
                   })}
                 </div>
                 <p className="mt-3 text-xs text-muted-foreground">
-                  Resiliencia considera energia ate o escoamento. Tenacidade considera a energia total.
+                  Resiliencia considera energia ate o escoamento. Tenacidade considera a energia
+                  total.
                 </p>
               </div>
             </div>
@@ -534,7 +550,10 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
               </div>
               <div className="grid gap-3 md:grid-cols-2">
                 {glossary.map((item) => (
-                  <div key={item.term} className="rounded-lg border border-border bg-white px-4 py-3 text-xs">
+                  <div
+                    key={item.term}
+                    className="rounded-lg border border-border bg-white px-4 py-3 text-xs"
+                  >
                     <p className="font-semibold text-foreground">{item.term}</p>
                     <p className="text-muted-foreground">{item.description}</p>
                   </div>
@@ -566,12 +585,14 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
                   {validationProfile ? (
                     <p>
                       {validationProfile.isExact
-                        ? "Comparacao com dados reais na mesma condicao."
+                        ? 'Comparacao com dados reais na mesma condicao.'
                         : `Comparacao com o perfil real mais proximo: ${formatProfileLabel(
                             validationProfile.profile.temperature,
-                            validationProfile.profile.speed,
+                            validationProfile.profile.speed
                           )}.`}
-                      {validationPoints.length ? ` (${validationPoints.length} pontos amostrados)` : ""}
+                      {validationPoints.length
+                        ? ` (${validationPoints.length} pontos amostrados)`
+                        : ''}
                     </p>
                   ) : (
                     <p>Nenhum conjunto real disponivel para validacao.</p>
@@ -590,8 +611,8 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
                       Linearizacao Ramberg-Osgood (log-log)
                     </h3>
                     <p className="text-xs text-muted-foreground mb-3">
-                      A deformacao plastica e estimada removendo a parcela elastica; em escala log-log,
-                      um bom ajuste tende a alinhar os pontos reais.
+                      A deformacao plastica e estimada removendo a parcela elastica; em escala
+                      log-log, um bom ajuste tende a alinhar os pontos reais.
                     </p>
                     <RambergOsgoodLinearizationChart points={validationPoints} />
                   </div>

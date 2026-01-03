@@ -1,32 +1,32 @@
 #!/usr/bin/env node
 
-const fs = require("fs")
-const path = require("path")
-const { Client } = require("pg")
+const fs = require('fs')
+const path = require('path')
+const { Client } = require('pg')
 const {
   parseManualContent,
   normalizeManualRows,
   parseNumber,
   slugifyMaterial,
   formatCodeValue,
-} = require("../lib/import/manual-parser")
+} = require('../lib/import/manual-parser')
 
-const ROOT_DIR = path.resolve(__dirname, "..")
+const ROOT_DIR = path.resolve(__dirname, '..')
 const DEFAULT_LAYER_HEIGHT_MM = 0.5
 
 function parseArgs(argv) {
   const args = {}
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i]
-    if (!arg.startsWith("--")) continue
-    const [rawKey, rawValue] = arg.slice(2).split("=")
+    if (!arg.startsWith('--')) continue
+    const [rawKey, rawValue] = arg.slice(2).split('=')
     const key = rawKey.trim()
     if (rawValue !== undefined) {
       args[key] = rawValue
       continue
     }
     const next = argv[i + 1]
-    if (!next || next.startsWith("--")) {
+    if (!next || next.startsWith('--')) {
       args[key] = true
       continue
     }
@@ -39,27 +39,27 @@ function parseArgs(argv) {
 function printUsage() {
   console.log(
     [
-      "Manual import for tensile data (csv/txt).",
-      "",
-      "Usage:",
-      "  node scripts/import-manual.js --file <path> --material <name> [options]",
-      "",
-      "Options:",
-      "  --profile-code <code>        Optional profile code (default: <material>_T<temp>_V<speed>)",
-      "  --test-number <n>            Test number (default: 1)",
-      "  --layer-height <mm>          Layer height (optional)",
-      "  --specimen-length <mm>       Gauge length for strain from displacement",
-      "  --specimen-width <mm>        Specimen width",
-      "  --specimen-thickness <mm>    Specimen thickness",
-      "  --specimen-area <mm2>        Specimen area (overrides width*thickness)",
-      "  --delimiter <,|;|tab|space>  Force delimiter",
-      "  --columns <list>             Column order for headerless files",
-      "  --dry-run                    Parse only, no DB writes",
-      "  --help                       Show this help",
-      "",
-      "Example:",
-      "  node scripts/import-manual.js --file 01_ABS_BLACK.txt --material ABS --temperature 235 --speed 60 --dry-run",
-    ].join("\n"),
+      'Manual import for tensile data (csv/txt).',
+      '',
+      'Usage:',
+      '  node scripts/import-manual.js --file <path> --material <name> [options]',
+      '',
+      'Options:',
+      '  --profile-code <code>        Optional profile code (default: <material>_T<temp>_V<speed>)',
+      '  --test-number <n>            Test number (default: 1)',
+      '  --layer-height <mm>          Layer height (optional)',
+      '  --specimen-length <mm>       Gauge length for strain from displacement',
+      '  --specimen-width <mm>        Specimen width',
+      '  --specimen-thickness <mm>    Specimen thickness',
+      '  --specimen-area <mm2>        Specimen area (overrides width*thickness)',
+      '  --delimiter <,|;|tab|space>  Force delimiter',
+      '  --columns <list>             Column order for headerless files',
+      '  --dry-run                    Parse only, no DB writes',
+      '  --help                       Show this help',
+      '',
+      'Example:',
+      '  node scripts/import-manual.js --file 01_ABS_BLACK.txt --material ABS --temperature 235 --speed 60 --dry-run',
+    ].join('\n')
   )
 }
 
@@ -72,7 +72,7 @@ async function ensureMaterial(client, payload) {
        supplier = COALESCE(EXCLUDED.supplier, materials.supplier),
        notes = COALESCE(EXCLUDED.notes, materials.notes)
      RETURNING id`,
-    [payload.name, payload.grade, payload.supplier, payload.notes],
+    [payload.name, payload.grade, payload.supplier, payload.notes]
   )
   return result.rows[0].id
 }
@@ -96,7 +96,7 @@ async function upsertPrintProfile(client, payload) {
       payload.speed,
       payload.layerHeight,
       payload.extraParams,
-    ],
+    ]
   )
   return result.rows[0].id
 }
@@ -132,7 +132,7 @@ async function upsertTestRun(client, payload) {
       payload.specimenThicknessMm,
       payload.specimenAreaMm2,
       payload.notes,
-    ],
+    ]
   )
   return result.rows[0].id
 }
@@ -149,7 +149,7 @@ async function insertMeasurements(client, testRunId, rows) {
 
     for (const row of chunk) {
       placeholders.push(
-        `($${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++})`,
+        `($${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++})`
       )
       values.push(
         testRunId,
@@ -161,7 +161,7 @@ async function insertMeasurements(client, testRunId, rows) {
         row.forca_n ?? null,
         row.tensao_pa ?? null,
         row.tensao_mpa ?? null,
-        row.extras ?? {},
+        row.extras ?? {}
       )
       pointIndex += 1
     }
@@ -170,8 +170,8 @@ async function insertMeasurements(client, testRunId, rows) {
       `INSERT INTO test_measurements
         (test_run_id, point_index, tempo_s, alongamento_mm_mm, deformacao_mm_mm, deformacao_mm,
          forca_n, tensao_pa, tensao_mpa, extras)
-       VALUES ${placeholders.join(", ")}`,
-      values,
+       VALUES ${placeholders.join(', ')}`,
+      values
     )
   }
 }
@@ -205,19 +205,19 @@ async function main() {
   const codeTemperature = temperature ?? 0
   const codeSpeed = speed ?? 0
   const profileCode =
-    args["profile-code"] ||
+    args['profile-code'] ||
     `${slugifyMaterial(material)}_T${formatCodeValue(codeTemperature)}_V${formatCodeValue(codeSpeed)}`
-  const testNumber = Number.parseInt(args["test-number"] || "1", 10)
-  const layerHeightInput = parseNumber(args["layer-height"])
+  const testNumber = Number.parseInt(args['test-number'] || '1', 10)
+  const layerHeightInput = parseNumber(args['layer-height'])
   const layerHeight = layerHeightInput && layerHeightInput > 0 ? layerHeightInput : null
-  const specimenLengthMm = parseNumber(args["specimen-length"])
-  const specimenWidthMm = parseNumber(args["specimen-width"])
-  const specimenThicknessMm = parseNumber(args["specimen-thickness"])
+  const specimenLengthMm = parseNumber(args['specimen-length'])
+  const specimenWidthMm = parseNumber(args['specimen-width'])
+  const specimenThicknessMm = parseNumber(args['specimen-thickness'])
   const specimenAreaMm2 =
-    parseNumber(args["specimen-area"]) ??
+    parseNumber(args['specimen-area']) ??
     (specimenWidthMm && specimenThicknessMm ? specimenWidthMm * specimenThicknessMm : null)
 
-  const content = fs.readFileSync(filePath, "utf8")
+  const content = fs.readFileSync(filePath, 'utf8')
   const parseResult = parseManualContent(content, {
     delimiter: args.delimiter,
     columns: args.columns,
@@ -229,15 +229,15 @@ async function main() {
   })
 
   if (!normalized.rows.length) {
-    console.error("No usable data rows were parsed.")
+    console.error('No usable data rows were parsed.')
     process.exit(1)
   }
 
-  const dryRun = Boolean(args["dry-run"])
+  const dryRun = Boolean(args['dry-run'])
   const metadata = {
-    source: "manual",
-    importer: "import-manual",
-    delimiter: parseResult.delimiter ?? "whitespace",
+    source: 'manual',
+    importer: 'import-manual',
+    delimiter: parseResult.delimiter ?? 'whitespace',
     header_columns: parseResult.header,
     column_map: parseResult.columnMap,
     source_metadata: parseResult.metadata,
@@ -248,19 +248,19 @@ async function main() {
   }
 
   if (dryRun) {
-    console.log("[dry-run] Manual import summary")
+    console.log('[dry-run] Manual import summary')
     console.log(`file=${filePath}`)
     console.log(`material=${material}`)
     console.log(`profile=${profileCode} test=${testNumber}`)
     console.log(`rows=${normalized.rows.length}`)
     console.log(`delimiter=${metadata.delimiter}`)
-    console.log(`columns=${parseResult.header.join(", ")}`)
+    console.log(`columns=${parseResult.header.join(', ')}`)
     console.log(`mapped=${JSON.stringify(parseResult.columnMap)}`)
     return
   }
 
   if (!process.env.DATABASE_URL) {
-    console.error("Missing DATABASE_URL. Set it before running the import.")
+    console.error('Missing DATABASE_URL. Set it before running the import.')
     process.exit(1)
   }
 
@@ -272,7 +272,7 @@ async function main() {
       name: material,
       grade: args.grade ?? null,
       supplier: args.supplier ?? null,
-      notes: args["material-notes"] ?? null,
+      notes: args['material-notes'] ?? null,
     })
 
     const profileId = await upsertPrintProfile(client, {
@@ -289,7 +289,7 @@ async function main() {
     const testRunId = await upsertTestRun(client, {
       profileId,
       testNumber,
-      testCode: args["test-code"] ?? path.basename(filePath),
+      testCode: args['test-code'] ?? path.basename(filePath),
       rawFilePath: path.relative(ROOT_DIR, filePath),
       processedFilePath: null,
       sourceColumns: parseResult.header,
@@ -298,10 +298,10 @@ async function main() {
       specimenWidthMm,
       specimenThicknessMm,
       specimenAreaMm2,
-      notes: args["test-notes"] ?? null,
+      notes: args['test-notes'] ?? null,
     })
 
-    await client.query("DELETE FROM test_measurements WHERE test_run_id = $1", [testRunId])
+    await client.query('DELETE FROM test_measurements WHERE test_run_id = $1', [testRunId])
     await insertMeasurements(client, testRunId, normalized.rows)
     console.log(`Imported ${normalized.rows.length} rows into test_run_id=${testRunId}`)
   } finally {
@@ -310,6 +310,6 @@ async function main() {
 }
 
 main().catch((error) => {
-  console.error("Import failed:", error)
+  console.error('Import failed:', error)
   process.exit(1)
 })

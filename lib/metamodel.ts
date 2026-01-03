@@ -1,4 +1,4 @@
-import type { PredictionInput, RambergOsgoodParams, RambergOsgoodTrainingPoint } from "@/types"
+import type { PredictionInput, RambergOsgoodParams, RambergOsgoodTrainingPoint } from '@/types'
 
 type InterpolationResult = RambergOsgoodParams & { maxStrain: number }
 
@@ -40,7 +40,7 @@ function computeBounds(points: RambergOsgoodTrainingPoint[]) {
 
 function computeEpsilon(
   points: RambergOsgoodTrainingPoint[],
-  ranges: ReturnType<typeof computeRanges>,
+  ranges: ReturnType<typeof computeRanges>
 ) {
   if (points.length < 2) return 1
   let sum = 0
@@ -61,10 +61,7 @@ function computeEpsilon(
   return meanDist > 0 ? 1 / meanDist : 1
 }
 
-function rbfWeights(
-  input: PredictionInput,
-  points: RambergOsgoodTrainingPoint[],
-) {
+function rbfWeights(input: PredictionInput, points: RambergOsgoodTrainingPoint[]) {
   if (!points.length) return []
   const ranges = computeRanges(points)
   const inputTemp = normalize(input.temperature, ranges.tempMin, ranges.tempMax)
@@ -84,7 +81,7 @@ function interpolateValue(
   weights: number[],
   getter: (point: RambergOsgoodTrainingPoint) => number,
   min: number,
-  max: number,
+  max: number
 ) {
   if (!points.length) return min
   const weightSum = weights.reduce((sum, weight) => sum + weight, 0)
@@ -94,32 +91,31 @@ function interpolateValue(
   return clamp(value, min, max)
 }
 
-
 export function polynomialInterpolation(
   input: PredictionInput,
-  data: RambergOsgoodTrainingPoint[],
+  data: RambergOsgoodTrainingPoint[]
 ): InterpolationResult {
   return rbfInterpolation(input, data)
 }
 
-
 export function rbfInterpolation(
   input: PredictionInput,
-  data: RambergOsgoodTrainingPoint[],
+  data: RambergOsgoodTrainingPoint[]
 ): InterpolationResult {
-  const validData = data.filter((point) =>
-    Number.isFinite(point.temperature) &&
-    point.temperature > 0 &&
-    Number.isFinite(point.speed) &&
-    point.speed > 0 &&
-    Number.isFinite(point.E) &&
-    point.E > 0 &&
-    Number.isFinite(point.sigma_0) &&
-    point.sigma_0 > 0 &&
-    Number.isFinite(point.n) &&
-    point.n > 0 &&
-    Number.isFinite(point.maxStrain) &&
-    point.maxStrain > 0,
+  const validData = data.filter(
+    (point) =>
+      Number.isFinite(point.temperature) &&
+      point.temperature > 0 &&
+      Number.isFinite(point.speed) &&
+      point.speed > 0 &&
+      Number.isFinite(point.E) &&
+      point.E > 0 &&
+      Number.isFinite(point.sigma_0) &&
+      point.sigma_0 > 0 &&
+      Number.isFinite(point.n) &&
+      point.n > 0 &&
+      Number.isFinite(point.maxStrain) &&
+      point.maxStrain > 0
   )
 
   if (!validData.length) {
@@ -127,7 +123,7 @@ export function rbfInterpolation(
   }
 
   const exactMatch = validData.find(
-    (point) => point.temperature === input.temperature && point.speed === input.speed,
+    (point) => point.temperature === input.temperature && point.speed === input.speed
   )
   if (exactMatch) {
     return {
@@ -143,14 +139,20 @@ export function rbfInterpolation(
 
   return {
     E: interpolateValue(validData, weights, (point) => point.E, bounds.E[0], bounds.E[1]),
-    sigma_0: interpolateValue(validData, weights, (point) => point.sigma_0, bounds.sigma_0[0], bounds.sigma_0[1]),
+    sigma_0: interpolateValue(
+      validData,
+      weights,
+      (point) => point.sigma_0,
+      bounds.sigma_0[0],
+      bounds.sigma_0[1]
+    ),
     n: interpolateValue(validData, weights, (point) => point.n, bounds.n[0], bounds.n[1]),
     maxStrain: interpolateValue(
       validData,
       weights,
       (point) => point.maxStrain,
       bounds.maxStrain[0],
-      bounds.maxStrain[1],
+      bounds.maxStrain[1]
     ),
   }
 }

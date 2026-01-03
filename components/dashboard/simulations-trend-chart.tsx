@@ -1,10 +1,10 @@
-"use client"
+'use client'
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import type { ProfileAverages } from "@/lib/dashboard-data"
-import { formatProfileLabel } from "@/lib/formatters"
-import { Area, AreaChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer } from "recharts"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
+import type { ProfileAverages } from '@/lib/dashboard-data'
+import { formatProfileLabel } from '@/lib/formatters'
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer } from 'recharts'
 
 type SimulationsTrendChartProps = {
   data: ProfileAverages[]
@@ -25,17 +25,21 @@ export function SimulationsTrendChart({ data }: SimulationsTrendChartProps) {
     <Card>
       <CardHeader>
         <CardTitle>Tensão média por perfil</CardTitle>
-        <CardDescription>Tensão máxima média dos ensaios reais por combinação de temperatura e velocidade</CardDescription>
+        <CardDescription>
+          Tensão máxima média dos ensaios reais por combinação de temperatura e velocidade
+        </CardDescription>
       </CardHeader>
       <CardContent>
         {chartData.length === 0 ? (
-          <p className="text-sm text-muted-foreground">Nenhuma curva com tensão calculada foi encontrada.</p>
+          <p className="text-sm text-muted-foreground">
+            Nenhuma curva com tensão calculada foi encontrada.
+          </p>
         ) : (
           <ChartContainer
             config={{
               avgStress: {
-                label: "Tensão média (MPa)",
-                color: "var(--chart-1)",
+                label: 'Tensão média (MPa)',
+                color: 'var(--chart-1)',
               },
             }}
             className="h-[300px]"
@@ -55,7 +59,8 @@ export function SimulationsTrendChart({ data }: SimulationsTrendChartProps) {
                   content={
                     <ChartTooltipContent
                       formatter={(value, _name, payload) => {
-                        const entry = payload && !Array.isArray(payload) ? payload.payload : undefined
+                        const entry =
+                          payload && !Array.isArray(payload) ? payload.payload : undefined
                         return (
                           <>
                             <div className="flex items-center justify-between gap-2">
@@ -64,7 +69,8 @@ export function SimulationsTrendChart({ data }: SimulationsTrendChartProps) {
                             </div>
                             {entry ? (
                               <div className="text-xs text-muted-foreground">
-                                {formatProfileLabel(entry.temperature, entry.speed)} · {entry.tests} ensaios
+                                {formatProfileLabel(entry.temperature, entry.speed)} · {entry.tests}{' '}
+                                ensaios
                               </div>
                             ) : null}
                           </>

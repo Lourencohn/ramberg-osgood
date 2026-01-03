@@ -1,12 +1,12 @@
-import { redirect } from "next/navigation"
-import { SignupForm } from "@/components/signup-form"
-import { getCurrentUser } from "@/lib/auth"
+import { redirect } from 'next/navigation'
+import { SignupForm } from '@/components/signup-form'
+import { getCurrentUser } from '@/lib/auth'
 
 const signupErrors: Record<string, string> = {
-  "missing-fields": "Preencha nome, e-mail e senha para continuar.",
-  "password-mismatch": "As senhas não conferem.",
-  "weak-password": "A senha precisa ter pelo menos 8 caracteres.",
-  "email-in-use": "Já existe um cadastro com este e-mail.",
+  'missing-fields': 'Preencha nome, e-mail e senha para continuar.',
+  'password-mismatch': 'As senhas não conferem.',
+  'weak-password': 'A senha precisa ter pelo menos 8 caracteres.',
+  'email-in-use': 'Já existe um cadastro com este e-mail.',
 }
 
 type PageProps = {
@@ -16,7 +16,7 @@ type PageProps = {
 export default async function Page({ searchParams }: PageProps) {
   const user = await getCurrentUser()
   if (user) {
-    redirect("/dashboard")
+    redirect('/dashboard')
   }
 
   const resolvedSearchParams = await searchParams

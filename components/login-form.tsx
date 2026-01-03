@@ -1,26 +1,20 @@
-import type React from "react"
-import Link from "next/link"
+import type React from 'react'
+import Link from 'next/link'
 
-import { cn } from "@/lib/utils"
-import { loginAction } from "@/lib/auth-actions"
-import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
+import { cn } from '@/lib/utils'
+import { loginAction } from '@/lib/auth-actions'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Field, FieldDescription, FieldGroup, FieldLabel } from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
 
-type LoginFormProps = React.ComponentProps<"div"> & {
+type LoginFormProps = React.ComponentProps<'div'> & {
   error?: string
 }
 
 export function LoginForm({ className, error, ...props }: LoginFormProps) {
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
+    <div className={cn('flex flex-col gap-6', className)} {...props}>
       <Card>
         <CardHeader>
           <CardTitle>Acesse sua conta</CardTitle>

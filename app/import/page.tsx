@@ -1,7 +1,7 @@
-import { DashboardLayout } from "@/components/layout/dashboard-layout"
-import { ImportForm } from "@/components/import/import-form"
-import { UploadCloud, Info } from "lucide-react"
-import { Alert, AlertDescription } from "@/components/ui/alert"
+import { DashboardLayout } from '@/components/layout/dashboard-layout'
+import { ImportForm } from '@/components/import/import-form'
+import { UploadCloud, Info } from 'lucide-react'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 
 export default function ImportPage() {
   return (

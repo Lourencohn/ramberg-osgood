@@ -1,21 +1,21 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import type { RunMetrics } from "@/lib/dashboard-data"
-import { formatDataSource, formatSpeed, formatTemperature } from "@/lib/formatters"
-import { ArrowRight, Thermometer, Gauge, CheckCircle2, FileText } from "lucide-react"
-import Link from "next/link"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import type { RunMetrics } from '@/lib/dashboard-data'
+import { formatDataSource, formatSpeed, formatTemperature } from '@/lib/formatters'
+import { ArrowRight, Thermometer, Gauge, CheckCircle2, FileText } from 'lucide-react'
+import Link from 'next/link'
 
 type RecentSimulationsProps = {
   runs: RunMetrics[]
 }
 
-const dateFormatter = new Intl.DateTimeFormat("pt-BR", {
-  dateStyle: "short",
-  timeStyle: "short",
+const dateFormatter = new Intl.DateTimeFormat('pt-BR', {
+  dateStyle: 'short',
+  timeStyle: 'short',
 })
 
-const numberFormatter = new Intl.NumberFormat("pt-BR", {
+const numberFormatter = new Intl.NumberFormat('pt-BR', {
   minimumFractionDigits: 1,
   maximumFractionDigits: 1,
 })
@@ -79,12 +79,14 @@ export function RecentSimulations({ runs }: RecentSimulationsProps) {
                 </div>
                 <div className="text-right space-y-1">
                   <p className="text-sm font-semibold text-foreground">
-                    <span className="text-muted-foreground font-normal">σ:</span>{" "}
-                    {run.maxStress !== null ? `${numberFormatter.format(run.maxStress)} MPa` : "—"}
+                    <span className="text-muted-foreground font-normal">σ:</span>{' '}
+                    {run.maxStress !== null ? `${numberFormatter.format(run.maxStress)} MPa` : '—'}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    <span className="text-muted-foreground">ε:</span>{" "}
-                    {run.maxStrain !== null ? `${numberFormatter.format(run.maxStrain)} mm/mm` : "—"}
+                    <span className="text-muted-foreground">ε:</span>{' '}
+                    {run.maxStrain !== null
+                      ? `${numberFormatter.format(run.maxStrain)} mm/mm`
+                      : '—'}
                   </p>
                 </div>
               </div>

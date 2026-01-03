@@ -1,23 +1,23 @@
-"use client"
+'use client'
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import type { ProfileDetail } from "@/lib/dashboard-data"
-import { formatDataSource, formatTestCode } from "@/lib/formatters"
-import { FileText, BarChart2 } from "lucide-react"
-import { LineChart, Line, CartesianGrid, XAxis, YAxis, ResponsiveContainer, Legend } from "recharts"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
+import type { ProfileDetail } from '@/lib/dashboard-data'
+import { formatDataSource, formatTestCode } from '@/lib/formatters'
+import { FileText, BarChart2 } from 'lucide-react'
+import { LineChart, Line, CartesianGrid, XAxis, YAxis, ResponsiveContainer, Legend } from 'recharts'
 
 type ProfileTestsProps = {
   profiles: ProfileDetail[]
 }
 
-const stressFormatter = new Intl.NumberFormat("pt-BR", {
+const stressFormatter = new Intl.NumberFormat('pt-BR', {
   minimumFractionDigits: 1,
   maximumFractionDigits: 1,
 })
 
-const strainFormatter = new Intl.NumberFormat("pt-BR", {
+const strainFormatter = new Intl.NumberFormat('pt-BR', {
   minimumFractionDigits: 4,
   maximumFractionDigits: 4,
 })
@@ -30,7 +30,7 @@ type OverlaySeries = {
 }
 
 function buildOverlayData(series: OverlaySeries[]) {
-  const map = new Map<number, ({ strain: number } & Record<string, number | null>)>()
+  const map = new Map<number, { strain: number } & Record<string, number | null>>()
 
   for (const item of series) {
     for (const point of item.points) {
@@ -79,17 +79,18 @@ export function ProfileTests({ profiles }: ProfileTestsProps) {
     <Card>
       <CardHeader className="pb-4">
         <CardTitle>Análise individual por perfil</CardTitle>
-        <CardDescription>
-          Consulte cada perfil importado e os ensaios realizados.
-        </CardDescription>
+        <CardDescription>Consulte cada perfil importado e os ensaios realizados.</CardDescription>
         <p className="text-xs text-muted-foreground">
-          Nota: os primeiros milissegundos dos ensaios podem conter ruído da máquina; observe a curva a partir do início da carga.
+          Nota: os primeiros milissegundos dos ensaios podem conter ruído da máquina; observe a
+          curva a partir do início da carga.
         </p>
       </CardHeader>
       <CardContent className="space-y-4">
         {representatives.length > 0 && overlayData.length > 0 ? (
           <div className="rounded-xl border border-border bg-muted/40 p-4">
-            <h3 className="text-sm font-semibold text-foreground mb-2">Comparação geral entre variantes</h3>
+            <h3 className="text-sm font-semibold text-foreground mb-2">
+              Comparação geral entre variantes
+            </h3>
             <ChartContainer
               config={representatives.reduce(
                 (acc, item) => {
@@ -99,7 +100,7 @@ export function ProfileTests({ profiles }: ProfileTestsProps) {
                   }
                   return acc
                 },
-                {} as Record<string, { label: string; color: string }>,
+                {} as Record<string, { label: string; color: string }>
               )}
               className="h-[260px] w-full aspect-auto"
             >
@@ -129,7 +130,7 @@ export function ProfileTests({ profiles }: ProfileTestsProps) {
 
         {profiles.map((profile) => {
           const profileColor =
-            representatives.find((item) => item.key === profile.profile)?.color ?? "var(--chart-1)"
+            representatives.find((item) => item.key === profile.profile)?.color ?? 'var(--chart-1)'
 
           return (
             <div
@@ -139,7 +140,9 @@ export function ProfileTests({ profiles }: ProfileTestsProps) {
               <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <p className="text-sm font-semibold text-foreground">{profile.label}</p>
-                  <p className="text-xs text-muted-foreground">{profile.profile} • {profile.tests.length} ensaios</p>
+                  <p className="text-xs text-muted-foreground">
+                    {profile.profile} • {profile.tests.length} ensaios
+                  </p>
                 </div>
                 <Badge variant="secondary" className="gap-1">
                   <BarChart2 className="size-3.5" />
@@ -153,32 +156,36 @@ export function ProfileTests({ profiles }: ProfileTestsProps) {
                     key={test.id}
                     className="rounded-lg border border-border bg-muted/30 p-3 transition-colors hover:border-foreground/20 hover:bg-muted/50"
                   >
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <p className="text-sm font-semibold text-foreground">{test.label}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {formatTestCode(test.testCode) ?? `Ensaio ${test.testNumber}`}
-                      </p>
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <p className="text-sm font-semibold text-foreground">{test.label}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {formatTestCode(test.testCode) ?? `Ensaio ${test.testNumber}`}
+                        </p>
+                      </div>
+                      {formatDataSource(test.source) ? (
+                        <Badge variant="outline" className="gap-1 text-[11px] font-normal">
+                          <FileText className="size-3" />
+                          {formatDataSource(test.source)}
+                        </Badge>
+                      ) : null}
                     </div>
-                    {formatDataSource(test.source) ? (
-                      <Badge variant="outline" className="gap-1 text-[11px] font-normal">
-                        <FileText className="size-3" />
-                        {formatDataSource(test.source)}
-                      </Badge>
-                    ) : null}
-                  </div>
 
                     <div className="mt-3 grid gap-1.5 text-xs text-muted-foreground">
                       <div className="flex items-center justify-between">
                         <span>σ máx</span>
                         <span className="font-mono text-foreground font-semibold">
-                          {test.maxStress !== null ? `${stressFormatter.format(test.maxStress)} MPa` : "—"}
+                          {test.maxStress !== null
+                            ? `${stressFormatter.format(test.maxStress)} MPa`
+                            : '—'}
                         </span>
                       </div>
                       <div className="flex items-center justify-between">
                         <span>ε máx</span>
                         <span className="font-mono text-foreground">
-                          {test.maxStrain !== null ? `${strainFormatter.format(test.maxStrain)} mm/mm` : "—"}
+                          {test.maxStrain !== null
+                            ? `${strainFormatter.format(test.maxStrain)} mm/mm`
+                            : '—'}
                         </span>
                       </div>
                       <div className="flex items-center justify-between">
@@ -192,7 +199,7 @@ export function ProfileTests({ profiles }: ProfileTestsProps) {
                         <ChartContainer
                           config={{
                             stress: {
-                              label: "σ (MPa)",
+                              label: 'σ (MPa)',
                               color: profileColor,
                             },
                           }}
@@ -219,8 +226,8 @@ export function ProfileTests({ profiles }: ProfileTestsProps) {
                     ) : (
                       <p className="mt-3 text-[11px] text-muted-foreground">
                         {test.pointCount > 0
-                          ? "Sem dados de tensão/deformação no arquivo de origem."
-                          : "Sem pontos calculados para este ensaio."}
+                          ? 'Sem dados de tensão/deformação no arquivo de origem.'
+                          : 'Sem pontos calculados para este ensaio.'}
                       </p>
                     )}
                   </div>

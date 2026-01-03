@@ -1,10 +1,10 @@
-"use client"
+'use client'
 
-import Link from "next/link"
-import { LogOut, Settings } from "lucide-react"
+import Link from 'next/link'
+import { LogOut, Settings } from 'lucide-react'
 
-import { logoutAction } from "@/lib/auth-actions"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { logoutAction } from '@/lib/auth-actions'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,8 +12,13 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar"
+} from '@/components/ui/dropdown-menu'
+import {
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  useSidebar,
+} from '@/components/ui/sidebar'
 
 type NavUserProps = {
   user: {
@@ -25,11 +30,11 @@ type NavUserProps = {
 
 function getInitials(name: string) {
   return name
-    .split(" ")
+    .split(' ')
     .map((part) => part[0])
     .filter(Boolean)
     .slice(0, 2)
-    .join("")
+    .join('')
     .toUpperCase()
 }
 
@@ -58,7 +63,7 @@ export function NavUser({ user }: NavUserProps) {
           </DropdownMenuTrigger>
           <DropdownMenuContent
             className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
-            side={isMobile ? "bottom" : "right"}
+            side={isMobile ? 'bottom' : 'right'}
             align="end"
             sideOffset={4}
           >

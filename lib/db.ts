@@ -1,9 +1,9 @@
-import { Pool } from "pg"
+import { Pool } from 'pg'
 
 const globalForPool = globalThis as unknown as { pgPool?: Pool }
 
 if (!process.env.DATABASE_URL) {
-  throw new Error("DATABASE_URL não está configurada")
+  throw new Error('DATABASE_URL não está configurada')
 }
 
 export const pool =
@@ -12,7 +12,7 @@ export const pool =
     connectionString: process.env.DATABASE_URL,
   })
 
-if (process.env.NODE_ENV !== "production") {
+if (process.env.NODE_ENV !== 'production') {
   globalForPool.pgPool = pool
 }
 

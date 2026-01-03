@@ -1,8 +1,8 @@
-import { pool } from "@/lib/db"
-import manualParser from "@/lib/import/manual-parser"
+import { pool } from '@/lib/db'
+import manualParser from '@/lib/import/manual-parser'
 
-export const runtime = "nodejs"
-export const dynamic = "force-dynamic"
+export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
 
 type ImportResult = {
   file: string
@@ -46,39 +46,34 @@ type TestRunPayload = {
   notes: string | null
 }
 
-const {
-  parseManualContent,
-  normalizeManualRows,
-  parseNumber,
-  slugifyMaterial,
-  formatCodeValue,
-} = manualParser as {
-  parseManualContent: (
-    content: string,
-    options?: { delimiter?: string; columns?: string | string[] },
-  ) => {
-    rows: Record<string, unknown>[]
-    header: string[]
-    columnMap: Record<string, string>
-    metadata: Record<string, string>
-    delimiter: string | null
+const { parseManualContent, normalizeManualRows, parseNumber, slugifyMaterial, formatCodeValue } =
+  manualParser as {
+    parseManualContent: (
+      content: string,
+      options?: { delimiter?: string; columns?: string | string[] }
+    ) => {
+      rows: Record<string, unknown>[]
+      header: string[]
+      columnMap: Record<string, string>
+      metadata: Record<string, string>
+      delimiter: string | null
+    }
+    normalizeManualRows: (
+      rows: Record<string, unknown>[],
+      options?: { specimenAreaMm2?: number | null; specimenLengthMm?: number | null }
+    ) => {
+      rows: Record<string, unknown>[]
+      computedStress: boolean
+      computedStrain: boolean
+    }
+    parseNumber: (value: unknown) => number | null
+    slugifyMaterial: (value: string) => string
+    formatCodeValue: (value: number) => string
   }
-  normalizeManualRows: (
-    rows: Record<string, unknown>[],
-    options?: { specimenAreaMm2?: number | null; specimenLengthMm?: number | null },
-  ) => {
-    rows: Record<string, unknown>[]
-    computedStress: boolean
-    computedStrain: boolean
-  }
-  parseNumber: (value: unknown) => number | null
-  slugifyMaterial: (value: string) => string
-  formatCodeValue: (value: number) => string
-}
 
 function getTextField(formData: FormData, key: string) {
   const value = formData.get(key)
-  if (typeof value !== "string") return ""
+  if (typeof value !== 'string') return ''
   return value.trim()
 }
 
@@ -87,7 +82,10 @@ function getNumericField(formData: FormData, key: string) {
   return value ? parseNumber(value) : null
 }
 
-async function ensureMaterial(client: Awaited<ReturnType<typeof pool.connect>>, payload: MaterialPayload) {
+async function ensureMaterial(
+  client: Awaited<ReturnType<typeof pool.connect>>,
+  payload: MaterialPayload
+) {
   const result = await client.query<{ id: number }>(
     `INSERT INTO materials (name, grade, supplier, notes)
      VALUES ($1, $2, $3, $4)
@@ -96,12 +94,15 @@ async function ensureMaterial(client: Awaited<ReturnType<typeof pool.connect>>, 
        supplier = COALESCE(EXCLUDED.supplier, materials.supplier),
        notes = COALESCE(EXCLUDED.notes, materials.notes)
      RETURNING id`,
-    [payload.name, payload.grade, payload.supplier, payload.notes],
+    [payload.name, payload.grade, payload.supplier, payload.notes]
   )
   return result.rows[0].id
 }
 
-async function upsertPrintProfile(client: Awaited<ReturnType<typeof pool.connect>>, payload: ProfilePayload) {
+async function upsertPrintProfile(
+  client: Awaited<ReturnType<typeof pool.connect>>,
+  payload: ProfilePayload
+) {
   const result = await client.query<{ id: number }>(
     `INSERT INTO print_profiles
       (material_id, code, temperature_c, speed_mm_s, layer_height_mm, extra_params)
@@ -120,12 +121,15 @@ async function upsertPrintProfile(client: Awaited<ReturnType<typeof pool.connect
       payload.speed,
       payload.layerHeight,
       payload.extraParams,
-    ],
+    ]
   )
   return result.rows[0].id
 }
 
-async function upsertTestRun(client: Awaited<ReturnType<typeof pool.connect>>, payload: TestRunPayload) {
+async function upsertTestRun(
+  client: Awaited<ReturnType<typeof pool.connect>>,
+  payload: TestRunPayload
+) {
   const result = await client.query<{ id: number }>(
     `INSERT INTO test_runs
       (print_profile_id, test_number, test_code, raw_file_path, processed_file_path,
@@ -156,7 +160,7 @@ async function upsertTestRun(client: Awaited<ReturnType<typeof pool.connect>>, p
       payload.specimenThicknessMm,
       payload.specimenAreaMm2,
       payload.notes,
-    ],
+    ]
   )
   return result.rows[0].id
 }
@@ -164,7 +168,7 @@ async function upsertTestRun(client: Awaited<ReturnType<typeof pool.connect>>, p
 async function insertMeasurements(
   client: Awaited<ReturnType<typeof pool.connect>>,
   testRunId: number,
-  rows: Record<string, unknown>[],
+  rows: Record<string, unknown>[]
 ) {
   const chunkSize = 1000
   let pointIndex = 1
@@ -178,7 +182,7 @@ async function insertMeasurements(
     for (const row of chunk) {
       const typed = row as Record<string, number | null | Record<string, unknown>>
       placeholders.push(
-        `($${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++})`,
+        `($${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++})`
       )
       values.push(
         testRunId,
@@ -190,7 +194,7 @@ async function insertMeasurements(
         (typed.forca_n as number | null) ?? null,
         (typed.tensao_pa as number | null) ?? null,
         (typed.tensao_mpa as number | null) ?? null,
-        (typed.extras as Record<string, unknown>) ?? {},
+        (typed.extras as Record<string, unknown>) ?? {}
       )
       pointIndex += 1
     }
@@ -199,8 +203,8 @@ async function insertMeasurements(
       `INSERT INTO test_measurements
         (test_run_id, point_index, tempo_s, alongamento_mm_mm, deformacao_mm_mm, deformacao_mm,
          forca_n, tensao_pa, tensao_mpa, extras)
-       VALUES ${placeholders.join(", ")}`,
-      values,
+       VALUES ${placeholders.join(', ')}`,
+      values
     )
   }
 }
@@ -209,25 +213,25 @@ export async function POST(request: Request) {
   try {
     const formData = await request.formData()
     const files = formData
-      .getAll("files")
+      .getAll('files')
       .filter((item): item is File => item instanceof File && item.size > 0)
 
     if (!files.length) {
-      return Response.json({ error: "Nenhum arquivo foi enviado." }, { status: 400 })
+      return Response.json({ error: 'Nenhum arquivo foi enviado.' }, { status: 400 })
     }
 
-    const material = getTextField(formData, "material")
-    const temperatureInput = getNumericField(formData, "temperature")
-    const speedInput = getNumericField(formData, "speed")
-    const layerHeightInput = getNumericField(formData, "layerHeight")
+    const material = getTextField(formData, 'material')
+    const temperatureInput = getNumericField(formData, 'temperature')
+    const speedInput = getNumericField(formData, 'speed')
+    const layerHeightInput = getNumericField(formData, 'layerHeight')
     const temperature = temperatureInput && temperatureInput > 0 ? temperatureInput : null
     const speed = speedInput && speedInput > 0 ? speedInput : null
     const layerHeight = layerHeightInput && layerHeightInput > 0 ? layerHeightInput : null
 
     if (!material) {
-      return Response.json({ error: "Informe o material." }, { status: 400 })
+      return Response.json({ error: 'Informe o material.' }, { status: 400 })
     }
-    const profileCodeInput = getTextField(formData, "profileCode")
+    const profileCodeInput = getTextField(formData, 'profileCode')
     const codeTemperature = temperature ?? 0
     const codeSpeed = speed ?? 0
     const profileCode =
@@ -235,32 +239,30 @@ export async function POST(request: Request) {
       `${slugifyMaterial(material)}_T${formatCodeValue(codeTemperature)}_V${formatCodeValue(codeSpeed)}`
 
     const testNumberStart =
-      getNumericField(formData, "testNumberStart") ??
-      getNumericField(formData, "testNumber") ??
-      1
+      getNumericField(formData, 'testNumberStart') ?? getNumericField(formData, 'testNumber') ?? 1
 
-    const specimenLengthMm = getNumericField(formData, "specimenLength")
-    const specimenWidthMm = getNumericField(formData, "specimenWidth")
-    const specimenThicknessMm = getNumericField(formData, "specimenThickness")
+    const specimenLengthMm = getNumericField(formData, 'specimenLength')
+    const specimenWidthMm = getNumericField(formData, 'specimenWidth')
+    const specimenThicknessMm = getNumericField(formData, 'specimenThickness')
     const specimenAreaMm2 =
-      getNumericField(formData, "specimenArea") ??
+      getNumericField(formData, 'specimenArea') ??
       (specimenWidthMm && specimenThicknessMm ? specimenWidthMm * specimenThicknessMm : null)
 
-    const delimiter = getTextField(formData, "delimiter")
-    const columns = getTextField(formData, "columns")
+    const delimiter = getTextField(formData, 'delimiter')
+    const columns = getTextField(formData, 'columns')
 
     const materialPayload: MaterialPayload = {
       name: material,
-      grade: getTextField(formData, "materialGrade") || null,
-      supplier: getTextField(formData, "materialSupplier") || null,
-      notes: getTextField(formData, "materialNotes") || null,
+      grade: getTextField(formData, 'materialGrade') || null,
+      supplier: getTextField(formData, 'materialSupplier') || null,
+      notes: getTextField(formData, 'materialNotes') || null,
     }
 
     const client = await pool.connect()
     const results: ImportResult[] = []
 
     try {
-      await client.query("BEGIN")
+      await client.query('BEGIN')
       const materialId = await ensureMaterial(client, materialPayload)
       const profileId = await upsertPrintProfile(client, {
         materialId,
@@ -291,9 +293,9 @@ export async function POST(request: Request) {
 
         const testNumber = Math.max(1, Math.floor(testNumberStart + index))
         const metadata = {
-          source: "manual",
-          importer: "manual",
-          delimiter: parseResult.delimiter ?? "whitespace",
+          source: 'manual',
+          importer: 'manual',
+          delimiter: parseResult.delimiter ?? 'whitespace',
           header_columns: parseResult.header,
           column_map: parseResult.columnMap,
           source_metadata: parseResult.metadata,
@@ -315,10 +317,10 @@ export async function POST(request: Request) {
           specimenWidthMm,
           specimenThicknessMm,
           specimenAreaMm2,
-          notes: getTextField(formData, "testNotes") || null,
+          notes: getTextField(formData, 'testNotes') || null,
         })
 
-        await client.query("DELETE FROM test_measurements WHERE test_run_id = $1", [testRunId])
+        await client.query('DELETE FROM test_measurements WHERE test_run_id = $1', [testRunId])
         await insertMeasurements(client, testRunId, normalized.rows)
 
         results.push({
@@ -333,9 +335,9 @@ export async function POST(request: Request) {
         })
       }
 
-      await client.query("COMMIT")
+      await client.query('COMMIT')
     } catch (error) {
-      await client.query("ROLLBACK")
+      await client.query('ROLLBACK')
       throw error
     } finally {
       client.release()
@@ -348,13 +350,14 @@ export async function POST(request: Request) {
       results,
     })
   } catch (error) {
-    let message = error instanceof Error ? error.message : "Falha ao importar arquivos."
-    if (message.includes("No header found")) {
-      message = "Nao foi encontrado cabecalho. Informe o mapeamento de colunas manualmente."
+    let message = error instanceof Error ? error.message : 'Falha ao importar arquivos.'
+    if (message.includes('No header found')) {
+      message = 'Nao foi encontrado cabecalho. Informe o mapeamento de colunas manualmente.'
     }
-    const status = message.includes("Nao foi encontrado cabecalho") || message.includes("nao possui dados")
-      ? 400
-      : 500
+    const status =
+      message.includes('Nao foi encontrado cabecalho') || message.includes('nao possui dados')
+        ? 400
+        : 500
     return Response.json({ error: message }, { status })
   }
 }

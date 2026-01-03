@@ -1,9 +1,9 @@
-"use client"
+'use client'
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import type { TemperatureUsage } from "@/lib/dashboard-data"
-import { Pie, PieChart, ResponsiveContainer, Cell } from "recharts"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
+import type { TemperatureUsage } from '@/lib/dashboard-data'
+import { Pie, PieChart, ResponsiveContainer, Cell } from 'recharts'
 
 type ParametersUsageChartProps = {
   data: TemperatureUsage[]
@@ -29,7 +29,7 @@ export function ParametersUsageChart({ data }: ParametersUsageChartProps) {
           <ChartContainer
             config={{
               value: {
-                label: "Ensaios",
+                label: 'Ensaios',
               },
             }}
             className="h-[300px]"

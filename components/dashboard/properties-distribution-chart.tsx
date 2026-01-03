@@ -1,9 +1,9 @@
-"use client"
+'use client'
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import type { StressHistogramBin } from "@/lib/dashboard-data"
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer, Legend } from "recharts"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
+import type { StressHistogramBin } from '@/lib/dashboard-data'
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer, Legend } from 'recharts'
 
 type PropertiesDistributionChartProps = {
   data: StressHistogramBin[]
@@ -14,17 +14,21 @@ export function PropertiesDistributionChart({ data }: PropertiesDistributionChar
     <Card>
       <CardHeader>
         <CardTitle>Distribuição da tensão máxima</CardTitle>
-        <CardDescription>Frequência dos ensaios reais por faixas de tensão máxima (MPa)</CardDescription>
+        <CardDescription>
+          Frequência dos ensaios reais por faixas de tensão máxima (MPa)
+        </CardDescription>
       </CardHeader>
       <CardContent>
         {data.length === 0 ? (
-          <p className="text-sm text-muted-foreground">Nenhum valor de tensão calculada para exibir.</p>
+          <p className="text-sm text-muted-foreground">
+            Nenhum valor de tensão calculada para exibir.
+          </p>
         ) : (
           <ChartContainer
             config={{
               count: {
-                label: "Ensaios",
-                color: "var(--chart-2)",
+                label: 'Ensaios',
+                color: 'var(--chart-2)',
               },
             }}
             className="h-[300px]"

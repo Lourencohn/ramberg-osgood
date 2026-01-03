@@ -1,7 +1,7 @@
-import { query } from "@/lib/db"
-import { formatProfileLabel, hasValidPrintParams } from "@/lib/formatters"
+import { query } from '@/lib/db'
+import { formatProfileLabel, hasValidPrintParams } from '@/lib/formatters'
 
-const STRAIN_EXPRESSION = "COALESCE(m.deformacao_mm_mm, m.alongamento_mm_mm)"
+const STRAIN_EXPRESSION = 'COALESCE(m.deformacao_mm_mm, m.alongamento_mm_mm)'
 
 type RunMetricsRow = {
   id: number
@@ -138,29 +138,30 @@ function buildStressDistribution(values: number[], bucketCount = 5): StressHisto
 }
 
 export function buildProfileAverages(metrics: RunMetrics[]): ProfileAverages[] {
-  const grouped = new Map<string, ProfileAverages & {
-    stressSum: number
-    stressCount: number
-    strainSum: number
-    strainCount: number
-  }>()
+  const grouped = new Map<
+    string,
+    ProfileAverages & {
+      stressSum: number
+      stressCount: number
+      strainSum: number
+      strainCount: number
+    }
+  >()
 
   for (const metric of metrics) {
     const key = metric.profileCode
-    const current =
-      grouped.get(key) ??
-      {
-        profile: metric.profileCode,
-        temperature: metric.temperature,
-        speed: metric.speed,
-        tests: 0,
-        avgMaxStress: null,
-        avgMaxStrain: null,
-        stressSum: 0,
-        stressCount: 0,
-        strainSum: 0,
-        strainCount: 0,
-      }
+    const current = grouped.get(key) ?? {
+      profile: metric.profileCode,
+      temperature: metric.temperature,
+      speed: metric.speed,
+      tests: 0,
+      avgMaxStress: null,
+      avgMaxStrain: null,
+      stressSum: 0,
+      stressCount: 0,
+      strainSum: 0,
+      strainCount: 0,
+    }
 
     current.tests += 1
     if (metric.maxStress !== null) {
@@ -184,7 +185,9 @@ export function buildProfileAverages(metrics: RunMetrics[]): ProfileAverages[] {
       avgMaxStress: item.stressCount ? item.stressSum / item.stressCount : null,
       avgMaxStrain: item.strainCount ? item.strainSum / item.strainCount : null,
     }))
-    .sort((a, b) => (a.temperature !== b.temperature ? a.temperature - b.temperature : a.speed - b.speed))
+    .sort((a, b) =>
+      a.temperature !== b.temperature ? a.temperature - b.temperature : a.speed - b.speed
+    )
 }
 
 function groupTemperatureUsage(metrics: RunMetrics[]): TemperatureUsage[] {
@@ -202,17 +205,17 @@ function groupTemperatureUsage(metrics: RunMetrics[]): TemperatureUsage[] {
 
 function buildSpeedPerformance(metrics: RunMetrics[]): SpeedPerformance {
   const validMetrics = metrics.filter(
-    (metric) => metric.maxStress !== null && hasValidPrintParams(metric.temperature, metric.speed),
+    (metric) => metric.maxStress !== null && hasValidPrintParams(metric.temperature, metric.speed)
   )
-  const temperatures = Array.from(new Set(validMetrics.map((metric) => metric.temperature))).sort((a, b) => a - b)
+  const temperatures = Array.from(new Set(validMetrics.map((metric) => metric.temperature))).sort(
+    (a, b) => a - b
+  )
 
-  const grouped = new Map<
-    number,
-    Map<number, { sum: number; count: number }>
-  >()
+  const grouped = new Map<number, Map<number, { sum: number; count: number }>>()
 
   for (const metric of validMetrics) {
-    const speedGroup = grouped.get(metric.speed) ?? new Map<number, { sum: number; count: number }>()
+    const speedGroup =
+      grouped.get(metric.speed) ?? new Map<number, { sum: number; count: number }>()
     const current = speedGroup.get(metric.temperature) ?? { sum: 0, count: 0 }
 
     current.sum += metric.maxStress ?? 0
@@ -222,7 +225,7 @@ function buildSpeedPerformance(metrics: RunMetrics[]): SpeedPerformance {
     grouped.set(metric.speed, speedGroup)
   }
 
-  const data: SpeedPerformance["data"] = Array.from(grouped.entries())
+  const data: SpeedPerformance['data'] = Array.from(grouped.entries())
     .sort((a, b) => a[0] - b[0])
     .map(([speed, tempMap]) => {
       const point: { speed: number } & Record<string, number | null> = { speed }
@@ -249,34 +252,32 @@ function cleanCurve(points: StressPoint[]): StressPoint[] {
 
 function buildProfileDetails(
   metrics: RunMetrics[],
-  pointsMap: Map<number, StressPoint[]>,
+  pointsMap: Map<number, StressPoint[]>
 ): ProfileDetail[] {
   const grouped = new Map<string, ProfileDetail>()
 
   for (const metric of metrics) {
     const key = metric.profileCode
     const curvePoints = pointsMap.get(metric.id) ?? []
-    const current =
-      grouped.get(key) ??
-      {
-        profile: metric.profileCode,
-        label: formatProfileLabel(metric.temperature, metric.speed),
-        temperature: metric.temperature,
-        speed: metric.speed,
-        tests: [],
-      }
+    const current = grouped.get(key) ?? {
+      profile: metric.profileCode,
+      label: formatProfileLabel(metric.temperature, metric.speed),
+      temperature: metric.temperature,
+      speed: metric.speed,
+      tests: [],
+    }
 
-      current.tests.push({
-        id: metric.id,
-        label: `Ensaio ${metric.testNumber}`,
-        testCode: metric.testCode,
-        testNumber: metric.testNumber,
-        source: metric.source,
-        maxStress: metric.maxStress,
-        maxStrain: metric.maxStrain,
-        pointCount: metric.pointCount,
-        points: curvePoints,
-      })
+    current.tests.push({
+      id: metric.id,
+      label: `Ensaio ${metric.testNumber}`,
+      testCode: metric.testCode,
+      testNumber: metric.testNumber,
+      source: metric.source,
+      maxStress: metric.maxStress,
+      maxStrain: metric.maxStrain,
+      pointCount: metric.pointCount,
+      points: curvePoints,
+    })
 
     grouped.set(key, current)
   }
@@ -286,7 +287,9 @@ function buildProfileDetails(
       ...profile,
       tests: profile.tests.sort((a, b) => a.testNumber - b.testNumber),
     }))
-    .sort((a, b) => (a.temperature !== b.temperature ? a.temperature - b.temperature : a.speed - b.speed))
+    .sort((a, b) =>
+      a.temperature !== b.temperature ? a.temperature - b.temperature : a.speed - b.speed
+    )
 }
 
 export async function getRunMetrics(): Promise<RunMetrics[]> {
@@ -309,7 +312,7 @@ export async function getRunMetrics(): Promise<RunMetrics[]> {
       JOIN test_measurements m ON m.test_run_id = t.id
       GROUP BY t.id, t.test_code, t.test_number, t.created_at, t.metadata, p.code, p.temperature_c, p.speed_mm_s
       ORDER BY t.created_at ASC
-    `,
+    `
   )
 
   return rows.map((row) => ({
@@ -333,7 +336,7 @@ async function fetchCounts() {
       SELECT
         (SELECT COUNT(*) FROM print_profiles) AS total_profiles,
         (SELECT COUNT(*) FROM test_measurements) AS total_measurements
-    `,
+    `
   )
 
   const [row] = rows
@@ -355,7 +358,7 @@ async function fetchTestPoints(): Promise<Map<number, StressPoint[]>> {
       WHERE m.tensao_mpa IS NOT NULL
         AND ${STRAIN_EXPRESSION} IS NOT NULL
       ORDER BY t.id, m.point_index
-    `,
+    `
   )
 
   const map = new Map<number, StressPoint[]>()
@@ -378,11 +381,17 @@ async function fetchTestPoints(): Promise<Map<number, StressPoint[]>> {
 }
 
 export async function getDashboardData(): Promise<DashboardData> {
-  const [metrics, counts, pointsMap] = await Promise.all([getRunMetrics(), fetchCounts(), fetchTestPoints()])
-  const stressValues = metrics.filter((metric) => metric.maxStress !== null).map((metric) => metric.maxStress as number)
+  const [metrics, counts, pointsMap] = await Promise.all([
+    getRunMetrics(),
+    fetchCounts(),
+    fetchTestPoints(),
+  ])
+  const stressValues = metrics
+    .filter((metric) => metric.maxStress !== null)
+    .map((metric) => metric.maxStress as number)
 
   const recentRuns = [...metrics].sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   )
 
   const stats: DashboardStats = {

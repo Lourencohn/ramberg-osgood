@@ -1,5 +1,5 @@
-import type { RambergOsgoodParams, StressStrainPoint } from "@/types"
-import { calculateStrain, generateStressStrainCurve } from "./ramberg-osgood"
+import type { RambergOsgoodParams, StressStrainPoint } from '@/types'
+import { calculateStrain, generateStressStrainCurve } from './ramberg-osgood'
 
 export interface RambergOsgoodFitOptions {
   iterations?: number
@@ -28,7 +28,7 @@ const DEFAULT_BOUNDS = {
   E: [500, 10000],
   sigma_0: [5, 200],
   n: [1, 30],
-} satisfies Required<NonNullable<RambergOsgoodFitOptions["bounds"]>>
+} satisfies Required<NonNullable<RambergOsgoodFitOptions['bounds']>>
 
 function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max)
@@ -108,7 +108,7 @@ function loss(params: RambergOsgoodParams, points: StressStrainPoint[]) {
 
 function createRandomParams(
   rng: () => number,
-  bounds: Required<NonNullable<RambergOsgoodFitOptions["bounds"]>>,
+  bounds: Required<NonNullable<RambergOsgoodFitOptions['bounds']>>
 ): RambergOsgoodParams {
   const randInRange = (min: number, max: number) => min + rng() * (max - min)
   return {
@@ -120,7 +120,7 @@ function createRandomParams(
 
 function clampParams(
   params: RambergOsgoodParams,
-  bounds: Required<NonNullable<RambergOsgoodFitOptions["bounds"]>>,
+  bounds: Required<NonNullable<RambergOsgoodFitOptions['bounds']>>
 ): RambergOsgoodParams {
   return {
     E: clamp(params.E, bounds.E[0], bounds.E[1]),
@@ -131,7 +131,7 @@ function clampParams(
 
 export function fitRambergOsgoodCurve(
   points: StressStrainPoint[],
-  options: RambergOsgoodFitOptions = {},
+  options: RambergOsgoodFitOptions = {}
 ): RambergOsgoodFitResult {
   const sanitized = sanitizePoints(points)
   if (!sanitized.length) {
@@ -161,7 +161,7 @@ export function fitRambergOsgoodCurve(
       sigma_0: estimateSigma0(sample),
       n: 8,
     },
-    bounds,
+    bounds
   )
 
   const totalIterations = options.iterations ?? 3000
@@ -183,7 +183,7 @@ export function fitRambergOsgoodCurve(
           sigma_0: params.sigma_0 * (1 + randomNormal(rng) * step),
           n: params.n * (1 + randomNormal(rng) * step),
         },
-        bounds,
+        bounds
       )
 
       const candidateResult = loss(candidate, sample)

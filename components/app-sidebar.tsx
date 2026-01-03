@@ -1,13 +1,22 @@
-"use client"
+'use client'
 
-import type React from "react"
-import Image from "next/image"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { FileText, GitCompare, History, Home, Search, Settings, Sparkles, UploadCloud } from "lucide-react"
+import type React from 'react'
+import Image from 'next/image'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import {
+  FileText,
+  GitCompare,
+  History,
+  Home,
+  Search,
+  Settings,
+  Sparkles,
+  UploadCloud,
+} from 'lucide-react'
 
-import { NavUser } from "@/components/nav-user"
-import { Label } from "@/components/ui/label"
+import { NavUser } from '@/components/nav-user'
+import { Label } from '@/components/ui/label'
 import {
   Sidebar,
   SidebarContent,
@@ -21,7 +30,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
-} from "@/components/ui/sidebar"
+} from '@/components/ui/sidebar'
 
 type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
   user: {
@@ -32,31 +41,28 @@ type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
 
 const navigation = [
   {
-    title: "Fluxos",
+    title: 'Fluxos',
     items: [
-      { title: "Dashboard", href: "/dashboard", icon: Home },
-      { title: "Nova Predição", href: "/predict", icon: Sparkles },
-      { title: "Histórico", href: "/history", icon: History },
-      { title: "Importar", href: "/import", icon: UploadCloud },
-      { title: "Comparar", href: "/compare", icon: GitCompare },
+      { title: 'Dashboard', href: '/dashboard', icon: Home },
+      { title: 'Nova Predição', href: '/predict', icon: Sparkles },
+      { title: 'Histórico', href: '/history', icon: History },
+      { title: 'Importar', href: '/import', icon: UploadCloud },
+      { title: 'Comparar', href: '/compare', icon: GitCompare },
     ],
   },
   {
-    title: "Conteúdo",
-    items: [{ title: "Documentação", href: "/docs", icon: FileText }],
+    title: 'Conteúdo',
+    items: [{ title: 'Documentação', href: '/docs', icon: FileText }],
   },
   {
-    title: "Ajustes",
-    items: [{ title: "Configurações", href: "/settings", icon: Settings }],
+    title: 'Ajustes',
+    items: [{ title: 'Configurações', href: '/settings', icon: Settings }],
   },
 ]
 
-function SearchForm({ ...props }: React.ComponentProps<"form">) {
+function SearchForm({ ...props }: React.ComponentProps<'form'>) {
   return (
-    <form
-      onSubmit={(event) => event.preventDefault()}
-      {...props}
-    >
+    <form onSubmit={(event) => event.preventDefault()} {...props}>
       <SidebarGroup className="py-0">
         <SidebarGroupContent className="relative">
           <Label htmlFor="sidebar-search" className="sr-only">

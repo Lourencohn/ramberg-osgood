@@ -1,20 +1,20 @@
-"use client"
+'use client'
 
-import type { StressStrainPoint } from "@/types"
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import { Line, LineChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer, Legend } from "recharts"
+import type { StressStrainPoint } from '@/types'
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
+import { Line, LineChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer, Legend } from 'recharts'
 
 type StressStrainValidationChartProps = {
   curve: StressStrainPoint[]
   points: StressStrainPoint[]
 }
 
-const strainFormatter = new Intl.NumberFormat("pt-BR", {
+const strainFormatter = new Intl.NumberFormat('pt-BR', {
   minimumFractionDigits: 3,
   maximumFractionDigits: 3,
 })
 
-const stressFormatter = new Intl.NumberFormat("pt-BR", {
+const stressFormatter = new Intl.NumberFormat('pt-BR', {
   minimumFractionDigits: 1,
   maximumFractionDigits: 1,
 })
@@ -32,12 +32,12 @@ export function StressStrainValidationChart({ curve, points }: StressStrainValid
     <ChartContainer
       config={{
         predicted: {
-          label: "Curva prevista",
-          color: "var(--chart-1)",
+          label: 'Curva prevista',
+          color: 'var(--chart-1)',
         },
         measured: {
-          label: "Pontos reais",
-          color: "var(--chart-3)",
+          label: 'Pontos reais',
+          color: 'var(--chart-3)',
         },
       }}
       className="h-[340px] w-full aspect-auto"
@@ -73,14 +73,14 @@ export function StressStrainValidationChart({ curve, points }: StressStrainValid
             stroke="transparent"
             dot={{
               r: 2,
-              fill: "var(--chart-3)",
-              stroke: "var(--chart-3)",
+              fill: 'var(--chart-3)',
+              stroke: 'var(--chart-3)',
               strokeWidth: 1,
             }}
             activeDot={{
               r: 3,
-              fill: "var(--chart-3)",
-              stroke: "var(--chart-3)",
+              fill: 'var(--chart-3)',
+              stroke: 'var(--chart-3)',
               strokeWidth: 1,
             }}
           />

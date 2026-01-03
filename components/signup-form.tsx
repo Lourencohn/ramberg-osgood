@@ -1,17 +1,11 @@
-import type React from "react"
-import Link from "next/link"
+import type React from 'react'
+import Link from 'next/link'
 
-import { signupAction } from "@/lib/auth-actions"
-import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
+import { signupAction } from '@/lib/auth-actions'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Field, FieldDescription, FieldGroup, FieldLabel } from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
 
 type SignupFormProps = React.ComponentProps<typeof Card> & {
   error?: string

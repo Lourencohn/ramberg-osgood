@@ -1,14 +1,33 @@
-"use client"
+'use client'
 
-import { useMemo, useState } from "react"
-import type { ProfileAverages, RunMetrics } from "@/lib/dashboard-data"
-import { formatDataSource, formatProfileLabel, formatSpeed, formatTemperature } from "@/lib/formatters"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ArrowDownRight, ArrowUpRight, Calendar, FileSpreadsheet, Gauge, GitCompare, Thermometer } from "lucide-react"
+import { useMemo, useState } from 'react'
+import type { ProfileAverages, RunMetrics } from '@/lib/dashboard-data'
+import {
+  formatDataSource,
+  formatProfileLabel,
+  formatSpeed,
+  formatTemperature,
+} from '@/lib/formatters'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Label } from '@/components/ui/label'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import {
+  ArrowDownRight,
+  ArrowUpRight,
+  Calendar,
+  FileSpreadsheet,
+  Gauge,
+  GitCompare,
+  Thermometer,
+} from 'lucide-react'
 
 type CompareClientProps = {
   runs: RunMetrics[]
@@ -23,30 +42,30 @@ type DifferenceInfo = {
   hasData: boolean
 }
 
-const dateFormatter = new Intl.DateTimeFormat("pt-BR", {
-  dateStyle: "short",
-  timeStyle: "short",
+const dateFormatter = new Intl.DateTimeFormat('pt-BR', {
+  dateStyle: 'short',
+  timeStyle: 'short',
 })
 
-const stressFormatter = new Intl.NumberFormat("pt-BR", {
+const stressFormatter = new Intl.NumberFormat('pt-BR', {
   minimumFractionDigits: 1,
   maximumFractionDigits: 1,
 })
 
-const strainFormatter = new Intl.NumberFormat("pt-BR", {
+const strainFormatter = new Intl.NumberFormat('pt-BR', {
   minimumFractionDigits: 4,
   maximumFractionDigits: 4,
 })
 
-const countFormatter = new Intl.NumberFormat("pt-BR")
+const countFormatter = new Intl.NumberFormat('pt-BR')
 
 function getDifferenceInfo(val1: number | null, val2: number | null): DifferenceInfo {
   if (val1 === null || val2 === null || val1 === 0) {
     return {
-      value: "—",
+      value: '—',
       isPositive: false,
       isEqual: false,
-      label: "sem dados",
+      label: 'sem dados',
       hasData: false,
     }
   }
@@ -59,7 +78,7 @@ function getDifferenceInfo(val1: number | null, val2: number | null): Difference
     value: Math.abs(diff).toFixed(1),
     isPositive,
     isEqual,
-    label: isEqual ? "igual" : isPositive ? "maior" : "menor",
+    label: isEqual ? 'igual' : isPositive ? 'maior' : 'menor',
     hasData: true,
   }
 }
@@ -71,13 +90,20 @@ function DifferenceMetric({ label, info }: { label: string; info: DifferenceInfo
       <div className="mt-2 flex items-center gap-2">
         <div
           className={`flex items-center gap-1 rounded-full px-2.5 py-1 text-sm font-semibold ${
-            info.hasData && info.isPositive ? "bg-foreground text-background" : "bg-muted text-muted-foreground"
+            info.hasData && info.isPositive
+              ? 'bg-foreground text-background'
+              : 'bg-muted text-muted-foreground'
           }`}
         >
           {info.hasData && !info.isEqual ? (
-            info.isPositive ? <ArrowUpRight className="size-4" /> : <ArrowDownRight className="size-4" />
+            info.isPositive ? (
+              <ArrowUpRight className="size-4" />
+            ) : (
+              <ArrowDownRight className="size-4" />
+            )
           ) : null}
-          {info.value}{info.hasData ? "%" : ""}
+          {info.value}
+          {info.hasData ? '%' : ''}
         </div>
         <span className="text-xs text-muted-foreground">{info.label}</span>
       </div>
@@ -97,7 +123,7 @@ function RunComparison({ left, right }: { left: RunMetrics; right: RunMetrics })
           <Card key={run.id} className="relative overflow-hidden">
             <div
               className={`absolute left-0 top-0 h-full w-1 ${
-                index === 0 ? "bg-foreground" : "bg-foreground/50"
+                index === 0 ? 'bg-foreground' : 'bg-foreground/50'
               }`}
             />
 
@@ -107,7 +133,9 @@ function RunComparison({ left, right }: { left: RunMetrics; right: RunMetrics })
                   <Badge
                     variant="outline"
                     className={`font-semibold ${
-                      index === 0 ? "border-foreground/50 text-foreground" : "border-foreground/30 text-foreground/70"
+                      index === 0
+                        ? 'border-foreground/50 text-foreground'
+                        : 'border-foreground/30 text-foreground/70'
                     }`}
                   >
                     Ensaio {index + 1}
@@ -164,20 +192,26 @@ function RunComparison({ left, right }: { left: RunMetrics; right: RunMetrics })
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">Tensão máxima (σ máx)</span>
                     <span className="text-sm font-bold text-foreground">
-                      {run.maxStress !== null ? `${stressFormatter.format(run.maxStress)} MPa` : "—"}
+                      {run.maxStress !== null
+                        ? `${stressFormatter.format(run.maxStress)} MPa`
+                        : '—'}
                     </span>
                   </div>
                   <div className="h-px bg-border" />
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">Deformação máxima (ε máx)</span>
                     <span className="text-sm font-bold text-foreground">
-                      {run.maxStrain !== null ? `${strainFormatter.format(run.maxStrain)} mm/mm` : "—"}
+                      {run.maxStrain !== null
+                        ? `${strainFormatter.format(run.maxStrain)} mm/mm`
+                        : '—'}
                     </span>
                   </div>
                   <div className="h-px bg-border" />
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">Pontos medidos</span>
-                    <span className="text-sm font-bold text-foreground">{countFormatter.format(run.pointCount)}</span>
+                    <span className="text-sm font-bold text-foreground">
+                      {countFormatter.format(run.pointCount)}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -194,7 +228,9 @@ function RunComparison({ left, right }: { left: RunMetrics; right: RunMetrics })
             </div>
             <div>
               <CardTitle className="text-lg">Diferenças Relativas</CardTitle>
-              <CardDescription>Comparação percentual: Ensaio 2 em relação ao Ensaio 1</CardDescription>
+              <CardDescription>
+                Comparação percentual: Ensaio 2 em relação ao Ensaio 1
+              </CardDescription>
             </div>
           </div>
         </CardHeader>
@@ -222,7 +258,7 @@ function AverageComparison({ left, right }: { left: ProfileAverages; right: Prof
           <Card key={profile.profile} className="relative overflow-hidden">
             <div
               className={`absolute left-0 top-0 h-full w-1 ${
-                index === 0 ? "bg-foreground" : "bg-foreground/50"
+                index === 0 ? 'bg-foreground' : 'bg-foreground/50'
               }`}
             />
 
@@ -232,7 +268,9 @@ function AverageComparison({ left, right }: { left: ProfileAverages; right: Prof
                   <Badge
                     variant="outline"
                     className={`font-semibold ${
-                      index === 0 ? "border-foreground/50 text-foreground" : "border-foreground/30 text-foreground/70"
+                      index === 0
+                        ? 'border-foreground/50 text-foreground'
+                        : 'border-foreground/30 text-foreground/70'
                     }`}
                   >
                     Perfil {index + 1}
@@ -273,22 +311,32 @@ function AverageComparison({ left, right }: { left: ProfileAverages; right: Prof
                 <h4 className="text-sm font-semibold text-foreground">Médias do Perfil</h4>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Tensão máxima média (σ máx)</span>
+                    <span className="text-sm text-muted-foreground">
+                      Tensão máxima média (σ máx)
+                    </span>
                     <span className="text-sm font-bold text-foreground">
-                      {profile.avgMaxStress !== null ? `${stressFormatter.format(profile.avgMaxStress)} MPa` : "—"}
+                      {profile.avgMaxStress !== null
+                        ? `${stressFormatter.format(profile.avgMaxStress)} MPa`
+                        : '—'}
                     </span>
                   </div>
                   <div className="h-px bg-border" />
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Deformação máxima média (ε máx)</span>
+                    <span className="text-sm text-muted-foreground">
+                      Deformação máxima média (ε máx)
+                    </span>
                     <span className="text-sm font-bold text-foreground">
-                      {profile.avgMaxStrain !== null ? `${strainFormatter.format(profile.avgMaxStrain)} mm/mm` : "—"}
+                      {profile.avgMaxStrain !== null
+                        ? `${strainFormatter.format(profile.avgMaxStrain)} mm/mm`
+                        : '—'}
                     </span>
                   </div>
                   <div className="h-px bg-border" />
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">Ensaios considerados</span>
-                    <span className="text-sm font-bold text-foreground">{countFormatter.format(profile.tests)}</span>
+                    <span className="text-sm font-bold text-foreground">
+                      {countFormatter.format(profile.tests)}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -305,7 +353,9 @@ function AverageComparison({ left, right }: { left: ProfileAverages; right: Prof
             </div>
             <div>
               <CardTitle className="text-lg">Diferenças Relativas</CardTitle>
-              <CardDescription>Comparação percentual: Perfil 2 em relação ao Perfil 1</CardDescription>
+              <CardDescription>
+                Comparação percentual: Perfil 2 em relação ao Perfil 1
+              </CardDescription>
             </div>
           </div>
         </CardHeader>
@@ -323,24 +373,27 @@ function AverageComparison({ left, right }: { left: ProfileAverages; right: Prof
 
 export function CompareClient({ runs, profileAverages }: CompareClientProps) {
   const orderedRuns = useMemo(
-    () => [...runs].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
-    [runs],
+    () =>
+      [...runs].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
+    [runs]
   )
   const runOptions = useMemo(
     () =>
       orderedRuns.map((run) => ({
         value: String(run.id),
         label: `Ensaio ${run.testNumber} · ${formatProfileLabel(run.temperature, run.speed)} · ${dateFormatter.format(
-          new Date(run.createdAt),
+          new Date(run.createdAt)
         )}`,
       })),
-    [orderedRuns],
+    [orderedRuns]
   )
 
   const profilesWithData = useMemo(
     () =>
-      profileAverages.filter((profile) => profile.avgMaxStress !== null || profile.avgMaxStrain !== null),
-    [profileAverages],
+      profileAverages.filter(
+        (profile) => profile.avgMaxStress !== null || profile.avgMaxStrain !== null
+      ),
+    [profileAverages]
   )
   const orderedProfiles = useMemo(
     () =>
@@ -352,7 +405,7 @@ export function CompareClient({ runs, profileAverages }: CompareClientProps) {
         const speedB = b.speed > 0 ? b.speed : Number.POSITIVE_INFINITY
         return speedA - speedB
       }),
-    [profilesWithData],
+    [profilesWithData]
   )
   const profileOptions = useMemo(
     () =>
@@ -360,7 +413,7 @@ export function CompareClient({ runs, profileAverages }: CompareClientProps) {
         value: profile.profile,
         label: `${formatProfileLabel(profile.temperature, profile.speed)} · ${profile.tests} ensaios`,
       })),
-    [orderedProfiles],
+    [orderedProfiles]
   )
 
   const [leftRunId, setLeftRunId] = useState<string | undefined>(runOptions[0]?.value)
@@ -388,7 +441,9 @@ export function CompareClient({ runs, profileAverages }: CompareClientProps) {
           </CardHeader>
           <CardContent>
             {runOptions.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Nenhum ensaio disponível para comparação.</p>
+              <p className="text-sm text-muted-foreground">
+                Nenhum ensaio disponível para comparação.
+              </p>
             ) : (
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
@@ -453,7 +508,9 @@ export function CompareClient({ runs, profileAverages }: CompareClientProps) {
           </CardHeader>
           <CardContent>
             {profileOptions.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Nenhum perfil com dados suficientes para comparar.</p>
+              <p className="text-sm text-muted-foreground">
+                Nenhum perfil com dados suficientes para comparar.
+              </p>
             ) : (
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">

@@ -1,9 +1,9 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import type { PredictionResult, RambergOsgoodTrainingPoint } from "@/types"
-import { PredictionForm } from "@/components/prediction-form"
-import { ResultsDisplay } from "@/components/results-display"
+import { useState } from 'react'
+import type { PredictionResult, RambergOsgoodTrainingPoint } from '@/types'
+import { PredictionForm } from '@/components/prediction-form'
+import { ResultsDisplay } from '@/components/results-display'
 
 type PredictionWorkspaceProps = {
   trainingData: RambergOsgoodTrainingPoint[]

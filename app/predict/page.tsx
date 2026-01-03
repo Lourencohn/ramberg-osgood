@@ -1,10 +1,10 @@
-import { DashboardLayout } from "@/components/layout/dashboard-layout"
-import { PredictionWorkspace } from "@/components/prediction/prediction-workspace"
-import { getRambergOsgoodTrainingData } from "@/lib/prediction-data"
-import { Sparkles, Info } from "lucide-react"
-import { Alert, AlertDescription } from "@/components/ui/alert"
+import { DashboardLayout } from '@/components/layout/dashboard-layout'
+import { PredictionWorkspace } from '@/components/prediction/prediction-workspace'
+import { getRambergOsgoodTrainingData } from '@/lib/prediction-data'
+import { Sparkles, Info } from 'lucide-react'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 
-export const dynamic = "force-dynamic"
+export const dynamic = 'force-dynamic'
 
 export default async function PredictPage() {
   const trainingData = await getRambergOsgoodTrainingData()
@@ -12,7 +12,6 @@ export default async function PredictPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <div className="flex items-center gap-3">
@@ -29,15 +28,14 @@ export default async function PredictPage() {
           </div>
         </div>
 
-
         <Alert className="border-foreground/20 bg-white">
           <Info className="size-4 text-foreground" />
           <AlertDescription className="text-sm">
-            As previsões são obtidas a partir de perfis experimentais reais, com ajuste Ramberg-Osgood
-            e interpolação por base radial. A confiança exibida reflete a proximidade do envelope experimental.
+            As previsões são obtidas a partir de perfis experimentais reais, com ajuste
+            Ramberg-Osgood e interpolação por base radial. A confiança exibida reflete a proximidade
+            do envelope experimental.
           </AlertDescription>
         </Alert>
-
 
         <PredictionWorkspace trainingData={trainingData} />
       </div>

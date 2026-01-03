@@ -1,5 +1,4 @@
-import type { RambergOsgoodParams, StressStrainPoint } from "@/types"
-
+import type { RambergOsgoodParams, StressStrainPoint } from '@/types'
 
 export function calculateStrain(stress: number, params: RambergOsgoodParams): number {
   const { E, sigma_0, n } = params
@@ -10,12 +9,10 @@ export function calculateStrain(stress: number, params: RambergOsgoodParams): nu
   return elasticStrain + plasticStrain
 }
 
-
 export function calculateStress(strain: number, params: RambergOsgoodParams): number {
   const { E, sigma_0, n } = params
   const tolerance = 1e-6
   const maxIterations = 100
-
 
   let stress = E * strain
 
@@ -35,11 +32,10 @@ export function calculateStress(strain: number, params: RambergOsgoodParams): nu
   return stress
 }
 
-
 export function generateStressStrainCurve(
   params: RambergOsgoodParams,
   maxStrain = 0.1,
-  points = 100,
+  points = 100
 ): StressStrainPoint[] {
   const curve: StressStrainPoint[] = []
 

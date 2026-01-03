@@ -1,16 +1,16 @@
-import { format } from "date-fns"
-import { DashboardLayout } from "@/components/layout/dashboard-layout"
-import { StatsCard } from "@/components/dashboard/stats-card"
-import { SimulationsTrendChart } from "@/components/dashboard/simulations-trend-chart"
-import { PropertiesDistributionChart } from "@/components/dashboard/properties-distribution-chart"
-import { ParametersUsageChart } from "@/components/dashboard/parameters-usage-chart"
-import { PerformanceComparisonChart } from "@/components/dashboard/performance-comparison-chart"
-import { ProfileTests } from "@/components/dashboard/profile-tests"
-import { Activity, Beaker, Baseline as ChartLine, History } from "lucide-react"
-import { getDashboardData } from "@/lib/dashboard-data"
-import { formatProfileLabel } from "@/lib/formatters"
+import { format } from 'date-fns'
+import { DashboardLayout } from '@/components/layout/dashboard-layout'
+import { StatsCard } from '@/components/dashboard/stats-card'
+import { SimulationsTrendChart } from '@/components/dashboard/simulations-trend-chart'
+import { PropertiesDistributionChart } from '@/components/dashboard/properties-distribution-chart'
+import { ParametersUsageChart } from '@/components/dashboard/parameters-usage-chart'
+import { PerformanceComparisonChart } from '@/components/dashboard/performance-comparison-chart'
+import { ProfileTests } from '@/components/dashboard/profile-tests'
+import { Activity, Beaker, Baseline as ChartLine, History } from 'lucide-react'
+import { getDashboardData } from '@/lib/dashboard-data'
+import { formatProfileLabel } from '@/lib/formatters'
 
-export const dynamic = "force-dynamic"
+export const dynamic = 'force-dynamic'
 
 export default async function DashboardPage() {
   const dashboardData = await getDashboardData()
@@ -23,13 +23,17 @@ export default async function DashboardPage() {
     profileDetails,
   } = dashboardData
 
-  const numberFormatter = new Intl.NumberFormat("pt-BR")
+  const numberFormatter = new Intl.NumberFormat('pt-BR')
   const avgPoints = stats.totalTests ? Math.round(stats.totalMeasurements / stats.totalTests) : 0
-  const stressShare = stats.totalTests ? Math.round((stats.testsWithStress / stats.totalTests) * 100) : 0
-  const lastTestValue = stats.lastTest ? format(new Date(stats.lastTest.createdAt), "dd/MM/yyyy HH:mm") : "—"
+  const stressShare = stats.totalTests
+    ? Math.round((stats.testsWithStress / stats.totalTests) * 100)
+    : 0
+  const lastTestValue = stats.lastTest
+    ? format(new Date(stats.lastTest.createdAt), 'dd/MM/yyyy HH:mm')
+    : '—'
   const lastTestDescription = stats.lastTest
     ? `${stats.lastTest.profileCode} • ${formatProfileLabel(stats.lastTest.temperature, stats.lastTest.speed)}`
-    : "Nenhum ensaio registrado"
+    : 'Nenhum ensaio registrado'
 
   return (
     <DashboardLayout>
@@ -46,7 +50,7 @@ export default async function DashboardPage() {
             title="Ensaios registrados"
             value={numberFormatter.format(stats.totalTests)}
             icon={<Activity className="size-5 text-background" />}
-            trend={{ value: stressShare, label: "com tensão calculada" }}
+            trend={{ value: stressShare, label: 'com tensão calculada' }}
             variant="primary"
           />
           <StatsCard

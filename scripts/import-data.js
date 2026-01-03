@@ -1,24 +1,24 @@
 #!/usr/bin/env node
 
-const fs = require("fs")
-const path = require("path")
-const { Client } = require("pg")
+const fs = require('fs')
+const path = require('path')
+const { Client } = require('pg')
 
-const ROOT_DIR = path.resolve(__dirname, "..")
-const DATA_DIR = path.join(ROOT_DIR, "data")
+const ROOT_DIR = path.resolve(__dirname, '..')
+const DATA_DIR = path.join(ROOT_DIR, 'data')
 const LAYER_HEIGHT_MM = 0.5
 
 const args = new Set(process.argv.slice(2))
-const DRY_RUN = args.has("--dry-run")
+const DRY_RUN = args.has('--dry-run')
 
 const NUMBER_FIELDS = new Set([
-  "tempo_s",
-  "alongamento_mm_mm",
-  "deformacao_mm_mm",
-  "deformacao_mm",
-  "forca_n",
-  "tensao_pa",
-  "tensao_mpa",
+  'tempo_s',
+  'alongamento_mm_mm',
+  'deformacao_mm_mm',
+  'deformacao_mm',
+  'forca_n',
+  'tensao_pa',
+  'tensao_mpa',
 ])
 
 function parseNumber(value) {
@@ -34,8 +34,8 @@ function normalizeHeader(header) {
 }
 
 function readLines(filePath) {
-  const content = fs.readFileSync(filePath, "utf8").replace(/\u0000/g, "")
-  return content.split(/\r?\n/).filter((line) => line.trim() !== "")
+  const content = fs.readFileSync(filePath, 'utf8').replace(/\u0000/g, '')
+  return content.split(/\r?\n/).filter((line) => line.trim() !== '')
 }
 
 function parseCsvFile(filePath) {
@@ -44,12 +44,12 @@ function parseCsvFile(filePath) {
     return { header: [], rows: [] }
   }
 
-  const header = lines[0].split(",").map((h) => h.trim())
+  const header = lines[0].split(',').map((h) => h.trim())
   const normalizedHeader = header.map(normalizeHeader)
   const rows = []
 
   for (let i = 1; i < lines.length; i += 1) {
-    const parts = lines[i].split(",")
+    const parts = lines[i].split(',')
     if (!parts.length) continue
     const row = {}
     for (let j = 0; j < normalizedHeader.length; j += 1) {
@@ -109,7 +109,7 @@ function listTests(profileDir) {
   const fullPath = path.join(DATA_DIR, profileDir)
   return fs
     .readdirSync(fullPath, { withFileTypes: true })
-    .filter((entry) => entry.isDirectory() && entry.name.startsWith("test_"))
+    .filter((entry) => entry.isDirectory() && entry.name.startsWith('test_'))
     .map((entry) => entry.name)
     .sort()
 }
@@ -120,7 +120,7 @@ async function ensureMaterial(client) {
      VALUES ($1)
      ON CONFLICT (name) DO UPDATE SET name = EXCLUDED.name
      RETURNING id`,
-    ["PLA"],
+    ['PLA']
   )
   return result.rows[0].id
 }
@@ -136,7 +136,7 @@ async function upsertPrintProfile(client, materialId, profileCode, temperature, 
        speed_mm_s = EXCLUDED.speed_mm_s,
        layer_height_mm = EXCLUDED.layer_height_mm
      RETURNING id`,
-    [materialId, profileCode, temperature, speed, LAYER_HEIGHT_MM],
+    [materialId, profileCode, temperature, speed, LAYER_HEIGHT_MM]
   )
   return result.rows[0].id
 }
@@ -161,7 +161,7 @@ async function upsertTestRun(client, profileId, testNumber, payload) {
       payload.processed_file_path,
       payload.source_columns,
       payload.metadata,
-    ],
+    ]
   )
   return result.rows[0].id
 }
@@ -178,7 +178,7 @@ async function insertMeasurements(client, testRunId, rows) {
 
     for (const row of chunk) {
       placeholders.push(
-        `($${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++})`,
+        `($${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++})`
       )
       values.push(
         testRunId,
@@ -189,7 +189,7 @@ async function insertMeasurements(client, testRunId, rows) {
         row.deformacao_mm ?? null,
         row.forca_n ?? null,
         row.tensao_pa ?? null,
-        row.tensao_mpa ?? null,
+        row.tensao_mpa ?? null
       )
       pointIndex += 1
     }
@@ -197,8 +197,8 @@ async function insertMeasurements(client, testRunId, rows) {
     await client.query(
       `INSERT INTO test_measurements
         (test_run_id, point_index, tempo_s, alongamento_mm_mm, deformacao_mm_mm, deformacao_mm, forca_n, tensao_pa, tensao_mpa)
-       VALUES ${placeholders.join(", ")}`,
-      values,
+       VALUES ${placeholders.join(', ')}`,
+      values
     )
   }
 }
@@ -207,7 +207,13 @@ async function importProfile(client, materialId, profileCode) {
   const params = parseProfileCode(profileCode)
   if (!params) return
 
-  const profileId = await upsertPrintProfile(client, materialId, profileCode, params.temperature, params.speed)
+  const profileId = await upsertPrintProfile(
+    client,
+    materialId,
+    profileCode,
+    params.temperature,
+    params.speed
+  )
   const testDirs = listTests(profileCode)
 
   for (const testDir of testDirs) {
@@ -216,20 +222,20 @@ async function importProfile(client, materialId, profileCode) {
 
     const testNumber = Number.parseInt(testNumberMatch[1], 10)
     const basePath = path.join(DATA_DIR, profileCode, testDir)
-    const rawPath = path.join(basePath, "raw.txt")
-    const processedPath = path.join(basePath, "processed.csv")
+    const rawPath = path.join(basePath, 'raw.txt')
+    const processedPath = path.join(basePath, 'processed.csv')
 
     const hasProcessed = fs.existsSync(processedPath)
     const hasRaw = fs.existsSync(rawPath)
 
     let parsed = { header: [], rows: [] }
-    let source = "none"
+    let source = 'none'
     if (hasProcessed) {
       parsed = parseCsvFile(processedPath)
-      source = "processed"
+      source = 'processed'
     } else if (hasRaw) {
       parsed = parseRawFile(rawPath)
-      source = "raw"
+      source = 'raw'
     }
 
     const payload = {
@@ -243,28 +249,28 @@ async function importProfile(client, materialId, profileCode) {
     if (DRY_RUN) {
       console.log(
         `[dry-run] ${profileCode}/${testDir} rows=${parsed.rows.length} source=${source} header=${parsed.header.join(
-          ",",
-        )}`,
+          ','
+        )}`
       )
       continue
     }
 
     const testRunId = await upsertTestRun(client, profileId, testNumber, payload)
-    await client.query("DELETE FROM test_measurements WHERE test_run_id = $1", [testRunId])
+    await client.query('DELETE FROM test_measurements WHERE test_run_id = $1', [testRunId])
     await insertMeasurements(client, testRunId, parsed.rows)
     console.log(
-      `Imported ${profileCode}/${testDir} rows=${parsed.rows.length} source=${source} test_run_id=${testRunId}`,
+      `Imported ${profileCode}/${testDir} rows=${parsed.rows.length} source=${source} test_run_id=${testRunId}`
     )
   }
 }
 
 async function main() {
   if (DRY_RUN) {
-    console.log("Running in dry-run mode. No database writes will be executed.")
+    console.log('Running in dry-run mode. No database writes will be executed.')
   }
 
   if (!process.env.DATABASE_URL) {
-    console.error("Missing DATABASE_URL. Set it before running the import.")
+    console.error('Missing DATABASE_URL. Set it before running the import.')
     process.exit(1)
   }
 
@@ -283,6 +289,6 @@ async function main() {
 }
 
 main().catch((error) => {
-  console.error("Import failed:", error)
+  console.error('Import failed:', error)
   process.exit(1)
 })

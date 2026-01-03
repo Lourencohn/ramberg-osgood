@@ -1,10 +1,10 @@
-"use client"
+'use client'
 
-import type React from "react"
+import type React from 'react'
 
-import { AppSidebar } from "@/components/app-sidebar"
-import { Separator } from "@/components/ui/separator"
-import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
+import { AppSidebar } from '@/components/app-sidebar'
+import { Separator } from '@/components/ui/separator'
+import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 
 type DashboardLayoutClientProps = {
   children: React.ReactNode
@@ -19,7 +19,7 @@ export function DashboardLayoutClient({ children, user }: DashboardLayoutClientP
     <SidebarProvider
       style={
         {
-          "--sidebar-width": "340px",
+          '--sidebar-width': '340px',
         } as React.CSSProperties
       }
     >

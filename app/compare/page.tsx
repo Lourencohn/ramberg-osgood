@@ -1,8 +1,8 @@
-import { DashboardLayout } from "@/components/layout/dashboard-layout"
-import { Button } from "@/components/ui/button"
-import { CompareClient } from "@/components/compare/compare-client"
-import { buildProfileAverages, getRunMetrics } from "@/lib/dashboard-data"
-import { Plus } from "lucide-react"
+import { DashboardLayout } from '@/components/layout/dashboard-layout'
+import { Button } from '@/components/ui/button'
+import { CompareClient } from '@/components/compare/compare-client'
+import { buildProfileAverages, getRunMetrics } from '@/lib/dashboard-data'
+import { Plus } from 'lucide-react'
 
 export default async function ComparePage() {
   const runs = await getRunMetrics()

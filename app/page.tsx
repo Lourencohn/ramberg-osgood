@@ -1,11 +1,11 @@
-import { redirect } from "next/navigation"
-import { LoginForm } from "@/components/login-form"
-import { getCurrentUser } from "@/lib/auth"
+import { redirect } from 'next/navigation'
+import { LoginForm } from '@/components/login-form'
+import { getCurrentUser } from '@/lib/auth'
 
 const loginErrors: Record<string, string> = {
-  "missing-fields": "Informe e-mail e senha para continuar.",
-  "invalid-credentials": "E-mail ou senha inválidos.",
-  "session-expired": "Sua sessão expirou. Entre novamente.",
+  'missing-fields': 'Informe e-mail e senha para continuar.',
+  'invalid-credentials': 'E-mail ou senha inválidos.',
+  'session-expired': 'Sua sessão expirou. Entre novamente.',
 }
 
 type PageProps = {
@@ -15,7 +15,7 @@ type PageProps = {
 export default async function Page({ searchParams }: PageProps) {
   const user = await getCurrentUser()
   if (user) {
-    redirect("/dashboard")
+    redirect('/dashboard')
   }
 
   const resolvedSearchParams = await searchParams

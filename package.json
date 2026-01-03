@@ -8,6 +8,8 @@
     "db:import:manual": "node scripts/import-manual.js",
     "db:schema": "psql $DATABASE_URL -f db/schema.sql",
     "dev": "next dev",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "lint": "eslint .",
     "start": "next start"
   },
@@ -70,7 +72,9 @@
     "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "eslint-config-prettier": "^10.1.8",
     "postcss": "^8.5",
+    "prettier": "^3.7.4",
     "tailwindcss": "^4.1.9",
     "tw-animate-css": "1.3.3",
     "typescript": "^5.9.3"

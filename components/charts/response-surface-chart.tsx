@@ -1,22 +1,28 @@
-"use client"
+'use client'
 
-import { useEffect, useMemo, useRef, useState } from "react"
-import * as THREE from "three"
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
-import type { PredictionResult, RambergOsgoodTrainingPoint } from "@/types"
-import { rbfInterpolation } from "@/lib/metamodel"
-import { calculateMechanicalProperties } from "@/lib/mechanical-properties"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useEffect, useMemo, useRef, useState } from 'react'
+import * as THREE from 'three'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
+import type { PredictionResult, RambergOsgoodTrainingPoint } from '@/types'
+import { rbfInterpolation } from '@/lib/metamodel'
+import { calculateMechanicalProperties } from '@/lib/mechanical-properties'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 type MetricKey =
-  | "E"
-  | "sigma_0"
-  | "n"
-  | "yieldStress"
-  | "ultimateStress"
-  | "ductility"
-  | "resilience"
-  | "toughness"
+  | 'E'
+  | 'sigma_0'
+  | 'n'
+  | 'yieldStress'
+  | 'ultimateStress'
+  | 'ductility'
+  | 'resilience'
+  | 'toughness'
 
 type MetricConfig = {
   key: MetricKey
@@ -37,71 +43,71 @@ type ResponseSurfaceChartProps = {
   result: PredictionResult | null
 }
 
-const numberFormatter = new Intl.NumberFormat("pt-BR", {
+const numberFormatter = new Intl.NumberFormat('pt-BR', {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
 })
 
-const stressFormatter = new Intl.NumberFormat("pt-BR", {
+const stressFormatter = new Intl.NumberFormat('pt-BR', {
   minimumFractionDigits: 1,
   maximumFractionDigits: 1,
 })
 
 const METRICS: MetricConfig[] = [
   {
-    key: "yieldStress",
-    label: "Tensao de escoamento",
-    unit: "MPa",
-    description: "Inicio do regime plastico (offset de 0,2%).",
+    key: 'yieldStress',
+    label: 'Tensao de escoamento',
+    unit: 'MPa',
+    description: 'Inicio do regime plastico (offset de 0,2%).',
     formatter: (value) => stressFormatter.format(value),
   },
   {
-    key: "ultimateStress",
-    label: "Tensao maxima",
-    unit: "MPa",
-    description: "Maior tensao prevista ate o limite experimental.",
+    key: 'ultimateStress',
+    label: 'Tensao maxima',
+    unit: 'MPa',
+    description: 'Maior tensao prevista ate o limite experimental.',
     formatter: (value) => stressFormatter.format(value),
   },
   {
-    key: "ductility",
-    label: "Ductilidade",
-    unit: "%",
-    description: "Deformacao total prevista no limite experimental.",
+    key: 'ductility',
+    label: 'Ductilidade',
+    unit: '%',
+    description: 'Deformacao total prevista no limite experimental.',
     formatter: (value) => numberFormatter.format(value),
   },
   {
-    key: "E",
-    label: "Modulo de elasticidade (E)",
-    unit: "MPa",
-    description: "Rigidez inicial do material.",
+    key: 'E',
+    label: 'Modulo de elasticidade (E)',
+    unit: 'MPa',
+    description: 'Rigidez inicial do material.',
     formatter: (value) => numberFormatter.format(value),
   },
   {
-    key: "sigma_0",
-    label: "Tensao de referencia (sigma0)",
-    unit: "MPa",
-    description: "Tensao associada ao deslocamento de 0,2%.",
+    key: 'sigma_0',
+    label: 'Tensao de referencia (sigma0)',
+    unit: 'MPa',
+    description: 'Tensao associada ao deslocamento de 0,2%.',
     formatter: (value) => stressFormatter.format(value),
   },
   {
-    key: "n",
-    label: "Expoente de encruamento (n)",
-    unit: "",
-    description: "Sensibilidade da curva a deformacao plastica.",
+    key: 'n',
+    label: 'Expoente de encruamento (n)',
+    unit: '',
+    description: 'Sensibilidade da curva a deformacao plastica.',
     formatter: (value) => numberFormatter.format(value),
   },
   {
-    key: "resilience",
-    label: "Resiliencia",
-    unit: "MJ/m³",
-    description: "Energia elastica acumulada ate o escoamento.",
+    key: 'resilience',
+    label: 'Resiliencia',
+    unit: 'MJ/m³',
+    description: 'Energia elastica acumulada ate o escoamento.',
     formatter: (value) => numberFormatter.format(value),
   },
   {
-    key: "toughness",
-    label: "Tenacidade",
-    unit: "MJ/m³",
-    description: "Energia total acumulada ate o limite experimental.",
+    key: 'toughness',
+    label: 'Tenacidade',
+    unit: 'MJ/m³',
+    description: 'Energia total acumulada ate o limite experimental.',
     formatter: (value) => numberFormatter.format(value),
   },
 ]
@@ -123,24 +129,25 @@ function isFiniteNumber(value: number) {
 }
 
 export function ResponseSurfaceChart({ trainingData, result }: ResponseSurfaceChartProps) {
-  const [metricKey, setMetricKey] = useState<MetricKey>("yieldStress")
+  const [metricKey, setMetricKey] = useState<MetricKey>('yieldStress')
   const [isReady, setIsReady] = useState(false)
   const containerRef = useRef<HTMLDivElement | null>(null)
 
   const gridData = useMemo(() => {
-    const validTraining = trainingData.filter((point) =>
-      Number.isFinite(point.temperature) &&
-      point.temperature > 0 &&
-      Number.isFinite(point.speed) &&
-      point.speed > 0 &&
-      Number.isFinite(point.E) &&
-      point.E > 0 &&
-      Number.isFinite(point.sigma_0) &&
-      point.sigma_0 > 0 &&
-      Number.isFinite(point.n) &&
-      point.n > 0 &&
-      Number.isFinite(point.maxStrain) &&
-      point.maxStrain > 0,
+    const validTraining = trainingData.filter(
+      (point) =>
+        Number.isFinite(point.temperature) &&
+        point.temperature > 0 &&
+        Number.isFinite(point.speed) &&
+        point.speed > 0 &&
+        Number.isFinite(point.E) &&
+        point.E > 0 &&
+        Number.isFinite(point.sigma_0) &&
+        point.sigma_0 > 0 &&
+        Number.isFinite(point.n) &&
+        point.n > 0 &&
+        Number.isFinite(point.maxStrain) &&
+        point.maxStrain > 0
     )
     if (validTraining.length < 2) return null
 
@@ -164,9 +171,18 @@ export function ResponseSurfaceChart({ trainingData, result }: ResponseSurfaceCh
       .map((point) => point.maxStrain)
       .filter((value) => isFiniteNumber(value) && value > 0)
     const fallbackParams = {
-      E: average(validTraining.map((point) => point.E), 3000),
-      sigma_0: average(validTraining.map((point) => point.sigma_0), 50),
-      n: average(validTraining.map((point) => point.n), 8),
+      E: average(
+        validTraining.map((point) => point.E),
+        3000
+      ),
+      sigma_0: average(
+        validTraining.map((point) => point.sigma_0),
+        50
+      ),
+      n: average(
+        validTraining.map((point) => point.n),
+        8
+      ),
       maxStrain: average(strainValues, 0.08),
     }
 
@@ -180,12 +196,13 @@ export function ResponseSurfaceChart({ trainingData, result }: ResponseSurfaceCh
           ? interpolation.sigma_0
           : fallbackParams.sigma_0
         const safeN = isFiniteNumber(interpolation.n) ? interpolation.n : fallbackParams.n
-        const maxStrain = isFiniteNumber(interpolation.maxStrain) && interpolation.maxStrain > 0
-          ? interpolation.maxStrain
-          : fallbackParams.maxStrain
+        const maxStrain =
+          isFiniteNumber(interpolation.maxStrain) && interpolation.maxStrain > 0
+            ? interpolation.maxStrain
+            : fallbackParams.maxStrain
         const properties = calculateMechanicalProperties(
           { E: safeE, sigma_0: safeSigma0, n: safeN },
-          maxStrain,
+          maxStrain
         )
 
         points.push({
@@ -208,7 +225,7 @@ export function ResponseSurfaceChart({ trainingData, result }: ResponseSurfaceCh
     const trainingPoints = validTraining.map((point) => {
       const props = calculateMechanicalProperties(
         { E: point.E, sigma_0: point.sigma_0, n: point.n },
-        point.maxStrain,
+        point.maxStrain
       )
       return {
         temperature: point.temperature,
@@ -332,7 +349,7 @@ export function ResponseSurfaceChart({ trainingData, result }: ResponseSurfaceCh
       colors[index * 3 + 2] = color.b
     }
 
-    geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3))
+    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3))
     geometry.computeVertexNormals()
 
     const surfaceMaterial = new THREE.MeshStandardMaterial({
@@ -399,8 +416,8 @@ export function ResponseSurfaceChart({ trainingData, result }: ResponseSurfaceCh
         colors[index * 3 + 2] = 0.2
       })
       pointsGeometry = new THREE.BufferGeometry()
-      pointsGeometry.setAttribute("position", new THREE.BufferAttribute(positions, 3))
-      pointsGeometry.setAttribute("color", new THREE.BufferAttribute(colors, 3))
+      pointsGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
+      pointsGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3))
       pointsMaterial = new THREE.PointsMaterial({ size: 0.035, vertexColors: true })
       const pointsMesh = new THREE.Points(pointsGeometry, pointsMaterial)
       scene.add(pointsMesh)
@@ -419,7 +436,7 @@ export function ResponseSurfaceChart({ trainingData, result }: ResponseSurfaceCh
       predictionMesh.position.set(
         mapX(predictionPoint.temperature),
         mapY(predictionPoint.speed),
-        mapZ(predictionPoint.values[metricKey]),
+        mapZ(predictionPoint.values[metricKey])
       )
       scene.add(predictionMesh)
     }
@@ -465,7 +482,9 @@ export function ResponseSurfaceChart({ trainingData, result }: ResponseSurfaceCh
   if (!trainingData.length) {
     return (
       <div className="h-80 flex items-center justify-center border-2 border-dashed border-border rounded-lg">
-        <p className="text-muted-foreground">Nenhum dado real disponivel para gerar a superficie.</p>
+        <p className="text-muted-foreground">
+          Nenhum dado real disponivel para gerar a superficie.
+        </p>
       </div>
     )
   }
@@ -482,8 +501,10 @@ export function ResponseSurfaceChart({ trainingData, result }: ResponseSurfaceCh
   const surfaceMin = metric.formatter(surface.zMin)
   const surfaceMax = metric.formatter(surface.zMax)
   const surfaceSpan = metric.formatter(zRange)
-  const predictionValue = predictionPoint ? metric.formatter(predictionPoint.values[metricKey]) : null
-  const metricUnitLabel = metric.unit || "adimensional"
+  const predictionValue = predictionPoint
+    ? metric.formatter(predictionPoint.values[metricKey])
+    : null
+  const metricUnitLabel = metric.unit || 'adimensional'
 
   return (
     <div className="space-y-4">
@@ -499,7 +520,7 @@ export function ResponseSurfaceChart({ trainingData, result }: ResponseSurfaceCh
           <SelectContent>
             {METRICS.map((entry) => (
               <SelectItem key={entry.key} value={entry.key}>
-                {entry.label} {entry.unit ? `(${entry.unit})` : "(adimensional)"}
+                {entry.label} {entry.unit ? `(${entry.unit})` : '(adimensional)'}
               </SelectItem>
             ))}
           </SelectContent>
@@ -526,11 +547,13 @@ export function ResponseSurfaceChart({ trainingData, result }: ResponseSurfaceCh
               Max: <span className="font-mono text-foreground">{surfaceMax}</span> {metricUnitLabel}
             </p>
             <p>
-              Amplitude: <span className="font-mono text-foreground">{surfaceSpan}</span> {metricUnitLabel}
+              Amplitude: <span className="font-mono text-foreground">{surfaceSpan}</span>{' '}
+              {metricUnitLabel}
             </p>
             {predictionValue ? (
               <p>
-                Atual: <span className="font-mono text-foreground">{predictionValue}</span> {metricUnitLabel}
+                Atual: <span className="font-mono text-foreground">{predictionValue}</span>{' '}
+                {metricUnitLabel}
               </p>
             ) : null}
           </div>
@@ -546,7 +569,9 @@ export function ResponseSurfaceChart({ trainingData, result }: ResponseSurfaceCh
           <div className="space-y-1">
             <p className="font-semibold text-foreground text-sm">Referencia</p>
             <p>{gridData.meta.profiles} perfis reais validados.</p>
-            <p>Grade de interpolacao: {gridData.rows} x {gridData.cols} pontos.</p>
+            <p>
+              Grade de interpolacao: {gridData.rows} x {gridData.cols} pontos.
+            </p>
             <p>Interpolacao RBF (Gaussiana) com normalizacao min-max.</p>
             <p>Marcadores escuros: ensaios reais. Marcador laranja: previsao atual.</p>
             {gridData.meta.discarded > 0 ? (

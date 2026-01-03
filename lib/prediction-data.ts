@@ -1,6 +1,6 @@
-import { query } from "@/lib/db"
-import { fitRambergOsgoodCurve } from "@/lib/ramberg-osgood-fit"
-import type { RambergOsgoodTrainingPoint, StressStrainPoint } from "@/types"
+import { query } from '@/lib/db'
+import { fitRambergOsgoodCurve } from '@/lib/ramberg-osgood-fit'
+import type { RambergOsgoodTrainingPoint, StressStrainPoint } from '@/types'
 
 type TestPointRow = {
   profile_code: string
@@ -74,21 +74,19 @@ export async function getRambergOsgoodTrainingData(): Promise<RambergOsgoodTrain
         AND p.speed_mm_s IS NOT NULL
         AND p.speed_mm_s > 0
       ORDER BY p.code, t.id, m.point_index
-    `,
+    `
   )
 
   const testMap = new Map<number, TestRunPoints>()
 
   for (const row of rows) {
     if (row.strain === null || row.stress === null) continue
-    const list =
-      testMap.get(row.test_run_id) ??
-      {
-        profile: row.profile_code,
-        temperature: Number(row.temperature_c),
-        speed: Number(row.speed_mm_s),
-        points: [],
-      }
+    const list = testMap.get(row.test_run_id) ?? {
+      profile: row.profile_code,
+      temperature: Number(row.temperature_c),
+      speed: Number(row.speed_mm_s),
+      points: [],
+    }
 
     list.points.push({
       strain: Number(row.strain),
@@ -100,22 +98,19 @@ export async function getRambergOsgoodTrainingData(): Promise<RambergOsgoodTrain
   const profileMap = new Map<string, ProfileAggregate>()
 
   for (const run of testMap.values()) {
-    const cleaned = cleanCurve(run.points)
-      .filter((point) => point.stress > 0 && point.strain >= 0)
+    const cleaned = cleanCurve(run.points).filter((point) => point.stress > 0 && point.strain >= 0)
     if (cleaned.length < 10) continue
 
     const trimmed = downsample(cleaned, 600)
     const maxStrain = Math.max(...trimmed.map((point) => point.strain))
 
-    const profileEntry =
-      profileMap.get(run.profile) ??
-      {
-        profile: run.profile,
-        temperature: run.temperature,
-        speed: run.speed,
-        points: [],
-        maxStrains: [],
-      }
+    const profileEntry = profileMap.get(run.profile) ?? {
+      profile: run.profile,
+      temperature: run.temperature,
+      speed: run.speed,
+      points: [],
+      maxStrains: [],
+    }
 
     profileEntry.points.push(...trimmed)
     profileEntry.maxStrains.push(maxStrain)
@@ -153,6 +148,6 @@ export async function getRambergOsgoodTrainingData(): Promise<RambergOsgoodTrain
   }
 
   return trainingData.sort((a, b) =>
-    a.temperature !== b.temperature ? a.temperature - b.temperature : a.speed - b.speed,
+    a.temperature !== b.temperature ? a.temperature - b.temperature : a.speed - b.speed
   )
 }

@@ -107,9 +107,46 @@ SELECT * FROM v_measurements_export LIMIT 5;
 - Por padrão local, o PostgreSQL usa seu usuário do sistema (ex.: `lourencohn`) e pode não exigir senha.
 - Se você definiu senha no Postgres, use a mesma no `DATABASE_URL` e no DBeaver.
 
+## Formatação de código
+
+O projeto usa [Prettier](https://prettier.io/) para manter o código formatado e consistente.
+
+### Comandos disponíveis
+
+```bash
+# Formatar todo o código
+npm run format
+
+# Verificar se o código está formatado (sem alterar)
+npm run format:check
+```
+
+### Configuração
+
+As regras de formatação estão em `.prettierrc`:
+
+- Sem ponto e vírgula no final
+- Aspas simples
+- Indentação de 2 espaços
+- Trailing comma em objetos/arrays
+- Largura máxima de 100 caracteres
+
+### Integração com VS Code
+
+Instale a extensão **Prettier - Code formatter** e adicione ao seu `settings.json`:
+
+```json
+{
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode"
+}
+```
+
 ## Scripts úteis
 
 - `npm run db:schema` aplica o schema do PostgreSQL.
 - `npm run db:import` importa os ensaios em `data/`.
 - `npm run db:import:manual` importa arquivos CSV/TXT individuais.
 - `npm run dev` inicia o Next.js em modo desenvolvimento.
+- `npm run format` formata o código com Prettier.
+- `npm run format:check` verifica formatação sem alterar.

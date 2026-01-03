@@ -1,13 +1,13 @@
-"use client"
+'use client'
 
-import { useEffect, useMemo, useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
+import { useEffect, useMemo, useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import {
   UploadCloud,
   Layers,
@@ -18,7 +18,7 @@ import {
   Settings2,
   CheckCircle2,
   AlertCircle,
-} from "lucide-react"
+} from 'lucide-react'
 
 type ImportResult = {
   file: string
@@ -39,7 +39,7 @@ type ImportResponse = {
 }
 
 export function ImportForm() {
-  const [mode, setMode] = useState<"single" | "batch">("single")
+  const [mode, setMode] = useState<'single' | 'batch'>('single')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [response, setResponse] = useState<ImportResponse | null>(null)
@@ -47,8 +47,8 @@ export function ImportForm() {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([])
 
   const fileLabel = useMemo(() => {
-    if (mode === "batch") return "Arquivos (mesma configuracao)"
-    return "Arquivo de ensaio"
+    if (mode === 'batch') return 'Arquivos (mesma configuracao)'
+    return 'Arquivo de ensaio'
   }, [mode])
 
   useEffect(() => {
@@ -67,29 +67,29 @@ export function ImportForm() {
 
     const formData = new FormData(event.currentTarget)
     const files = formData
-      .getAll("files")
+      .getAll('files')
       .filter((item) => item instanceof File && item.size > 0) as File[]
 
     if (!files.length) {
-      setError("Selecione pelo menos um arquivo CSV/TXT.")
+      setError('Selecione pelo menos um arquivo CSV/TXT.')
       return
     }
 
     setIsSubmitting(true)
     try {
-      const response = await fetch("/api/import/manual", {
-        method: "POST",
+      const response = await fetch('/api/import/manual', {
+        method: 'POST',
         body: formData,
       })
       const payload = await response.json()
       if (!response.ok) {
-        throw new Error(payload?.error || "Falha ao importar os arquivos.")
+        throw new Error(payload?.error || 'Falha ao importar os arquivos.')
       }
       setResponse(payload as ImportResponse)
       setSelectedFiles([])
       event.currentTarget.reset()
     } catch (error) {
-      setError(error instanceof Error ? error.message : "Falha ao importar os arquivos.")
+      setError(error instanceof Error ? error.message : 'Falha ao importar os arquivos.')
     } finally {
       setIsSubmitting(false)
     }
@@ -145,7 +145,13 @@ export function ImportForm() {
               <Label htmlFor="layerHeight" className="text-sm font-medium">
                 Altura de camada (mm) opcional
               </Label>
-              <Input id="layerHeight" name="layerHeight" type="number" step="0.01" placeholder="0.5" />
+              <Input
+                id="layerHeight"
+                name="layerHeight"
+                type="number"
+                step="0.01"
+                placeholder="0.5"
+              />
             </div>
           </div>
 
@@ -181,11 +187,12 @@ export function ImportForm() {
               </div>
             </div>
             <p className="mt-2 text-xs text-muted-foreground">
-              Se informado, o sistema calcula tensao a partir da forca e deformacao a partir do deslocamento.
+              Se informado, o sistema calcula tensao a partir da forca e deformacao a partir do
+              deslocamento.
             </p>
           </div>
 
-          <Tabs value={mode} onValueChange={(value) => setMode(value as "single" | "batch")}>
+          <Tabs value={mode} onValueChange={(value) => setMode(value as 'single' | 'batch')}>
             <TabsList className="grid w-full grid-cols-2 h-11">
               <TabsTrigger value="single" className="gap-2 text-xs sm:text-sm">
                 <FileSpreadsheet className="size-4 hidden sm:block" />
@@ -224,7 +231,13 @@ export function ImportForm() {
                 <Label htmlFor="testNumberStart" className="text-sm font-medium">
                   Numero inicial dos ensaios
                 </Label>
-                <Input id="testNumberStart" name="testNumberStart" type="number" min="1" defaultValue="1" />
+                <Input
+                  id="testNumberStart"
+                  name="testNumberStart"
+                  type="number"
+                  min="1"
+                  defaultValue="1"
+                />
                 <p className="text-xs text-muted-foreground">
                   Os arquivos serao importados como ensaios sequenciais a partir deste numero.
                 </p>
@@ -253,7 +266,7 @@ export function ImportForm() {
                 Arquivos selecionados
               </div>
               <div className="text-xs text-muted-foreground">
-                {selectedFiles.length ? `${selectedFiles.length} arquivo(s)` : "Nenhum arquivo"}
+                {selectedFiles.length ? `${selectedFiles.length} arquivo(s)` : 'Nenhum arquivo'}
               </div>
             </div>
             {selectedFiles.length > 0 ? (
@@ -285,11 +298,7 @@ export function ImportForm() {
                   <Label htmlFor="delimiter" className="text-sm font-medium">
                     Delimitador
                   </Label>
-                  <Input
-                    id="delimiter"
-                    name="delimiter"
-                    placeholder="Ex: ,  ;  tab  space"
-                  />
+                  <Input id="delimiter" name="delimiter" placeholder="Ex: ,  ;  tab  space" />
                   <p className="text-xs text-muted-foreground">
                     Deixe em branco para deteccao automatica.
                   </p>
@@ -313,7 +322,11 @@ export function ImportForm() {
                   <Label htmlFor="materialSupplier" className="text-sm font-medium">
                     Fornecedor (opcional)
                   </Label>
-                  <Input id="materialSupplier" name="materialSupplier" placeholder="Ex: Supplier X" />
+                  <Input
+                    id="materialSupplier"
+                    name="materialSupplier"
+                    placeholder="Ex: Supplier X"
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="profileCode" className="text-sm font-medium">
@@ -336,14 +349,18 @@ export function ImportForm() {
             <Alert className="border-emerald-200 bg-emerald-50 text-emerald-800">
               <CheckCircle2 className="size-4" />
               <AlertDescription>
-                Importacao concluida para {response.material} ({response.profileCode}).{" "}
+                Importacao concluida para {response.material} ({response.profileCode}).{' '}
                 {response.results.length} arquivo(s) processado(s).
               </AlertDescription>
             </Alert>
           ) : null}
 
-          <Button type="submit" className="w-full h-12 text-base font-semibold gap-2" disabled={isSubmitting}>
-            {isSubmitting ? "Importando..." : "Importar dados"}
+          <Button
+            type="submit"
+            className="w-full h-12 text-base font-semibold gap-2"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? 'Importando...' : 'Importar dados'}
           </Button>
         </CardContent>
       </Card>
@@ -368,10 +385,10 @@ export function ImportForm() {
                 </div>
                 <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
                   <span className="rounded-full border px-2 py-1">
-                    Tensao: {result.computed.stressFromArea ? "calculada" : "original"}
+                    Tensao: {result.computed.stressFromArea ? 'calculada' : 'original'}
                   </span>
                   <span className="rounded-full border px-2 py-1">
-                    Deformacao: {result.computed.strainFromLength ? "calculada" : "original"}
+                    Deformacao: {result.computed.strainFromLength ? 'calculada' : 'original'}
                   </span>
                 </div>
               </div>
