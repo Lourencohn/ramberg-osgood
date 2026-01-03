@@ -1,4 +1,5 @@
 import type React from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 
 import { cn } from '@/lib/utils'
@@ -15,6 +16,16 @@ type LoginFormProps = React.ComponentProps<'div'> & {
 export function LoginForm({ className, error, ...props }: LoginFormProps) {
   return (
     <div className={cn('flex flex-col gap-6', className)} {...props}>
+      <div className="flex justify-center">
+        <Image
+          src="/logo.png"
+          alt="Logo"
+          width={280}
+          height={80}
+          priority
+          className="h-auto w-full max-w-[280px]"
+        />
+      </div>
       <Card>
         <CardHeader>
           <CardTitle>Acesse sua conta</CardTitle>
