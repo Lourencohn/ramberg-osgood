@@ -4,6 +4,8 @@ import { CompareClient } from '@/components/compare/compare-client'
 import { buildProfileAverages, getRunMetrics } from '@/lib/dashboard-data'
 import { Plus } from 'lucide-react'
 
+export const dynamic = 'force-dynamic'
+
 export default async function ComparePage() {
   const runs = await getRunMetrics()
   const profileAverages = buildProfileAverages(runs)

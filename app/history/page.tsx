@@ -18,6 +18,8 @@ import {
   FileSpreadsheet,
 } from 'lucide-react'
 
+export const dynamic = 'force-dynamic'
+
 const dateFormatter = new Intl.DateTimeFormat('pt-BR', {
   dateStyle: 'short',
   timeStyle: 'short',
