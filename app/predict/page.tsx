@@ -28,7 +28,7 @@ export default async function PredictPage() {
           </div>
         </div>
 
-        <Alert className="border-foreground/20 bg-white">
+        <Alert className="border-foreground/20 bg-white dark:bg-black dark:text-white">
           <Info className="size-4 text-foreground" />
           <AlertDescription className="text-sm">
             As previsões são obtidas a partir de perfis experimentais reais, com ajuste

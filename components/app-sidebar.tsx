@@ -16,6 +16,7 @@ import {
   UploadCloud,
   FileSpreadsheet,
   Loader2,
+  Activity,
 } from 'lucide-react'
 
 import { NavUser } from '@/components/nav-user'
@@ -62,18 +63,12 @@ const navigation = [
     items: [
       { title: 'Dashboard', href: '/dashboard', icon: Home },
       { title: 'Nova Predição', href: '/predict', icon: Sparkles },
+      { title: 'Ensaio ao vivo', href: '/test-live', icon: Activity },
       { title: 'Histórico', href: '/history', icon: History },
       { title: 'Importar', href: '/import', icon: UploadCloud },
       { title: 'Comparar', href: '/compare', icon: GitCompare },
+      { title: 'Documentação', href: '/docs', icon: FileText },
     ],
-  },
-  {
-    title: 'Conteúdo',
-    items: [{ title: 'Documentação', href: '/docs', icon: FileText }],
-  },
-  {
-    title: 'Ajustes',
-    items: [{ title: 'Configurações', href: '/settings', icon: Settings }],
   },
 ]
 

@@ -23,7 +23,7 @@ export default function ImportPage() {
           </div>
         </div>
 
-        <Alert className="border-foreground/20 bg-white">
+        <Alert className="border-foreground/20 bg-white dark:bg-black dark:text-white">
           <Info className="size-4 text-foreground" />
           <AlertDescription className="text-sm">
             A importacao suporta CSV/TXT com cabecalho. Para arquivos sem cabecalho, informe o

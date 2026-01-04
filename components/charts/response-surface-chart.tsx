@@ -528,7 +528,7 @@ export function ResponseSurfaceChart({ trainingData, result }: ResponseSurfaceCh
       </div>
 
       <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_220px]">
-        <div className="rounded-xl border border-border bg-white p-3">
+        <div className="rounded-xl border border-border bg-white dark:bg-black dark:text-white p-3">
           <div className="h-[360px] w-full" ref={containerRef} />
           <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
             <span>Arraste para rotacionar. Role para zoom.</span>
@@ -537,7 +537,7 @@ export function ResponseSurfaceChart({ trainingData, result }: ResponseSurfaceCh
             </span>
           </div>
         </div>
-        <div className="rounded-xl border border-border bg-white p-3 space-y-3 text-xs text-muted-foreground">
+        <div className="rounded-xl border border-border bg-white dark:bg-black dark:text-white p-3 space-y-3 text-xs text-muted-foreground">
           <div className="space-y-1">
             <p className="font-semibold text-foreground text-sm">Faixa prevista</p>
             <p>

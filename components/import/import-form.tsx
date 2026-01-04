@@ -259,7 +259,7 @@ export function ImportForm() {
             </TabsContent>
           </Tabs>
 
-          <div className="rounded-xl border border-border bg-white p-4">
+          <div className="rounded-xl border border-border bg-white dark:bg-black dark:text-white p-4">
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-2 text-sm font-medium text-foreground">
                 <UploadCloud className="size-4" />

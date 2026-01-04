@@ -537,7 +537,7 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
             ) : null}
 
             <div className="grid gap-4 lg:grid-cols-3">
-              <div className="rounded-xl border border-border bg-white p-4 space-y-3">
+              <div className="rounded-xl border border-border bg-white dark:bg-black dark:text-white p-4 space-y-3">
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <Thermometer className="size-4 text-foreground" />
                   Entrada da simulacao
@@ -565,7 +565,7 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
                 </div>
               </div>
 
-              <div className="rounded-xl border border-border bg-white p-4 space-y-3">
+              <div className="rounded-xl border border-border bg-white dark:bg-black dark:text-white p-4 space-y-3">
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <Database className="size-4 text-foreground" />
                   Envelope experimental
@@ -631,7 +631,7 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
                 </div>
               </div>
 
-              <div className="rounded-xl border border-border bg-white p-4 space-y-3">
+              <div className="rounded-xl border border-border bg-white dark:bg-black dark:text-white p-4 space-y-3">
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <Shield className="size-4 text-foreground" />
                   Qualidade do ajuste
@@ -685,7 +685,7 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
             </div>
 
             <div className="grid gap-4 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
-              <div className="rounded-xl border border-foreground/20 bg-white p-4">
+              <div className="rounded-xl border border-foreground/20 bg-white dark:bg-black dark:text-white p-4">
                 <div className="flex items-center gap-2 mb-4">
                   <div className="flex size-8 items-center justify-center rounded-lg bg-foreground/10">
                     <Zap className="size-4 text-foreground" />
@@ -701,7 +701,7 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
                   {modelParameters.map((param) => (
                     <div
                       key={param.code}
-                      className="flex items-start justify-between gap-3 rounded-lg border border-border bg-white px-4 py-3"
+                      className="flex items-start justify-between gap-3 rounded-lg border border-border bg-white dark:bg-black dark:text-white px-4 py-3"
                     >
                       <div>
                         <div className="flex items-center gap-2">
@@ -718,7 +718,7 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
                 </div>
               </div>
 
-              <div className="rounded-xl border border-border bg-white p-4">
+              <div className="rounded-xl border border-border bg-white dark:bg-black dark:text-white p-4">
                 <div className="flex items-center gap-2 mb-4">
                   <div className="flex size-8 items-center justify-center rounded-lg bg-muted">
                     <Target className="size-4 text-foreground" />
@@ -736,7 +736,7 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
                     return (
                       <div
                         key={property.label}
-                        className="flex items-center gap-3 rounded-lg border border-border bg-white px-4 py-3"
+                        className="flex items-center gap-3 rounded-lg border border-border bg-white dark:bg-black dark:text-white px-4 py-3"
                       >
                         <Icon className="size-4 text-foreground" />
                         <div className="flex-1">
@@ -756,7 +756,7 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
               </div>
             </div>
 
-            <div className="rounded-xl border border-border bg-white p-4">
+            <div className="rounded-xl border border-border bg-white dark:bg-black dark:text-white p-4">
               <div className="flex items-center gap-2 mb-3">
                 <div className="flex size-8 items-center justify-center rounded-lg bg-muted">
                   <Database className="size-4 text-foreground" />
@@ -772,7 +772,7 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
                 {glossary.map((item) => (
                   <div
                     key={item.term}
-                    className="rounded-lg border border-border bg-white px-4 py-3 text-xs"
+                    className="rounded-lg border border-border bg-white dark:bg-black dark:text-white px-4 py-3 text-xs"
                   >
                     <p className="font-semibold text-foreground">{item.term}</p>
                     <p className="text-muted-foreground">{item.description}</p>
@@ -824,7 +824,7 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
           </TabsContent>
 
           <TabsContent value="surfaces" className="mt-4">
-            <div className="rounded-xl border border-border p-4 bg-white">
+            <div className="rounded-xl border border-border p-4 bg-white dark:bg-black dark:text-white">
               <ResponseSurfaceChart trainingData={trainingData} result={result} />
             </div>
           </TabsContent>
@@ -836,7 +836,7 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
               </div>
             ) : (
               <>
-                <div className="rounded-xl border border-border bg-white p-4 text-xs text-muted-foreground">
+                <div className="rounded-xl border border-border bg-white dark:bg-black dark:text-white p-4 text-xs text-muted-foreground">
                   {validationProfile ? (
                     <p>
                       {validationProfile.isExact
