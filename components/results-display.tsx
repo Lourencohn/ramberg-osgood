@@ -251,7 +251,7 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
       formatter: numberFormatter,
     },
     {
-      code: 'sigma0',
+      code: 'σ₀',
       label: 'Tensao de referencia',
       description: 'Marco de escoamento com offset de 0,2%.',
       value: convertStress(params?.sigma_0, settings.unitSystem),
@@ -320,7 +320,7 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
       description: 'Modulo de elasticidade; indica a rigidez inicial.',
     },
     {
-      term: 'sigma0',
+      term: 'σ₀',
       description: 'Tensao de referencia associada ao offset de 0,2%.',
     },
     {
