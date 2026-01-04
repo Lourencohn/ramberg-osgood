@@ -2,14 +2,37 @@
 
 import { useMemo, useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { StressStrainChart } from '@/components/charts/stress-strain-chart'
 import { StressStrainValidationChart } from '@/components/charts/stress-strain-validation-chart'
 import { RambergOsgoodLinearizationChart } from '@/components/charts/ramberg-osgood-linearization-chart'
 import { ResponseSurfaceChart } from '@/components/charts/response-surface-chart'
+import { useSettings } from '@/components/settings-provider'
 import type { PredictionResult, RambergOsgoodTrainingPoint } from '@/types'
-import { formatProfileLabel } from '@/lib/formatters'
+import type { ExportFormat } from '@/lib/settings'
+import {
+  buildHtmlTable,
+  downloadContent,
+  downloadHtmlAsExcel,
+  openPrintWindow,
+  toCsv,
+} from '@/lib/export'
+import {
+  convertEnergyDensity,
+  convertSpeed,
+  convertStress,
+  convertTemperature,
+  getUnitLabels,
+} from '@/lib/units'
 import {
   BarChart3,
   LineChart,
@@ -22,6 +45,7 @@ import {
   CheckCircle2,
   Thermometer,
   Database,
+  Download,
 } from 'lucide-react'
 
 type ResultsDisplayProps = {
@@ -32,6 +56,16 @@ type ResultsDisplayProps = {
 const numberFormatter = new Intl.NumberFormat('pt-BR', {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
+})
+
+const tempFormatter = new Intl.NumberFormat('pt-BR', {
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 1,
+})
+
+const speedFormatter = new Intl.NumberFormat('pt-BR', {
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 1,
 })
 
 const stressFormatter = new Intl.NumberFormat('pt-BR', {
@@ -59,7 +93,9 @@ const formatWithUnit = (
 }
 
 export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
+  const { settings } = useSettings()
   const [activeTab, setActiveTab] = useState('properties')
+  const unitLabels = getUnitLabels(settings.unitSystem)
   const params = result?.rambergOsgood
   const properties = result?.properties
   const validTraining = useMemo(
@@ -179,21 +215,47 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
       ? result.input.speed < diagnostics.speedMin || result.input.speed > diagnostics.speedMax
       : false
 
+  const formatTemperatureValue = (value: number | null | undefined) =>
+    formatWithUnit(convertTemperature(value, settings.unitSystem), tempFormatter, unitLabels.temperature)
+
+  const formatSpeedValue = (value: number | null | undefined) =>
+    formatWithUnit(convertSpeed(value, settings.unitSystem), speedFormatter, unitLabels.speed)
+
+  const formatProfileLabelWithUnits = (temperature: number, speed: number) => {
+    const temp = convertTemperature(temperature, settings.unitSystem)
+    const speedValue = convertSpeed(speed, settings.unitSystem)
+    const hasTemp = Number.isFinite(temp ?? temperature) && (temp ?? temperature) > 0
+    const hasSpeed = Number.isFinite(speedValue ?? speed) && (speedValue ?? speed) > 0
+
+    if (hasTemp && hasSpeed) {
+      return `Temperatura ${tempFormatter.format(temp ?? temperature)}${unitLabels.temperature} · Velocidade ${speedFormatter.format(
+        speedValue ?? speed
+      )} ${unitLabels.speed}`
+    }
+    if (hasTemp) {
+      return `Temperatura ${tempFormatter.format(temp ?? temperature)}${unitLabels.temperature}`
+    }
+    if (hasSpeed) {
+      return `Velocidade ${speedFormatter.format(speedValue ?? speed)} ${unitLabels.speed}`
+    }
+    return 'Parametros nao informados'
+  }
+
   const modelParameters = [
     {
       code: 'E',
       label: 'Modulo de elasticidade',
       description: 'Rigidez inicial do material.',
-      value: params?.E,
-      unit: 'MPa',
+      value: convertStress(params?.E, settings.unitSystem),
+      unit: unitLabels.stress,
       formatter: numberFormatter,
     },
     {
       code: 'sigma0',
       label: 'Tensao de referencia',
       description: 'Marco de escoamento com offset de 0,2%.',
-      value: params?.sigma_0,
-      unit: 'MPa',
+      value: convertStress(params?.sigma_0, settings.unitSystem),
+      unit: unitLabels.stress,
       formatter: stressFormatter,
     },
     {
@@ -217,15 +279,15 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
   const mechanicalProperties = [
     {
       label: 'Tensao de escoamento (0,2%)',
-      value: properties?.yieldStress,
-      unit: 'MPa',
+      value: convertStress(properties?.yieldStress, settings.unitSystem),
+      unit: unitLabels.stress,
       formatter: stressFormatter,
       icon: Shield,
     },
     {
       label: 'Tensao maxima',
-      value: properties?.ultimateStress,
-      unit: 'MPa',
+      value: convertStress(properties?.ultimateStress, settings.unitSystem),
+      unit: unitLabels.stress,
       formatter: stressFormatter,
       icon: Zap,
     },
@@ -238,15 +300,15 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
     },
     {
       label: 'Resiliencia',
-      value: properties?.resilience,
-      unit: 'MJ/m³',
+      value: convertEnergyDensity(properties?.resilience, settings.unitSystem),
+      unit: unitLabels.energy,
       formatter: numberFormatter,
       icon: Battery,
     },
     {
       label: 'Tenacidade',
-      value: properties?.toughness,
-      unit: 'MJ/m³',
+      value: convertEnergyDensity(properties?.toughness, settings.unitSystem),
+      unit: unitLabels.energy,
       formatter: numberFormatter,
       icon: Target,
     },
@@ -279,6 +341,129 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
     },
   ]
 
+  const exportFormats: ExportFormat[] = ['csv', 'json', 'xlsx', 'pdf']
+
+  const buildExportSummaryRows = () => {
+    if (!result) return [] as Array<Array<string | number | null>>
+    return [
+      ['section', 'key', 'value', 'unit'],
+      ['input', 'temperature', convertTemperature(result.input.temperature, settings.unitSystem), unitLabels.temperature],
+      ['input', 'speed', convertSpeed(result.input.speed, settings.unitSystem), unitLabels.speed],
+      ['model', 'E', convertStress(params?.E, settings.unitSystem), unitLabels.stress],
+      ['model', 'sigma_0', convertStress(params?.sigma_0, settings.unitSystem), unitLabels.stress],
+      ['model', 'n', params?.n ?? null, ''],
+      ['model', 'max_strain', maxStrain !== null ? maxStrain * 100 : null, '%'],
+      ['properties', 'yield_stress', convertStress(properties?.yieldStress, settings.unitSystem), unitLabels.stress],
+      ['properties', 'ultimate_stress', convertStress(properties?.ultimateStress, settings.unitSystem), unitLabels.stress],
+      ['properties', 'ductility', properties?.ductility ?? null, '%'],
+      ['properties', 'resilience', convertEnergyDensity(properties?.resilience, settings.unitSystem), unitLabels.energy],
+      ['properties', 'toughness', convertEnergyDensity(properties?.toughness, settings.unitSystem), unitLabels.energy],
+    ]
+  }
+
+  const buildCurveRows = () => {
+    if (!result?.curve?.length) return [] as Array<Array<string | number | null>>
+    return result.curve.map((point) => [
+      point.strain,
+      convertStress(point.stress, settings.unitSystem) ?? point.stress,
+    ])
+  }
+
+  const buildCsvExport = () => {
+    const summaryRows = buildExportSummaryRows()
+    if (!summaryRows.length) return ''
+    const summaryCsv = toCsv(summaryRows)
+    if (!settings.exportIncludeCharts) {
+      return summaryCsv
+    }
+    const curveRows = buildCurveRows()
+    if (!curveRows.length) return summaryCsv
+    const curveHeader = [`strain (${unitLabels.strain})`, `stress (${unitLabels.stress})`]
+    const curveCsv = toCsv([curveHeader, ...curveRows])
+    return `${summaryCsv}\n\n${curveCsv}`
+  }
+
+  const buildJsonExport = () => {
+    if (!result) return ''
+    const payload: Record<string, unknown> = {
+      generatedAt: new Date().toISOString(),
+      units: unitLabels,
+      input: {
+        temperature: convertTemperature(result.input.temperature, settings.unitSystem),
+        speed: convertSpeed(result.input.speed, settings.unitSystem),
+      },
+      interpolationMethod: result.interpolationMethod,
+      rambergOsgood: {
+        E: convertStress(params?.E, settings.unitSystem),
+        sigma_0: convertStress(params?.sigma_0, settings.unitSystem),
+        n: params?.n ?? null,
+        maxStrain: maxStrain,
+      },
+      properties: {
+        yieldStress: convertStress(properties?.yieldStress, settings.unitSystem),
+        ultimateStress: convertStress(properties?.ultimateStress, settings.unitSystem),
+        ductility: properties?.ductility ?? null,
+        resilience: convertEnergyDensity(properties?.resilience, settings.unitSystem),
+        toughness: convertEnergyDensity(properties?.toughness, settings.unitSystem),
+      },
+    }
+
+    if (settings.exportIncludeCharts) {
+      payload.curve = buildCurveRows().map(([strain, stress]) => ({
+        strain,
+        stress,
+      }))
+    }
+
+    return JSON.stringify(payload, null, 2)
+  }
+
+  const buildHtmlExport = () => {
+    if (!result) return ''
+    const summaryRows = buildExportSummaryRows().slice(1)
+    const summaryTable = buildHtmlTable(
+      ['Seção', 'Campo', 'Valor', 'Unidade'],
+      summaryRows
+    )
+    const curveRows = buildCurveRows()
+    const curveTable = settings.exportIncludeCharts && curveRows.length
+      ? buildHtmlTable(
+          [`Strain (${unitLabels.strain})`, `Stress (${unitLabels.stress})`],
+          curveRows
+        )
+      : ''
+
+    return `
+      <h1>Resultados da Previsao</h1>
+      ${summaryTable}
+      ${curveTable ? `<h2>Curva tensao x deformacao</h2>${curveTable}` : ''}
+    `
+  }
+
+  const handleExport = (format: ExportFormat) => {
+    if (!result) return
+    const baseName = `predicao-${result.input.temperature}-${result.input.speed}-${new Date()
+      .toISOString()
+      .slice(0, 10)}`
+
+    if (format === 'csv') {
+      downloadContent(`${baseName}.csv`, buildCsvExport(), 'text/csv;charset=utf-8')
+      return
+    }
+    if (format === 'json') {
+      downloadContent(`${baseName}.json`, buildJsonExport(), 'application/json')
+      return
+    }
+    const html = buildHtmlExport()
+    if (format === 'xlsx') {
+      downloadHtmlAsExcel(`${baseName}.xlsx`, html)
+      return
+    }
+    if (format === 'pdf') {
+      openPrintWindow('Relatorio de Predicao', html)
+    }
+  }
+
   return (
     <Card className="h-full">
       <CardHeader className="pb-4">
@@ -292,6 +477,33 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
           <div className="flex flex-wrap items-center gap-2">
             <Badge variant="outline">Modelo Ramberg-Osgood</Badge>
             <Badge variant="secondary">{methodLabel}</Badge>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-2"
+                  disabled={!result}
+                >
+                  <Download className="size-4" />
+                  Exportar
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onSelect={() => handleExport(settings.exportFormat)}>
+                  Exportar {settings.exportFormat.toUpperCase()} (padrão)
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                {exportFormats.map((format) => (
+                  <DropdownMenuItem
+                    key={format}
+                    onSelect={() => handleExport(format)}
+                  >
+                    {format.toUpperCase()}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </CardHeader>
@@ -334,13 +546,13 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
                   <div className="flex items-center justify-between gap-3">
                     <span className="text-muted-foreground">Temperatura</span>
                     <span className="font-mono font-semibold text-foreground">
-                      {result ? `${result.input.temperature}°C` : '--'}
+                      {result ? formatTemperatureValue(result.input.temperature) : '--'}
                     </span>
                   </div>
                   <div className="flex items-center justify-between gap-3">
                     <span className="text-muted-foreground">Velocidade</span>
                     <span className="font-mono font-semibold text-foreground">
-                      {result ? `${result.input.speed} mm/s` : '--'}
+                      {result ? formatSpeedValue(result.input.speed) : '--'}
                     </span>
                   </div>
                 </div>
@@ -361,9 +573,13 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
                 <div className="space-y-4 text-xs text-muted-foreground">
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <span>Temperatura (°C)</span>
+                      <span>Temperatura ({unitLabels.temperature})</span>
                       <span className="font-mono text-foreground">
-                        {diagnostics ? `${diagnostics.tempMin}–${diagnostics.tempMax}` : '--'}
+                        {diagnostics
+                          ? `${formatTemperatureValue(diagnostics.tempMin)}–${formatTemperatureValue(
+                              diagnostics.tempMax
+                            )}`
+                          : '--'}
                       </span>
                     </div>
                     <div className="relative h-2 rounded-full bg-muted">
@@ -386,9 +602,13 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
 
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <span>Velocidade (mm/s)</span>
+                      <span>Velocidade ({unitLabels.speed})</span>
                       <span className="font-mono text-foreground">
-                        {diagnostics ? `${diagnostics.speedMin}–${diagnostics.speedMax}` : '--'}
+                        {diagnostics
+                          ? `${formatSpeedValue(diagnostics.speedMin)}–${formatSpeedValue(
+                              diagnostics.speedMax
+                            )}`
+                          : '--'}
                       </span>
                     </div>
                     <div className="relative h-2 rounded-full bg-muted">
@@ -435,7 +655,7 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
                     <span className="text-muted-foreground">Perfil de referencia</span>
                     <span className="font-medium text-foreground">
                       {diagnostics
-                        ? formatProfileLabel(
+                        ? formatProfileLabelWithUnits(
                             diagnostics.nearestProfile.temperature,
                             diagnostics.nearestProfile.speed
                           )
@@ -560,11 +780,46 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
                 ))}
               </div>
             </div>
+
+            {settings.debugMode ? (
+              <div className="rounded-xl border border-border bg-muted/30 p-4 text-xs">
+                <div className="flex items-center gap-2 mb-3">
+                  <Database className="size-4 text-foreground" />
+                  <span className="font-semibold text-foreground">Detalhes técnicos</span>
+                </div>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-muted-foreground">Interpolação aplicada</span>
+                    <span className="font-mono font-semibold">
+                      {result?.interpolationMethod ?? '--'}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-muted-foreground">Pontos na curva</span>
+                    <span className="font-mono font-semibold">{settings.stressCurvePoints}</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-muted-foreground">Perfis reais</span>
+                    <span className="font-mono font-semibold">{validTraining.length}</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-muted-foreground">Pontos de validacao</span>
+                    <span className="font-mono font-semibold">
+                      {validationPoints.length || '--'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ) : null}
           </TabsContent>
 
           <TabsContent value="curve" className="mt-4">
             <div className="rounded-xl border border-border p-4">
-              <StressStrainChart curve={result?.curve ?? []} />
+              <StressStrainChart
+                curve={result?.curve ?? []}
+                unitSystem={settings.unitSystem}
+                interactive={settings.interactiveCharts}
+              />
             </div>
           </TabsContent>
 
@@ -586,7 +841,7 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
                     <p>
                       {validationProfile.isExact
                         ? 'Comparacao com dados reais na mesma condicao.'
-                        : `Comparacao com o perfil real mais proximo: ${formatProfileLabel(
+                        : `Comparacao com o perfil real mais proximo: ${formatProfileLabelWithUnits(
                             validationProfile.profile.temperature,
                             validationProfile.profile.speed
                           )}.`}
@@ -604,7 +859,12 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
                     <h3 className="text-sm font-semibold text-foreground mb-3">
                       Curva prevista x pontos reais
                     </h3>
-                    <StressStrainValidationChart curve={result.curve} points={validationPoints} />
+                    <StressStrainValidationChart
+                      curve={result.curve}
+                      points={validationPoints}
+                      unitSystem={settings.unitSystem}
+                      interactive={settings.interactiveCharts}
+                    />
                   </div>
                   <div className="rounded-xl border border-border p-4">
                     <h3 className="text-sm font-semibold text-foreground mb-3">
@@ -614,7 +874,11 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
                       A deformacao plastica e estimada removendo a parcela elastica; em escala
                       log-log, um bom ajuste tende a alinhar os pontos reais.
                     </p>
-                    <RambergOsgoodLinearizationChart points={validationPoints} />
+                    <RambergOsgoodLinearizationChart
+                      points={validationPoints}
+                      unitSystem={settings.unitSystem}
+                      interactive={settings.interactiveCharts}
+                    />
                   </div>
                 </div>
               </>

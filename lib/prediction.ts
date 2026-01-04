@@ -6,8 +6,13 @@ import { calculateMechanicalProperties } from './mechanical-properties'
 export async function predictProperties(
   input: PredictionInput,
   trainingData: RambergOsgoodTrainingPoint[],
-  method: 'polynomial' | 'rbf' = 'rbf'
+  options: {
+    method?: 'polynomial' | 'rbf'
+    curvePoints?: number
+  } = {}
 ): Promise<PredictionResult> {
+  const method = options.method ?? 'rbf'
+  const curvePoints = options.curvePoints ?? 180
   const interpolation =
     method === 'polynomial'
       ? polynomialInterpolation(input, trainingData)
@@ -19,7 +24,7 @@ export async function predictProperties(
   }
 
   const maxStrain = interpolation.maxStrain > 0 ? interpolation.maxStrain : 0.08
-  const curve = generateStressStrainCurve(rambergOsgood, maxStrain, 180)
+  const curve = generateStressStrainCurve(rambergOsgood, maxStrain, curvePoints)
 
   const properties = calculateMechanicalProperties(rambergOsgood, maxStrain)
 

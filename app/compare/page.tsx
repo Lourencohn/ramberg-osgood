@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button'
 import { CompareClient } from '@/components/compare/compare-client'
 import { buildProfileAverages, getRunMetrics } from '@/lib/dashboard-data'
 import { Plus } from 'lucide-react'
+import Link from 'next/link'
 
 export const dynamic = 'force-dynamic'
 
@@ -20,9 +21,11 @@ export default async function ComparePage() {
               Compare resultados de diferentes ensaios lado a lado
             </p>
           </div>
-          <Button className="gap-2 shadow-sm">
-            <Plus className="size-4" />
-            Adicionar Ensaio
+          <Button className="gap-2 shadow-sm" asChild>
+            <Link href="/import">
+              <Plus className="size-4" />
+              Adicionar Ensaio
+            </Link>
           </Button>
         </div>
 

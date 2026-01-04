@@ -1,13 +1,21 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { DEFAULT_LIMITS, validateInputs, type PredictionLimits } from '@/lib/validation'
+import { DEFAULT_LIMITS, type PredictionLimits } from '@/lib/validation'
 import { predictProperties } from '@/lib/prediction'
+import { useSettings } from '@/components/settings-provider'
+import {
+  convertSpeed,
+  convertTemperature,
+  getUnitLabels,
+  toBaseSpeed,
+  toBaseTemperature,
+} from '@/lib/units'
 import type { PredictionInput, PredictionResult, RambergOsgoodTrainingPoint } from '@/types'
 import { Thermometer, Gauge, Calculator, AlertCircle, Loader2 } from 'lucide-react'
 
@@ -16,7 +24,19 @@ type PredictionFormProps = {
   onResult: (result: PredictionResult) => void
 }
 
+const tempFormatter = new Intl.NumberFormat('pt-BR', {
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 1,
+})
+
+const speedFormatter = new Intl.NumberFormat('pt-BR', {
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 1,
+})
+
 export function PredictionForm({ trainingData, onResult }: PredictionFormProps) {
+  const { settings } = useSettings()
+  const unitLabels = getUnitLabels(settings.unitSystem)
   const [temperature, setTemperature] = useState('205')
   const [speed, setSpeed] = useState('95')
   const [errors, setErrors] = useState<string[]>([])
@@ -36,13 +56,122 @@ export function PredictionForm({ trainingData, onResult }: PredictionFormProps) 
     }
   }, [trainingData])
 
+  const displayLimits = useMemo(
+    () => ({
+      temperature: {
+        min:
+          convertTemperature(limits.temperature.min, settings.unitSystem) ??
+          limits.temperature.min,
+        max:
+          convertTemperature(limits.temperature.max, settings.unitSystem) ??
+          limits.temperature.max,
+      },
+      speed: {
+        min: convertSpeed(limits.speed.min, settings.unitSystem) ?? limits.speed.min,
+        max: convertSpeed(limits.speed.max, settings.unitSystem) ?? limits.speed.max,
+      },
+    }),
+    [limits, settings.unitSystem]
+  )
+
+  const previousUnitSystem = useRef(settings.unitSystem)
+
+  useEffect(() => {
+    const previous = previousUnitSystem.current
+    if (previous === settings.unitSystem) return
+
+    const tempValue = Number.parseFloat(temperature)
+    const speedValue = Number.parseFloat(speed)
+
+    if (Number.isFinite(tempValue)) {
+      const nextTemp =
+        previous === 'si'
+          ? convertTemperature(tempValue, settings.unitSystem)
+          : toBaseTemperature(tempValue, previous)
+      if (nextTemp !== null) {
+        setTemperature(String(Math.round(nextTemp * 10) / 10))
+      }
+    }
+
+    if (Number.isFinite(speedValue)) {
+      const nextSpeed =
+        previous === 'si'
+          ? convertSpeed(speedValue, settings.unitSystem)
+          : toBaseSpeed(speedValue, previous)
+      if (nextSpeed !== null) {
+        setSpeed(String(Math.round(nextSpeed * 10) / 10))
+      }
+    }
+
+    previousUnitSystem.current = settings.unitSystem
+  }, [settings.unitSystem, speed, temperature])
+
+  const resolveMethod = () => {
+    if (settings.interpolationMethod !== 'auto') return settings.interpolationMethod
+    return trainingData.length > 12 ? 'rbf' : 'polynomial'
+  }
+
+  const formatRange = (min: number, max: number, unit: string, formatter: Intl.NumberFormat) =>
+    `${formatter.format(min)} ${unit}–${formatter.format(max)} ${unit}`
+
+  const validateInput = (input: PredictionInput, raw: PredictionInput) => {
+    const baseErrors: string[] = []
+
+    if (isNaN(raw.temperature)) {
+      baseErrors.push('Temperatura deve ser um número válido')
+    } else if (input.temperature <= 0) {
+      baseErrors.push('Temperatura deve ser maior que zero')
+    } else if (settings.autoValidation) {
+      const min = limits.temperature.min
+      const max = limits.temperature.max
+      if (input.temperature < min || input.temperature > max) {
+        baseErrors.push(
+          `Temperatura fora da faixa experimental (${formatRange(
+            displayLimits.temperature.min,
+            displayLimits.temperature.max,
+            unitLabels.temperature,
+            tempFormatter
+          )})`
+        )
+      }
+    }
+
+    if (isNaN(raw.speed)) {
+      baseErrors.push('Velocidade deve ser um número válido')
+    } else if (input.speed <= 0) {
+      baseErrors.push('Velocidade deve ser maior que zero')
+    } else if (settings.autoValidation) {
+      const min = limits.speed.min
+      const max = limits.speed.max
+      if (input.speed < min || input.speed > max) {
+        baseErrors.push(
+          `Velocidade fora da faixa experimental (${formatRange(
+            displayLimits.speed.min,
+            displayLimits.speed.max,
+            unitLabels.speed,
+            speedFormatter
+          )})`
+        )
+      }
+    }
+
+    return {
+      valid: baseErrors.length === 0,
+      errors: baseErrors,
+    }
+  }
+
   const handleCalculate = async () => {
-    const input: PredictionInput = {
+    const rawInput: PredictionInput = {
       temperature: Number.parseFloat(temperature),
       speed: Number.parseFloat(speed),
     }
+    const input: PredictionInput = {
+      temperature: toBaseTemperature(rawInput.temperature, settings.unitSystem) ?? NaN,
+      speed: toBaseSpeed(rawInput.speed, settings.unitSystem) ?? NaN,
+    }
 
-    const validation = validateInputs(input, limits)
+    const validation = validateInput(input, rawInput)
     if (!validation.valid) {
       setErrors(validation.errors)
       return
@@ -57,7 +186,10 @@ export function PredictionForm({ trainingData, onResult }: PredictionFormProps) 
     setIsCalculating(true)
 
     try {
-      const results = await predictProperties(input, trainingData)
+      const results = await predictProperties(input, trainingData, {
+        method: resolveMethod(),
+        curvePoints: settings.stressCurvePoints,
+      })
       onResult(results)
     } catch (error) {
       setErrors(['Erro ao calcular propriedades'])
@@ -85,21 +217,29 @@ export function PredictionForm({ trainingData, onResult }: PredictionFormProps) 
               <Input
                 id="temperature"
                 type="number"
-                min={limits.temperature.min}
-                max={limits.temperature.max}
+                min={displayLimits.temperature.min}
+                max={displayLimits.temperature.max}
                 step="1"
                 value={temperature}
                 onChange={(e) => setTemperature(e.target.value)}
-                placeholder={`${Math.round((limits.temperature.min + limits.temperature.max) / 2)}`}
+                placeholder={tempFormatter.format(
+                  (displayLimits.temperature.min + displayLimits.temperature.max) / 2
+                )}
                 className="pr-12 text-lg font-semibold h-12"
               />
               <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">
-                °C
+                {unitLabels.temperature}
               </span>
             </div>
             <div className="flex items-center justify-between text-xs text-muted-foreground">
-              <span>Mínimo: {limits.temperature.min}°C</span>
-              <span>Máximo: {limits.temperature.max}°C</span>
+              <span>
+                Mínimo: {tempFormatter.format(displayLimits.temperature.min)}{' '}
+                {unitLabels.temperature}
+              </span>
+              <span>
+                Máximo: {tempFormatter.format(displayLimits.temperature.max)}{' '}
+                {unitLabels.temperature}
+              </span>
             </div>
           </div>
 
@@ -112,21 +252,27 @@ export function PredictionForm({ trainingData, onResult }: PredictionFormProps) 
               <Input
                 id="speed"
                 type="number"
-                min={limits.speed.min}
-                max={limits.speed.max}
+                min={displayLimits.speed.min}
+                max={displayLimits.speed.max}
                 step="1"
                 value={speed}
                 onChange={(e) => setSpeed(e.target.value)}
-                placeholder={`${Math.round((limits.speed.min + limits.speed.max) / 2)}`}
+                placeholder={speedFormatter.format(
+                  (displayLimits.speed.min + displayLimits.speed.max) / 2
+                )}
                 className="pr-16 text-lg font-semibold h-12"
               />
               <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">
-                mm/s
+                {unitLabels.speed}
               </span>
             </div>
             <div className="flex items-center justify-between text-xs text-muted-foreground">
-              <span>Mínimo: {limits.speed.min} mm/s</span>
-              <span>Máximo: {limits.speed.max} mm/s</span>
+              <span>
+                Mínimo: {speedFormatter.format(displayLimits.speed.min)} {unitLabels.speed}
+              </span>
+              <span>
+                Máximo: {speedFormatter.format(displayLimits.speed.max)} {unitLabels.speed}
+              </span>
             </div>
           </div>
 
@@ -150,6 +296,11 @@ export function PredictionForm({ trainingData, onResult }: PredictionFormProps) 
               ? `Baseado em ${trainingData.length} perfis reais com ajuste Ramberg-Osgood.`
               : 'Nenhum perfil com dados suficientes para ajuste foi encontrado.'}
           </p>
+          {!settings.autoValidation ? (
+            <p className="text-xs text-amber-600">
+              Validação automática desativada. Resultados podem extrapolar a faixa experimental.
+            </p>
+          ) : null}
 
           <Button
             onClick={handleCalculate}

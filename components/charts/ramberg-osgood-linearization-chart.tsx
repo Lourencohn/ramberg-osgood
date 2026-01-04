@@ -4,6 +4,8 @@ import { useMemo } from 'react'
 import type { StressStrainPoint } from '@/types'
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
 import { Line, LineChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer, Legend } from 'recharts'
+import type { UnitSystem } from '@/lib/settings'
+import { convertStress, getUnitLabels } from '@/lib/units'
 
 type LinearizationPoint = {
   logStress: number
@@ -12,6 +14,8 @@ type LinearizationPoint = {
 
 type RambergOsgoodLinearizationChartProps = {
   points: StressStrainPoint[]
+  unitSystem?: UnitSystem
+  interactive?: boolean
 }
 
 const axisFormatter = new Intl.NumberFormat('pt-BR', {
@@ -33,7 +37,12 @@ function toLog(value: number) {
   return Math.log10(value)
 }
 
-export function RambergOsgoodLinearizationChart({ points }: RambergOsgoodLinearizationChartProps) {
+export function RambergOsgoodLinearizationChart({
+  points,
+  unitSystem = 'si',
+  interactive = true,
+}: RambergOsgoodLinearizationChartProps) {
+  const unitLabels = getUnitLabels(unitSystem)
   const { actualPoints, linePoints, xDomain, yDomain, r2, estimatedE } = useMemo(() => {
     if (!points.length) {
       return {
@@ -46,7 +55,11 @@ export function RambergOsgoodLinearizationChart({ points }: RambergOsgoodLineari
       }
     }
 
-    const sorted = [...points].sort((a, b) => a.strain - b.strain)
+    const scaled = points.map((point) => ({
+      ...point,
+      stress: convertStress(point.stress, unitSystem) ?? point.stress,
+    }))
+    const sorted = [...scaled].sort((a, b) => a.strain - b.strain)
     const estimatedE = estimateElasticModulus(sorted)
     if (!estimatedE) {
       return {
@@ -145,7 +158,7 @@ export function RambergOsgoodLinearizationChart({ points }: RambergOsgoodLineari
       r2,
       estimatedE,
     }
-  }, [points])
+  }, [points, unitSystem])
 
   if (!actualPoints.length) {
     return (
@@ -160,7 +173,11 @@ export function RambergOsgoodLinearizationChart({ points }: RambergOsgoodLineari
       <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
         <span>Reta ajustada por regressao linear (log-log)</span>
         {r2 !== null ? <span>• R2: {r2.toFixed(3)}</span> : null}
-        {estimatedE !== null ? <span>• E estimado: {Math.round(estimatedE)} MPa</span> : null}
+        {estimatedE !== null ? (
+          <span>
+            • E estimado: {Math.round(estimatedE)} {unitLabels.stress}
+          </span>
+        ) : null}
       </div>
       <ChartContainer
         config={{
@@ -185,7 +202,7 @@ export function RambergOsgoodLinearizationChart({ points }: RambergOsgoodLineari
               padding={{ left: 6, right: 6 }}
               tickFormatter={(value) => axisFormatter.format(value)}
               className="text-xs"
-              name="log tensao"
+              name={`log tensao (${unitLabels.stress})`}
             />
             <YAxis
               type="number"
@@ -195,32 +212,34 @@ export function RambergOsgoodLinearizationChart({ points }: RambergOsgoodLineari
               className="text-xs"
               name="log deformacao plastica"
             />
-            <ChartTooltip
-              content={
-                <ChartTooltipContent
-                  formatter={(value, _name, payload) => {
-                    const entry = payload && !Array.isArray(payload) ? payload.payload : undefined
-                    if (!entry) return value as number
-                    return (
-                      <div className="space-y-1">
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="text-muted-foreground">log tensao</span>
-                          <span className="font-mono font-semibold">
-                            {axisFormatter.format(entry.logStress)}
-                          </span>
+            {interactive ? (
+              <ChartTooltip
+                content={
+                  <ChartTooltipContent
+                    formatter={(value, _name, payload) => {
+                      const entry = payload && !Array.isArray(payload) ? payload.payload : undefined
+                      if (!entry) return value as number
+                      return (
+                        <div className="space-y-1">
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="text-muted-foreground">log tensao</span>
+                            <span className="font-mono font-semibold">
+                              {axisFormatter.format(entry.logStress)}
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="text-muted-foreground">log deformacao plastica</span>
+                            <span className="font-mono font-semibold">
+                              {axisFormatter.format(entry.logPlasticStrain)}
+                            </span>
+                          </div>
                         </div>
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="text-muted-foreground">log deformacao plastica</span>
-                          <span className="font-mono font-semibold">
-                            {axisFormatter.format(entry.logPlasticStrain)}
-                          </span>
-                        </div>
-                      </div>
-                    )
-                  }}
-                />
-              }
-            />
+                      )
+                    }}
+                  />
+                }
+              />
+            ) : null}
             <Legend />
             <Line
               type="linear"
