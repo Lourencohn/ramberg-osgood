@@ -83,10 +83,7 @@ function getNumericField(formData: FormData, key: string) {
   return value ? parseNumber(value) : null
 }
 
-async function ensureMaterial(
-  client: PoolClient,
-  payload: MaterialPayload
-) {
+async function ensureMaterial(client: PoolClient, payload: MaterialPayload) {
   const result = await client.query<{ id: number }>(
     `INSERT INTO materials (name, grade, supplier, notes)
      VALUES ($1, $2, $3, $4)
@@ -100,10 +97,7 @@ async function ensureMaterial(
   return result.rows[0].id
 }
 
-async function upsertPrintProfile(
-  client: PoolClient,
-  payload: ProfilePayload
-) {
+async function upsertPrintProfile(client: PoolClient, payload: ProfilePayload) {
   const result = await client.query<{ id: number }>(
     `INSERT INTO print_profiles
       (material_id, code, temperature_c, speed_mm_s, layer_height_mm, extra_params)
@@ -127,10 +121,7 @@ async function upsertPrintProfile(
   return result.rows[0].id
 }
 
-async function upsertTestRun(
-  client: PoolClient,
-  payload: TestRunPayload
-) {
+async function upsertTestRun(client: PoolClient, payload: TestRunPayload) {
   const result = await client.query<{ id: number }>(
     `INSERT INTO test_runs
       (print_profile_id, test_number, test_code, raw_file_path, processed_file_path,

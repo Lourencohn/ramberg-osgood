@@ -60,11 +60,9 @@ export function PredictionForm({ trainingData, onResult }: PredictionFormProps) 
     () => ({
       temperature: {
         min:
-          convertTemperature(limits.temperature.min, settings.unitSystem) ??
-          limits.temperature.min,
+          convertTemperature(limits.temperature.min, settings.unitSystem) ?? limits.temperature.min,
         max:
-          convertTemperature(limits.temperature.max, settings.unitSystem) ??
-          limits.temperature.max,
+          convertTemperature(limits.temperature.max, settings.unitSystem) ?? limits.temperature.max,
       },
       speed: {
         min: convertSpeed(limits.speed.min, settings.unitSystem) ?? limits.speed.min,

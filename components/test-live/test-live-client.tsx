@@ -313,7 +313,12 @@ function SpecimenScene({ progress }: SpecimenSceneProps) {
       metalness: 0.1,
     })
 
-    const gripGeometry = new THREE.CylinderGeometry(base.gripRadius, base.gripRadius, base.gripLength, 36)
+    const gripGeometry = new THREE.CylinderGeometry(
+      base.gripRadius,
+      base.gripRadius,
+      base.gripLength,
+      36
+    )
     const transitionGeometry = new THREE.CylinderGeometry(
       base.gripRadius,
       base.gaugeRadius,
@@ -561,7 +566,10 @@ export function TestLiveClient() {
   }, [status])
 
   const currentPoint = useMemo(() => getPointAtProgress(curve, progress), [curve, progress])
-  const jitter = status === 'running' ? 1 + 0.018 * Math.sin(elapsedMs / 180) + 0.012 * Math.sin(elapsedMs / 60) : 1
+  const jitter =
+    status === 'running'
+      ? 1 + 0.018 * Math.sin(elapsedMs / 180) + 0.012 * Math.sin(elapsedMs / 60)
+      : 1
   const strainJitter = status === 'running' ? 1 + 0.01 * Math.sin(elapsedMs / 140 + 0.4) : 1
   const stressReading = Math.max(0, currentPoint.stress * jitter)
   const strainReading = Math.max(0, currentPoint.strain * strainJitter)

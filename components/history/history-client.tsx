@@ -32,7 +32,13 @@ import {
   convertTemperature,
   getUnitLabels,
 } from '@/lib/units'
-import { buildHtmlTable, downloadContent, downloadHtmlAsExcel, openPrintWindow, toCsv } from '@/lib/export'
+import {
+  buildHtmlTable,
+  downloadContent,
+  downloadHtmlAsExcel,
+  openPrintWindow,
+  toCsv,
+} from '@/lib/export'
 import {
   Search,
   Download,
@@ -97,7 +103,11 @@ const parseNumber = (value: string) => {
   return Number.isNaN(parsed) ? null : parsed
 }
 
-export function HistoryClient({ runs, initialQuery = '', initialViewId = null }: HistoryClientProps) {
+export function HistoryClient({
+  runs,
+  initialQuery = '',
+  initialViewId = null,
+}: HistoryClientProps) {
   const { settings } = useSettings()
   const unitLabels = getUnitLabels(settings.unitSystem)
   const [query, setQuery] = useState(initialQuery)
@@ -310,7 +320,11 @@ export function HistoryClient({ runs, initialQuery = '', initialViewId = null }:
   const handleExportAll = (format: 'csv' | 'json' | 'xlsx' | 'pdf') => {
     const baseName = `historico-${new Date().toISOString().slice(0, 10)}`
     if (format === 'csv') {
-      downloadContent(`${baseName}.csv`, toCsv(buildSummaryRows(exportRuns)), 'text/csv;charset=utf-8')
+      downloadContent(
+        `${baseName}.csv`,
+        toCsv(buildSummaryRows(exportRuns)),
+        'text/csv;charset=utf-8'
+      )
       return
     }
     if (format === 'json') {
@@ -333,7 +347,11 @@ export function HistoryClient({ runs, initialQuery = '', initialViewId = null }:
       ['test_number', item.testNumber, ''],
       ['test_code', item.testCode ?? '', ''],
       ['profile', item.profileCode, ''],
-      ['temperature', convertTemperature(item.temperature, settings.unitSystem), unitLabels.temperature],
+      [
+        'temperature',
+        convertTemperature(item.temperature, settings.unitSystem),
+        unitLabels.temperature,
+      ],
       ['speed', convertSpeed(item.speed, settings.unitSystem), unitLabels.speed],
       ['max_stress', convertStress(item.maxStress, settings.unitSystem), unitLabels.stress],
       ['max_strain', convertStrain(item.maxStrain), unitLabels.strain],
@@ -409,9 +427,7 @@ export function HistoryClient({ runs, initialQuery = '', initialViewId = null }:
   const handleExportRun = async (runId: number, format: 'csv' | 'json' | 'xlsx' | 'pdf') => {
     const detailItem = (await loadRunDetail(runId)) ?? detailCache[runId]
     if (!detailItem) return
-    const baseName = `ensaio-${detailItem.testNumber}-${new Date()
-      .toISOString()
-      .slice(0, 10)}`
+    const baseName = `ensaio-${detailItem.testNumber}-${new Date().toISOString().slice(0, 10)}`
 
     if (format === 'csv') {
       downloadContent(`${baseName}.csv`, buildRunDetailCsv(detailItem), 'text/csv;charset=utf-8')
@@ -583,7 +599,9 @@ export function HistoryClient({ runs, initialQuery = '', initialViewId = null }:
                 </div>
               </div>
               <div className="space-y-2">
-                <Label className="text-xs text-muted-foreground">Velocidade ({unitLabels.speed})</Label>
+                <Label className="text-xs text-muted-foreground">
+                  Velocidade ({unitLabels.speed})
+                </Label>
                 <div className="flex gap-2">
                   <Input
                     placeholder="Min"
@@ -838,7 +856,9 @@ export function HistoryClient({ runs, initialQuery = '', initialViewId = null }:
                   </div>
                   <div className="rounded-lg border border-border bg-background px-4 py-3 text-sm sm:col-span-2">
                     <p className="text-xs text-muted-foreground">Data</p>
-                    <p className="font-semibold">{dateFormatter.format(new Date(detail.createdAt))}</p>
+                    <p className="font-semibold">
+                      {dateFormatter.format(new Date(detail.createdAt))}
+                    </p>
                   </div>
                 </div>
 
@@ -858,12 +878,17 @@ export function HistoryClient({ runs, initialQuery = '', initialViewId = null }:
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem onSelect={() => handleExportRun(detail.id, settings.exportFormat)}>
+                    <DropdownMenuItem
+                      onSelect={() => handleExportRun(detail.id, settings.exportFormat)}
+                    >
                       Exportar {settings.exportFormat.toUpperCase()} (padrão)
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     {exportFormats.map((format) => (
-                      <DropdownMenuItem key={format} onSelect={() => handleExportRun(detail.id, format)}>
+                      <DropdownMenuItem
+                        key={format}
+                        onSelect={() => handleExportRun(detail.id, format)}
+                      >
                         {format.toUpperCase()}
                       </DropdownMenuItem>
                     ))}

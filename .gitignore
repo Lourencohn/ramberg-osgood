@@ -26,6 +26,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+WARP.md
 GEMINI.md
 CLAUDE.md
 AGENTS.md

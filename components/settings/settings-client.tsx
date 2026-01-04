@@ -171,9 +171,7 @@ export function SettingsClient() {
                 <CheckCircle2 className="size-5 text-foreground" />
                 <div>
                   <Label className="text-sm font-medium">Validação Automática</Label>
-                  <p className="text-xs text-muted-foreground">
-                    Verificar limites dos parâmetros
-                  </p>
+                  <p className="text-xs text-muted-foreground">Verificar limites dos parâmetros</p>
                 </div>
               </div>
               <Switch
@@ -237,7 +235,9 @@ export function SettingsClient() {
               </Label>
               <Select
                 value={draft.unitSystem}
-                onValueChange={(value) => updateField('unitSystem', value as AppSettings['unitSystem'])}
+                onValueChange={(value) =>
+                  updateField('unitSystem', value as AppSettings['unitSystem'])
+                }
               >
                 <SelectTrigger id="units" className="h-11">
                   <SelectValue />

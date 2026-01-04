@@ -250,7 +250,11 @@ function FemScene({
     const baseDepth = 0.6
     const baseGeometry = new THREE.BoxGeometry(baseWidth, elementLength, baseDepth)
     const edgeGeometry = new THREE.EdgesGeometry(baseGeometry)
-    const edgeMaterial = new THREE.LineBasicMaterial({ color: 0x1f2937, transparent: true, opacity: 0.45 })
+    const edgeMaterial = new THREE.LineBasicMaterial({
+      color: 0x1f2937,
+      transparent: true,
+      opacity: 0.45,
+    })
 
     const elementGroups = Array.from({ length: ELEMENT_COUNT }, () => {
       const material = new THREE.MeshStandardMaterial({
@@ -294,7 +298,10 @@ function FemScene({
       metalness: 0.2,
     })
     const arrowGroup = new THREE.Group()
-    const arrowShaft = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.5, 18), arrowMaterial)
+    const arrowShaft = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.05, 0.05, 0.5, 18),
+      arrowMaterial
+    )
     const arrowHead = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.26, 18), arrowMaterial)
     arrowHead.position.y = 0.38
     arrowGroup.add(arrowShaft, arrowHead)
@@ -804,8 +811,8 @@ export function MefRambergClient() {
               </Badge>
             </div>
             <p className="text-sm text-muted-foreground">
-              A barra e discretizada em elementos finitos para ligar a curva constitutiva a
-              resposta estrutural global.
+              A barra e discretizada em elementos finitos para ligar a curva constitutiva a resposta
+              estrutural global.
             </p>
             <p className="text-xs text-muted-foreground">
               Tempo: {elapsedSeconds.toFixed(1)}s / {durationSeconds.toFixed(0)}s
@@ -1034,9 +1041,7 @@ export function MefRambergClient() {
             <Card className="border-border/70">
               <CardHeader className="pb-3">
                 <CardTitle>Curva tensao x deformacao</CardTitle>
-                <CardDescription>
-                  O ponto marca o valor atual de tensao maxima.
-                </CardDescription>
+                <CardDescription>O ponto marca o valor atual de tensao maxima.</CardDescription>
               </CardHeader>
               <CardContent>
                 <MaterialCurveChart

@@ -5,11 +5,13 @@ import { getRunMetrics } from '@/lib/dashboard-data'
 export const dynamic = 'force-dynamic'
 
 type HistoryPageProps = {
-  searchParams?: { query?: string; q?: string; view?: string } | Promise<{
-    query?: string
-    q?: string
-    view?: string
-  }>
+  searchParams?:
+    | { query?: string; q?: string; view?: string }
+    | Promise<{
+        query?: string
+        q?: string
+        view?: string
+      }>
 }
 
 export default async function HistoryPage({ searchParams }: HistoryPageProps) {

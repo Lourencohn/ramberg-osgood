@@ -44,7 +44,10 @@ export const buildHtmlTable = (headers: string[], rows: CsvValue[][]) => {
   const bodyRows = rows
     .map((row) => {
       const cells = row
-        .map((cell) => `<td>${escapeHtml(cell === null || cell === undefined ? '' : String(cell))}</td>`)
+        .map(
+          (cell) =>
+            `<td>${escapeHtml(cell === null || cell === undefined ? '' : String(cell))}</td>`
+        )
         .join('')
       return `<tr>${cells}</tr>`
     })

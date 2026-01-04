@@ -46,7 +46,9 @@ export const normalizeSettings = (input?: Partial<AppSettings> | null): AppSetti
   const resolved = input ?? {}
 
   return {
-    interpolationMethod: INTERPOLATION_METHODS.has(resolved.interpolationMethod as InterpolationMethod)
+    interpolationMethod: INTERPOLATION_METHODS.has(
+      resolved.interpolationMethod as InterpolationMethod
+    )
       ? (resolved.interpolationMethod as InterpolationMethod)
       : DEFAULT_SETTINGS.interpolationMethod,
     stressCurvePoints: clampNumber(

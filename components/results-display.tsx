@@ -216,7 +216,11 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
       : false
 
   const formatTemperatureValue = (value: number | null | undefined) =>
-    formatWithUnit(convertTemperature(value, settings.unitSystem), tempFormatter, unitLabels.temperature)
+    formatWithUnit(
+      convertTemperature(value, settings.unitSystem),
+      tempFormatter,
+      unitLabels.temperature
+    )
 
   const formatSpeedValue = (value: number | null | undefined) =>
     formatWithUnit(convertSpeed(value, settings.unitSystem), speedFormatter, unitLabels.speed)
@@ -347,17 +351,42 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
     if (!result) return [] as Array<Array<string | number | null>>
     return [
       ['section', 'key', 'value', 'unit'],
-      ['input', 'temperature', convertTemperature(result.input.temperature, settings.unitSystem), unitLabels.temperature],
+      [
+        'input',
+        'temperature',
+        convertTemperature(result.input.temperature, settings.unitSystem),
+        unitLabels.temperature,
+      ],
       ['input', 'speed', convertSpeed(result.input.speed, settings.unitSystem), unitLabels.speed],
       ['model', 'E', convertStress(params?.E, settings.unitSystem), unitLabels.stress],
       ['model', 'sigma_0', convertStress(params?.sigma_0, settings.unitSystem), unitLabels.stress],
       ['model', 'n', params?.n ?? null, ''],
       ['model', 'max_strain', maxStrain !== null ? maxStrain * 100 : null, '%'],
-      ['properties', 'yield_stress', convertStress(properties?.yieldStress, settings.unitSystem), unitLabels.stress],
-      ['properties', 'ultimate_stress', convertStress(properties?.ultimateStress, settings.unitSystem), unitLabels.stress],
+      [
+        'properties',
+        'yield_stress',
+        convertStress(properties?.yieldStress, settings.unitSystem),
+        unitLabels.stress,
+      ],
+      [
+        'properties',
+        'ultimate_stress',
+        convertStress(properties?.ultimateStress, settings.unitSystem),
+        unitLabels.stress,
+      ],
       ['properties', 'ductility', properties?.ductility ?? null, '%'],
-      ['properties', 'resilience', convertEnergyDensity(properties?.resilience, settings.unitSystem), unitLabels.energy],
-      ['properties', 'toughness', convertEnergyDensity(properties?.toughness, settings.unitSystem), unitLabels.energy],
+      [
+        'properties',
+        'resilience',
+        convertEnergyDensity(properties?.resilience, settings.unitSystem),
+        unitLabels.energy,
+      ],
+      [
+        'properties',
+        'toughness',
+        convertEnergyDensity(properties?.toughness, settings.unitSystem),
+        unitLabels.energy,
+      ],
     ]
   }
 
@@ -421,17 +450,15 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
   const buildHtmlExport = () => {
     if (!result) return ''
     const summaryRows = buildExportSummaryRows().slice(1)
-    const summaryTable = buildHtmlTable(
-      ['Seção', 'Campo', 'Valor', 'Unidade'],
-      summaryRows
-    )
+    const summaryTable = buildHtmlTable(['Seção', 'Campo', 'Valor', 'Unidade'], summaryRows)
     const curveRows = buildCurveRows()
-    const curveTable = settings.exportIncludeCharts && curveRows.length
-      ? buildHtmlTable(
-          [`Strain (${unitLabels.strain})`, `Stress (${unitLabels.stress})`],
-          curveRows
-        )
-      : ''
+    const curveTable =
+      settings.exportIncludeCharts && curveRows.length
+        ? buildHtmlTable(
+            [`Strain (${unitLabels.strain})`, `Stress (${unitLabels.stress})`],
+            curveRows
+          )
+        : ''
 
     return `
       <h1>Resultados da Previsao</h1>
@@ -479,12 +506,7 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
             <Badge variant="secondary">{methodLabel}</Badge>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="gap-2"
-                  disabled={!result}
-                >
+                <Button variant="outline" size="sm" className="gap-2" disabled={!result}>
                   <Download className="size-4" />
                   Exportar
                 </Button>
@@ -495,10 +517,7 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 {exportFormats.map((format) => (
-                  <DropdownMenuItem
-                    key={format}
-                    onSelect={() => handleExport(format)}
-                  >
+                  <DropdownMenuItem key={format} onSelect={() => handleExport(format)}>
                     {format.toUpperCase()}
                   </DropdownMenuItem>
                 ))}
