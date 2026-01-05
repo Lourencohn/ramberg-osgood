@@ -721,7 +721,7 @@ export function TestLiveClient() {
                     detail: 'Rigidez inicial do material.',
                   },
                   {
-                    label: 'Limite de escoamento (sigma_0)',
+                    label: 'Limite de escoamento (\u03c3\u2080)',
                     value: `${RAMBERG_PARAMS.sigma_0} MPa`,
                     detail: 'Inicio do comportamento plastico.',
                   },

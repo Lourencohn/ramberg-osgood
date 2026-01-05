@@ -84,7 +84,7 @@ const METRICS: MetricConfig[] = [
   },
   {
     key: 'sigma_0',
-    label: 'Tensao de referencia (sigma0)',
+    label: 'Tensao de referencia (σ₀)',
     unit: 'MPa',
     description: 'Tensao associada ao deslocamento de 0,2%.',
     formatter: (value) => stressFormatter.format(value),
@@ -98,7 +98,7 @@ const METRICS: MetricConfig[] = [
   },
   {
     key: 'resilience',
-    label: 'Resiliencia',
+    label: 'Resiliência',
     unit: 'MJ/m³',
     description: 'Energia elastica acumulada ate o escoamento.',
     formatter: (value) => numberFormatter.format(value),

@@ -303,7 +303,7 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
       icon: Percent,
     },
     {
-      label: 'Resiliencia',
+      label: 'Resiliência',
       value: convertEnergyDensity(properties?.resilience, settings.unitSystem),
       unit: unitLabels.energy,
       formatter: numberFormatter,
@@ -769,7 +769,7 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
                   })}
                 </div>
                 <p className="mt-3 text-xs text-muted-foreground">
-                  Resiliencia considera energia ate o escoamento. Tenacidade considera a energia
+                  Resiliência considera energia até o escoamento. Tenacidade considera a energia
                   total.
                 </p>
               </div>

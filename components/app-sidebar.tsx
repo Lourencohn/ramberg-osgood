@@ -18,6 +18,9 @@ import {
   Loader2,
   Activity,
   Layers,
+  BarChart3,
+  Target,
+  ShieldCheck,
 } from 'lucide-react'
 
 import { NavUser } from '@/components/nav-user'
@@ -69,6 +72,9 @@ const navigation = [
       { title: 'Histórico', href: '/history', icon: History },
       { title: 'Importar', href: '/import', icon: UploadCloud },
       { title: 'Comparar', href: '/compare', icon: GitCompare },
+      { title: 'Calibração', href: '/calibracao', icon: Target },
+      { title: 'Verificação MEF', href: '/verificacao', icon: ShieldCheck },
+      { title: 'Atlas Paramétrico', href: '/atlas', icon: BarChart3 },
       { title: 'Documentação', href: '/docs', icon: FileText },
     ],
   },

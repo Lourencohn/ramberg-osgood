@@ -172,7 +172,7 @@ export function RambergOsgoodLinearizationChart({
     <div className="space-y-2">
       <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
         <span>Reta ajustada por regressao linear (log-log)</span>
-        {r2 !== null ? <span>• R2: {r2.toFixed(3)}</span> : null}
+        {r2 !== null ? <span>• R²: {r2.toFixed(3)}</span> : null}
         {estimatedE !== null ? (
           <span>
             • E estimado: {Math.round(estimatedE)} {unitLabels.stress}
