@@ -1,8 +1,9 @@
 import { DashboardLayout } from '@/components/layout/dashboard-layout'
+import { PageShell } from '@/components/layout/page-shell'
 import { Button } from '@/components/ui/button'
 import { CompareClient } from '@/components/compare/compare-client'
 import { buildProfileAverages, getRunMetrics } from '@/lib/dashboard-data'
-import { Plus } from 'lucide-react'
+import { GitCompare, Plus } from 'lucide-react'
 import Link from 'next/link'
 
 export const dynamic = 'force-dynamic'
@@ -13,24 +14,21 @@ export default async function ComparePage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight md:text-3xl">Análise Comparativa</h1>
-            <p className="mt-1.5 text-muted-foreground">
-              Compare resultados de diferentes ensaios lado a lado
-            </p>
-          </div>
+      <PageShell
+        title="Análise Comparativa"
+        description="Compare resultados de diferentes ensaios lado a lado"
+        icon={<GitCompare className="size-5" />}
+        actions={
           <Button className="gap-2 shadow-sm" asChild>
             <Link href="/import">
               <Plus className="size-4" />
               Adicionar Ensaio
             </Link>
           </Button>
-        </div>
-
+        }
+      >
         <CompareClient runs={runs} profileAverages={profileAverages} />
-      </div>
+      </PageShell>
     </DashboardLayout>
   )
 }

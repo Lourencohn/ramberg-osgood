@@ -17,6 +17,7 @@ type DashboardLayoutClientProps = {
 export function DashboardLayoutClient({ children, user }: DashboardLayoutClientProps) {
   return (
     <SidebarProvider
+      className="h-svh overflow-hidden"
       style={
         {
           '--sidebar-width': '340px',
@@ -24,13 +25,15 @@ export function DashboardLayoutClient({ children, user }: DashboardLayoutClientP
       }
     >
       <AppSidebar user={user} />
-      <SidebarInset>
+      <SidebarInset className="min-h-0">
         <header className="bg-background/95 sticky top-0 z-10 flex h-14 items-center gap-3 border-b px-4 backdrop-blur">
           <SidebarTrigger className="-ml-1" />
           <Separator orientation="vertical" className="h-4" />
           <span className="text-sm font-medium text-muted-foreground">ResistencIA</span>
         </header>
-        <main className="flex-1 p-4 md:p-6 lg:p-8">{children}</main>
+        <main className="flex min-h-0 flex-1 flex-col overflow-auto p-4 md:p-6 lg:p-8">
+          {children}
+        </main>
       </SidebarInset>
     </SidebarProvider>
   )
