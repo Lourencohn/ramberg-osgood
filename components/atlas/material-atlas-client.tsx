@@ -375,7 +375,7 @@ export function MaterialAtlasClient({ trainingData }: MaterialAtlasClientProps) 
   }
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)] lg:h-[calc(100svh-220px)] lg:items-stretch lg:overflow-hidden">
+    <div className="grid gap-4 lg:grid-cols-[minmax(0,400px)_minmax(0,1fr)] lg:h-[calc(100svh-220px)] lg:items-stretch lg:overflow-hidden">
       <Card className="flex h-full flex-col">
         <CardHeader className="pb-4">
           <div className="flex items-center gap-3">
@@ -565,7 +565,7 @@ export function MaterialAtlasClient({ trainingData }: MaterialAtlasClientProps) 
             </TabsContent>
 
             <TabsContent value="summary">
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="grid gap-3 grid-cols-2">
                 <div className="rounded-xl border border-border/80 bg-card p-4">
                   <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                     Perfis
