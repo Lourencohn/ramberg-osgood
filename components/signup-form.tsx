@@ -70,7 +70,7 @@ export function SignupForm({ error, ...props }: SignupFormProps) {
                 Criar conta
               </Button>
               <FieldDescription className="text-center">
-                Já possui acesso? <Link href="/">Entrar</Link>
+                Já possui acesso? <Link href="/login">Entrar</Link>
               </FieldDescription>
             </Field>
           </FieldGroup>

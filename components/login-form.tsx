@@ -15,22 +15,29 @@ import {
   FieldSeparator,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import { loginAction } from "@/lib/auth-actions"
 
 export function LoginForm({
   className,
+  error,
   ...props
-}: React.ComponentProps<"div">) {
+}: React.ComponentProps<"div"> & { error?: string }) {
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader className="text-center">
-          <CardTitle className="text-xl">Welcome back</CardTitle>
+          <CardTitle className="text-xl">Bem-vindo de volta</CardTitle>
           <CardDescription>
-            Login with your Apple or Google account
+            Faça login com sua conta Apple ou Google
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
+          <form action={loginAction}>
+            {error ? (
+              <div className="mb-4 rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive">
+                {error}
+              </div>
+            ) : null}
             <FieldGroup>
               <Field>
                 <Button variant="outline" type="button">
@@ -40,7 +47,7 @@ export function LoginForm({
                       fill="currentColor"
                     />
                   </svg>
-                  Login with Apple
+                  Entrar com Apple
                 </Button>
                 <Button variant="outline" type="button">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -49,37 +56,38 @@ export function LoginForm({
                       fill="currentColor"
                     />
                   </svg>
-                  Login with Google
+                  Entrar com Google
                 </Button>
               </Field>
               <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
-                Or continue with
+                Ou continue com
               </FieldSeparator>
               <Field>
-                <FieldLabel htmlFor="email">Email</FieldLabel>
+                <FieldLabel htmlFor="email">E-mail</FieldLabel>
                 <Input
                   id="email"
+                  name="email"
                   type="email"
-                  placeholder="m@example.com"
+                  placeholder="m@exemplo.com"
                   required
                 />
               </Field>
               <Field>
                 <div className="flex items-center">
-                  <FieldLabel htmlFor="password">Password</FieldLabel>
+                  <FieldLabel htmlFor="password">Senha</FieldLabel>
                   <a
                     href="#"
                     className="ml-auto text-sm underline-offset-4 hover:underline"
                   >
-                    Forgot your password?
+                    Esqueceu sua senha?
                   </a>
                 </div>
-                <Input id="password" type="password" required />
+                <Input id="password" name="password" type="password" required />
               </Field>
               <Field>
-                <Button type="submit">Login</Button>
+                <Button type="submit">Entrar</Button>
                 <FieldDescription className="text-center">
-                  Don&apos;t have an account? <a href="#">Sign up</a>
+                  Não tem uma conta? <a href="/signup">Cadastre-se</a>
                 </FieldDescription>
               </Field>
             </FieldGroup>
@@ -87,8 +95,8 @@ export function LoginForm({
         </CardContent>
       </Card>
       <FieldDescription className="px-6 text-center">
-        By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
-        and <a href="#">Privacy Policy</a>.
+        Ao clicar em continuar, você concorda com nossos <a href="#">Termos de Serviço</a>{" "}
+        e <a href="#">Política de Privacidade</a>.
       </FieldDescription>
     </div>
   )
