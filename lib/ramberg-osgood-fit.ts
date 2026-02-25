@@ -152,7 +152,7 @@ export function fitRambergOsgoodCurve(
     n: options.bounds?.n ?? DEFAULT_BOUNDS.n,
   }
 
-  const sampleSize = options.sampleSize ?? Math.min(400, sanitized.length)
+  const sampleSize = options.sampleSize ?? Math.min(200, sanitized.length)
   const sample = samplePoints(sanitized, sampleSize)
 
   const initialParams = clampParams(
@@ -164,8 +164,8 @@ export function fitRambergOsgoodCurve(
     bounds
   )
 
-  const totalIterations = options.iterations ?? 3000
-  const restarts = Math.max(1, options.restarts ?? 3)
+  const totalIterations = options.iterations ?? 1000
+  const restarts = Math.max(1, options.restarts ?? 2)
   const iterationsPerRun = Math.max(1, Math.floor(totalIterations / restarts))
 
   let bestParams = initialParams
@@ -177,6 +177,8 @@ export function fitRambergOsgoodCurve(
     let step = 0.25
 
     for (let i = 0; i < iterationsPerRun; i += 1) {
+      if (result.error / (result.count || 1) < 1e-10) break
+
       const candidate = clampParams(
         {
           E: params.E * (1 + randomNormal(rng) * step),

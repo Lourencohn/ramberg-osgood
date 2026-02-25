@@ -74,6 +74,12 @@ export function CalibrationErrorSurface({ points, params }: CalibrationErrorSurf
   const grid = useMemo<ErrorSurfaceGrid | null>(() => {
     if (points.length < 8) return null
 
+    // Downsample points for surface calculation to avoid main thread blocking
+    const surfacePoints =
+      points.length > 150
+        ? points.filter((_, i) => i % Math.ceil(points.length / 150) === 0)
+        : points
+
     const nCenter = Number.isFinite(params.n) ? params.n : 8
     const sigmaCenter = Number.isFinite(params.sigma_0) ? params.sigma_0 : 50
     const nMin = Math.max(0.5, nCenter * 0.55)
@@ -97,7 +103,7 @@ export function CalibrationErrorSurface({ points, params }: CalibrationErrorSurf
       const sigma = sigmaMin + ((sigmaMax - sigmaMin) * row) / (rows - 1)
       for (let col = 0; col < cols; col += 1) {
         const n = nMin + ((nMax - nMin) * col) / (cols - 1)
-        const rmse = computeRmse(points, {
+        const rmse = computeRmse(surfacePoints, {
           E: params.E,
           sigma_0: sigma,
           n,
@@ -119,7 +125,7 @@ export function CalibrationErrorSurface({ points, params }: CalibrationErrorSurf
       return null
     }
 
-    const focusRmse = computeRmse(points, params)
+    const focusRmse = computeRmse(surfacePoints, params)
 
     return {
       cols,
