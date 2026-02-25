@@ -8,12 +8,12 @@ export async function loginAction(formData: FormData) {
   const password = String(formData.get('password') ?? '')
 
   if (!email || !password) {
-    redirect('/?error=missing-fields')
+    redirect('/login?error=missing-fields')
   }
 
   const user = await verifyUser(email, password)
   if (!user) {
-    redirect('/?error=invalid-credentials')
+    redirect('/login?error=invalid-credentials')
   }
 
   await createSession(user.id)
@@ -54,5 +54,5 @@ export async function signupAction(formData: FormData) {
 
 export async function logoutAction() {
   await clearSession()
-  redirect('/')
+  redirect('/login')
 }
