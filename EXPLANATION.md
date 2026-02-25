@@ -2,6 +2,17 @@
 
 Este documento descreve o propósito de colunas importantes na tabela de usuários (`users`) relacionadas à segurança e autenticação.
 
+## password_salt
+
+A coluna `password_salt` (ou "sal da senha") armazena um valor aleatório único gerado para cada usuário no momento do cadastro.
+
+**Para que serve?**
+1. **Prevenir ataques de "Rainbow Table":** Rainbow Tables são tabelas pré-computadas com milhões de senhas e seus respectivos hashes. Sem o salt, se dois usuários tiverem a senha "123456", o hash seria idêntico. Com o salt, mesmo senhas iguais geram hashes completamente diferentes.
+2. **Garantir unicidade:** Cada hash de senha é único, mesmo que múltiplos usuários escolham a mesma senha fraca.
+
+**Como funciona:**
+O salt é combinado com a senha do usuário *antes* de passar pela função de hash. O valor do salt não precisa ser secreto (ele é armazenado em texto claro no banco), mas deve ser único por usuário.
+
 ## password_hash
 
 A coluna `password_hash` armazena a versão criptografada da senha do usuário.
