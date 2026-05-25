@@ -89,10 +89,10 @@ export async function verifyUser(email: string, password: string): Promise<AuthU
   if (!user) return null
 
   const candidateHash = hashPassword(password, user.password_salt)
-  const matches = timingSafeEqual(
-    Buffer.from(candidateHash, 'hex'),
-    Buffer.from(user.password_hash, 'hex')
-  )
+  const candidateBuf = Buffer.from(candidateHash, 'hex')
+  const storedBuf = Buffer.from(user.password_hash, 'hex')
+  if (candidateBuf.length !== storedBuf.length) return null
+  const matches = timingSafeEqual(candidateBuf, storedBuf)
   if (!matches) return null
 
   return { id: user.id, name: user.name, email: user.email }

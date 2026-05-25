@@ -369,7 +369,7 @@ export function MefVerificationClient() {
             </div>
           </div>
         </CardHeader>
-        <CardContent className="flex-1">
+        <CardContent className="flex-1 overflow-y-auto">
           <Tabs defaultValue="config" className="space-y-3">
             <TabsList className="grid w-full grid-cols-2 h-auto gap-1 p-1">
               <TabsTrigger value="config" className="py-2.5">
@@ -446,7 +446,7 @@ export function MefVerificationClient() {
             </TabsContent>
 
             <TabsContent value="summary">
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="grid gap-3 @sm:grid-cols-2 @lg:grid-cols-4">
                 {summaryMetrics.map((metric) => (
                   <div key={metric.label} className="rounded-xl border border-border/80 bg-card p-4">
                     <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
@@ -476,20 +476,20 @@ export function MefVerificationClient() {
             </div>
           </div>
         </CardHeader>
-        <CardContent className="flex-1 overflow-hidden">
+        <CardContent className="flex-1 overflow-hidden @container">
           <Tabs defaultValue="mesh" className="flex h-full flex-col">
-            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto gap-1 p-1">
-              <TabsTrigger value="mesh" className="py-2.5">
-                Discretização
+            <TabsList className="grid w-full grid-cols-2 @sm:grid-cols-4 h-auto gap-1 p-1">
+              <TabsTrigger value="mesh" className="py-2.5 min-w-0 overflow-hidden text-xs">
+                <span className="truncate">Discretização</span>
               </TabsTrigger>
-              <TabsTrigger value="convergence" className="py-2.5">
-                Convergência
+              <TabsTrigger value="convergence" className="py-2.5 min-w-0 overflow-hidden text-xs">
+                <span className="truncate">Convergência</span>
               </TabsTrigger>
-              <TabsTrigger value="table" className="py-2.5">
-                Tabela
+              <TabsTrigger value="table" className="py-2.5 min-w-0 overflow-hidden text-xs">
+                <span className="truncate">Tabela</span>
               </TabsTrigger>
-              <TabsTrigger value="notes" className="py-2.5">
-                Notas
+              <TabsTrigger value="notes" className="py-2.5 min-w-0 overflow-hidden text-xs">
+                <span className="truncate">Notas</span>
               </TabsTrigger>
             </TabsList>
 
@@ -569,7 +569,8 @@ export function MefVerificationClient() {
             </TabsContent>
 
             <TabsContent value="table" className="mt-3">
-              <div className="grid gap-2 text-xs text-muted-foreground">
+              <div className="overflow-x-auto">
+              <div className="grid gap-2 text-xs text-muted-foreground min-w-[360px]">
                 <div className="grid grid-cols-4 rounded-lg bg-muted/40 px-3 py-2 font-semibold text-foreground">
                   <span>Elementos</span>
                   <span>h ({lengthUnit})</span>
@@ -591,6 +592,7 @@ export function MefVerificationClient() {
                     <span>{percentFormatter.format(point.error * 100)}%</span>
                   </div>
                 ))}
+              </div>
               </div>
             </TabsContent>
 

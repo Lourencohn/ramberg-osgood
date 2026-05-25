@@ -526,25 +526,27 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
           </div>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="@container">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 h-11">
-            <TabsTrigger value="properties" className="gap-2 text-xs sm:text-sm">
-              <BarChart3 className="size-4 hidden sm:block" />
-              Resumo tecnico
+          <TabsList className="grid w-full grid-cols-2 @sm:grid-cols-4 h-auto @sm:h-11">
+            <TabsTrigger value="properties" className="gap-1.5 py-2 @sm:py-0 text-xs min-w-0 overflow-hidden">
+              <BarChart3 className="size-4 shrink-0" />
+              <span className="@sm:hidden truncate">Resumo</span>
+              <span className="hidden @sm:block truncate">Resumo tecnico</span>
             </TabsTrigger>
-            <TabsTrigger value="curve" className="gap-2 text-xs sm:text-sm">
-              <LineChart className="size-4 hidden sm:block" />
-              <span className="sm:hidden">Curva tensao</span>
-              <span className="hidden sm:inline">Curva tensao x deformacao</span>
+            <TabsTrigger value="curve" className="gap-1.5 py-2 @sm:py-0 text-xs min-w-0 overflow-hidden">
+              <LineChart className="size-4 shrink-0" />
+              <span className="@sm:hidden truncate">Curva</span>
+              <span className="hidden @sm:block truncate">Curva tensao×deform.</span>
             </TabsTrigger>
-            <TabsTrigger value="surfaces" className="gap-2 text-xs sm:text-sm">
-              <Box className="size-4 hidden sm:block" />
-              Superficie 3D
+            <TabsTrigger value="surfaces" className="gap-1.5 py-2 @sm:py-0 text-xs min-w-0 overflow-hidden">
+              <Box className="size-4 shrink-0" />
+              <span className="@sm:hidden truncate">Sup. 3D</span>
+              <span className="hidden @sm:block truncate">Superficie 3D</span>
             </TabsTrigger>
-            <TabsTrigger value="validation" className="gap-2 text-xs sm:text-sm">
-              <CheckCircle2 className="size-4 hidden sm:block" />
-              Validacao
+            <TabsTrigger value="validation" className="gap-1.5 py-2 @sm:py-0 text-xs min-w-0 overflow-hidden">
+              <CheckCircle2 className="size-4 shrink-0" />
+              <span className="truncate">Validacao</span>
             </TabsTrigger>
           </TabsList>
 

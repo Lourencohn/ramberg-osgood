@@ -261,8 +261,13 @@ function SpecimenScene({ progress }: SpecimenSceneProps) {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     renderer.setClearColor(0x000000, 0)
     renderer.outputColorSpace = THREE.SRGBColorSpace
-    renderer.domElement.style.display = 'block'
-    renderer.domElement.style.margin = '0 auto'
+    Object.assign(renderer.domElement.style, {
+      position: 'absolute',
+      top: '0',
+      left: '0',
+      width: '100%',
+      height: '100%',
+    })
     container.appendChild(renderer.domElement)
 
     const scene = new THREE.Scene()
@@ -468,7 +473,7 @@ function SpecimenScene({ progress }: SpecimenSceneProps) {
     const handleResize = () => {
       const { width, height } = container.getBoundingClientRect()
       if (!width || !height) return
-      renderer.setSize(width, height)
+      renderer.setSize(width, height, false)
       camera.aspect = width / height
       camera.updateProjectionMatrix()
       fitCameraToSpecimen()

@@ -49,9 +49,8 @@ export default async function DashboardPage() {
           <StatsCard
             title="Ensaios registrados"
             value={numberFormatter.format(stats.totalTests)}
-            icon={<Activity className="size-5 text-background" />}
+            icon={<Activity className="size-5 text-foreground" />}
             trend={{ value: stressShare, label: 'com tensão calculada' }}
-            variant="primary"
           />
           <StatsCard
             title="Última Simulação"
