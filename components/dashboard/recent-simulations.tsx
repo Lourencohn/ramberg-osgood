@@ -80,13 +80,13 @@ export function RecentSimulations({ runs }: RecentSimulationsProps) {
                 <div className="text-right space-y-1">
                   <p className="text-sm font-semibold text-foreground">
                     <span className="text-muted-foreground font-normal">σ:</span>{' '}
-                    {run.maxStress !== null ? `${numberFormatter.format(run.maxStress)} MPa` : '—'}
+                    {run.maxStress !== null ? `${numberFormatter.format(run.maxStress)} MPa` : 'sem dados'}
                   </p>
                   <p className="text-xs text-muted-foreground">
                     <span className="text-muted-foreground">ε:</span>{' '}
                     {run.maxStrain !== null
                       ? `${numberFormatter.format(run.maxStrain)} mm/mm`
-                      : '—'}
+                      : 'sem dados'}
                   </p>
                 </div>
               </div>

@@ -1,88 +1,75 @@
-import { format } from 'date-fns'
 import { DashboardLayout } from '@/components/layout/dashboard-layout'
-import { StatsCard } from '@/components/dashboard/stats-card'
-import { SimulationsTrendChart } from '@/components/dashboard/simulations-trend-chart'
-import { PropertiesDistributionChart } from '@/components/dashboard/properties-distribution-chart'
-import { ParametersUsageChart } from '@/components/dashboard/parameters-usage-chart'
-import { PerformanceComparisonChart } from '@/components/dashboard/performance-comparison-chart'
-import { ProfileTests } from '@/components/dashboard/profile-tests'
-import { Activity, Beaker, Baseline as ChartLine, History } from 'lucide-react'
+import { EditorialHeader } from '@/components/dashboard/editorial-header'
+import { KpiStrip } from '@/components/dashboard/kpi-strip'
+import { CurveOverlayCard } from '@/components/dashboard/curve-overlay-card'
+import { ThermalRings } from '@/components/dashboard/thermal-rings'
+import { EditorialActions } from '@/components/dashboard/editorial-actions'
+import { ProfileMatrix } from '@/components/dashboard/profile-matrix'
 import { getDashboardData } from '@/lib/dashboard-data'
-import { formatProfileLabel } from '@/lib/formatters'
 
 export const dynamic = 'force-dynamic'
 
-export default async function DashboardPage() {
-  const dashboardData = await getDashboardData()
-  const {
-    stats,
-    profileAverages,
-    temperatureUsage,
-    stressDistribution,
-    speedPerformance,
-    profileDetails,
-  } = dashboardData
+const numberFormatter = new Intl.NumberFormat('pt-BR')
 
-  const numberFormatter = new Intl.NumberFormat('pt-BR')
+export default async function DashboardPage() {
+  const { stats, temperatureUsage, profileDetails } = await getDashboardData()
+
   const avgPoints = stats.totalTests ? Math.round(stats.totalMeasurements / stats.totalTests) : 0
-  const stressShare = stats.totalTests
-    ? Math.round((stats.testsWithStress / stats.totalTests) * 100)
-    : 0
-  const lastTestValue = stats.lastTest
-    ? format(new Date(stats.lastTest.createdAt), 'dd/MM/yyyy HH:mm')
-    : '—'
-  const lastTestDescription = stats.lastTest
-    ? `${stats.lastTest.profileCode} • ${formatProfileLabel(stats.lastTest.temperature, stats.lastTest.speed)}`
-    : 'Nenhum ensaio registrado'
+
+  // KPI values pre-formatted for editorial display: the big number is the
+  // "headline", the unit/hint sit beneath for context.
+  const kpis = [
+    {
+      caption: 'Ensaios catalogados',
+      value: stats.totalTests.toString().padStart(3, '0'),
+      hint: `${stats.testsWithStress} com tensão calculada`,
+      accent: true,
+    },
+    {
+      caption: 'Perfis distintos',
+      value: stats.totalProfiles.toString().padStart(2, '0'),
+      hint: 'Material × temperatura × velocidade',
+    },
+    {
+      caption: 'Pontos medidos',
+      value: numberFormatter.format(stats.totalMeasurements),
+      hint: `~${numberFormatter.format(avgPoints)} por ensaio`,
+    },
+    {
+      caption: 'Modelo ativo',
+      value: 'R.O',
+      hint: 'Ramberg-Osgood com RBF',
+    },
+  ]
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
-        <div className="flex flex-col gap-1">
-          <h1 className="text-2xl font-bold tracking-tight md:text-3xl">Dashboard</h1>
-          <p className="text-muted-foreground">
-            Visão geral do sistema de predição de propriedades mecânicas
-          </p>
-        </div>
+      <div className="relative mx-auto w-full max-w-[1320px] space-y-8 pb-12">
+        {/* Paper-grain backdrop */}
+        <div className="pointer-events-none absolute inset-0 -z-10 grain opacity-60" aria-hidden="true" />
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <StatsCard
-            title="Ensaios registrados"
-            value={numberFormatter.format(stats.totalTests)}
-            icon={<Activity className="size-5 text-foreground" />}
-            trend={{ value: stressShare, label: 'com tensão calculada' }}
-          />
-          <StatsCard
-            title="Última Simulação"
-            value={lastTestValue}
-            icon={<History className="size-5 text-foreground" />}
-            description={lastTestDescription}
-          />
-          <StatsCard
-            title="Perfis de Impressão"
-            value={numberFormatter.format(stats.totalProfiles)}
-            icon={<Beaker className="size-5 text-foreground" />}
-            description="Perfis cadastrados (parametros opcionais)"
-          />
-          <StatsCard
-            title="Pontos Medidos"
-            value={numberFormatter.format(stats.totalMeasurements)}
-            icon={<ChartLine className="size-5 text-foreground" />}
-            description={`~${numberFormatter.format(avgPoints)} pontos por ensaio`}
-          />
-        </div>
+        <EditorialHeader totalTests={stats.totalTests} lastTestAt={stats.lastTest?.createdAt} />
 
-        <div className="grid gap-6 lg:grid-cols-2">
-          <SimulationsTrendChart data={profileAverages} />
-          <ParametersUsageChart data={temperatureUsage} />
-        </div>
+        <KpiStrip items={kpis} />
 
-        <div className="grid gap-6 lg:grid-cols-2">
-          <PropertiesDistributionChart data={stressDistribution} />
-          <PerformanceComparisonChart performance={speedPerformance} />
-        </div>
+        {/* Hero band: curve overlay (large), thermal rings and shortcuts on the right */}
+        <section className="grid gap-5 lg:grid-cols-[1.7fr_1fr]">
+          <CurveOverlayCard profiles={profileDetails} />
 
-        <ProfileTests profiles={profileDetails} />
+          <div className="flex flex-col gap-5">
+            <ThermalRings data={temperatureUsage} totalRuns={stats.totalTests} />
+            <EditorialActions />
+          </div>
+        </section>
+
+        {/* Dense profile matrix, replaces the long scrolling ProfileTests */}
+        <ProfileMatrix profiles={profileDetails} />
+
+        {/* Editorial colophon */}
+        <footer className="flex items-center justify-between border-t border-foreground/15 pt-4 text-[10px] uppercase tracking-[0.18em] text-foreground/40">
+          <span>ResistencIA · vol. 01 · ed. {new Date().getFullYear()}</span>
+          <span>Dados experimentais reais · sem síntese</span>
+        </footer>
       </div>
     </DashboardLayout>
   )

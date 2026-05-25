@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import {
-  Settings,
   Calculator,
   Palette,
   FileOutput,
@@ -23,7 +22,6 @@ import {
 import { useSettings } from '@/components/settings-provider'
 import type { AppSettings, ExportFormat } from '@/lib/settings'
 import { getSavedPredictionsCount, clearSavedPredictions } from '@/lib/prediction-storage'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -39,6 +37,61 @@ import {
 const toNumber = (value: string, fallback: number) => {
   const parsed = Number.parseInt(value, 10)
   return Number.isNaN(parsed) ? fallback : parsed
+}
+
+type SectionProps = {
+  chapter: string
+  title: string
+  hint: string
+  icon: React.ComponentType<{ className?: string }>
+  children: React.ReactNode
+}
+
+function Section({ chapter, title, hint, icon: Icon, children }: SectionProps) {
+  return (
+    <section className="rounded-md border border-foreground/15 bg-card">
+      <div className="flex items-center justify-between border-b border-foreground/10 px-5 py-4">
+        <div className="flex items-center gap-3">
+          <span className="flex size-9 items-center justify-center rounded-md border border-foreground/15 bg-background text-copper-deep">
+            <Icon className="size-4" />
+          </span>
+          <div>
+            <span className="label-caps">{chapter}</span>
+            <h2 className="font-display text-xl italic leading-tight">{title}</h2>
+          </div>
+        </div>
+        <p className="hidden max-w-xs text-right text-xs text-muted-foreground sm:block">{hint}</p>
+      </div>
+      <div className="space-y-5 px-5 py-5">{children}</div>
+    </section>
+  )
+}
+
+function ToggleRow({
+  label,
+  hint,
+  icon: Icon,
+  checked,
+  onCheckedChange,
+}: {
+  label: string
+  hint: string
+  icon: React.ComponentType<{ className?: string }>
+  checked: boolean
+  onCheckedChange: (checked: boolean) => void
+}) {
+  return (
+    <div className="flex items-center justify-between gap-4 rounded-md border border-foreground/10 bg-background px-4 py-3">
+      <div className="flex items-center gap-3">
+        <Icon className="size-4 text-foreground/70" />
+        <div>
+          <Label className="text-sm font-medium">{label}</Label>
+          <p className="text-xs text-muted-foreground">{hint}</p>
+        </div>
+      </div>
+      <Switch checked={checked} onCheckedChange={onCheckedChange} />
+    </div>
+  )
 }
 
 export function SettingsClient() {
@@ -68,7 +121,7 @@ export function SettingsClient() {
 
   const handleSave = () => {
     updateSettings(draft)
-    setStatus('Configurações salvas com sucesso.')
+    setStatus('Configurações salvas.')
   }
 
   const handleCancel = () => {
@@ -78,7 +131,7 @@ export function SettingsClient() {
 
   const handleReset = () => {
     if (typeof window !== 'undefined') {
-      const confirmed = window.confirm('Deseja restaurar todas as configurações padrão?')
+      const confirmed = window.confirm('Restaurar todas as configurações para o padrão?')
       if (!confirmed) return
     }
     resetSettings()
@@ -87,7 +140,7 @@ export function SettingsClient() {
 
   const handleClearCache = () => {
     if (typeof window !== 'undefined') {
-      const confirmed = window.confirm('Deseja limpar o cache de simulações salvas?')
+      const confirmed = window.confirm('Limpar o cache de simulações salvas?')
       if (!confirmed) return
     }
     clearSavedPredictions()
@@ -97,338 +150,265 @@ export function SettingsClient() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-3">
-          <div className="flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-foreground to-foreground/80 text-background shadow-md">
-            <Settings className="size-5" />
+      <div className="grid gap-5 lg:grid-cols-2">
+        <Section
+          chapter="Seção 01"
+          title="Cálculo"
+          hint="Como o sistema interpola e valida cada predição."
+          icon={Calculator}
+        >
+          <div className="space-y-2">
+            <Label htmlFor="interpolation-method" className="label-caps">
+              Método de interpolação
+            </Label>
+            <Select
+              value={draft.interpolationMethod}
+              onValueChange={(value) =>
+                updateField('interpolationMethod', value as AppSettings['interpolationMethod'])
+              }
+            >
+              <SelectTrigger id="interpolation-method" className="h-10 border-foreground/15">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="polynomial">Polinomial de segunda ordem</SelectItem>
+                <SelectItem value="rbf">RBF gaussiano</SelectItem>
+                <SelectItem value="auto">Automático</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight md:text-3xl">Configurações</h1>
-            <p className="text-muted-foreground">
-              Personalize o comportamento e aparência do sistema
+
+          <div className="space-y-2">
+            <Label htmlFor="stress-points" className="label-caps">
+              Pontos na curva σ por ε
+            </Label>
+            <Input
+              id="stress-points"
+              type="number"
+              value={draft.stressCurvePoints}
+              min="50"
+              max="500"
+              onChange={(event) =>
+                updateField(
+                  'stressCurvePoints',
+                  toNumber(event.target.value, draft.stressCurvePoints)
+                )
+              }
+              className="h-10 border-foreground/15 font-mono-data"
+            />
+          </div>
+
+          <ToggleRow
+            label="Validação automática"
+            hint="Avisa quando um valor sai dos limites recomendados."
+            icon={CheckCircle2}
+            checked={draft.autoValidation}
+            onCheckedChange={(checked) => updateField('autoValidation', checked)}
+          />
+        </Section>
+
+        <Section
+          chapter="Seção 02"
+          title="Aparência"
+          hint="Como a interface se apresenta no seu navegador."
+          icon={Palette}
+        >
+          <div className="space-y-2">
+            <Label htmlFor="theme" className="label-caps">
+              Tema
+            </Label>
+            <Select
+              value={draft.theme}
+              onValueChange={(value) => updateField('theme', value as AppSettings['theme'])}
+            >
+              <SelectTrigger id="theme" className="h-10 border-foreground/15">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="light">
+                  <div className="flex items-center gap-2">
+                    <Sun className="size-4" />
+                    Claro
+                  </div>
+                </SelectItem>
+                <SelectItem value="dark">
+                  <div className="flex items-center gap-2">
+                    <Moon className="size-4" />
+                    Escuro
+                  </div>
+                </SelectItem>
+                <SelectItem value="system">
+                  <div className="flex items-center gap-2">
+                    <Monitor className="size-4" />
+                    Acompanhar o sistema
+                  </div>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="units" className="label-caps">
+              Sistema de unidades
+            </Label>
+            <Select
+              value={draft.unitSystem}
+              onValueChange={(value) =>
+                updateField('unitSystem', value as AppSettings['unitSystem'])
+              }
+            >
+              <SelectTrigger id="units" className="h-10 border-foreground/15">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="si">SI (MPa, mm, °C)</SelectItem>
+                <SelectItem value="imperial">Imperial (psi, in, °F)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <ToggleRow
+            label="Gráficos interativos"
+            hint="Habilita tooltips, zoom e destaque ao passar o cursor."
+            icon={LineChart}
+            checked={draft.interactiveCharts}
+            onCheckedChange={(checked) => updateField('interactiveCharts', checked)}
+          />
+        </Section>
+
+        <Section
+          chapter="Seção 03"
+          title="Exportação"
+          hint="Padrões usados ao baixar resultados."
+          icon={FileOutput}
+        >
+          <div className="space-y-2">
+            <Label htmlFor="export-format" className="label-caps">
+              Formato padrão
+            </Label>
+            <Select
+              value={draft.exportFormat}
+              onValueChange={(value) => updateField('exportFormat', value as ExportFormat)}
+            >
+              <SelectTrigger id="export-format" className="h-10 border-foreground/15">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="csv">CSV</SelectItem>
+                <SelectItem value="json">JSON</SelectItem>
+                <SelectItem value="xlsx">Excel (XLSX)</SelectItem>
+                <SelectItem value="pdf">PDF</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <ToggleRow
+            label="Incluir gráficos"
+            hint="Adiciona as curvas e os pontos no arquivo exportado."
+            icon={Zap}
+            checked={draft.exportIncludeCharts}
+            onCheckedChange={(checked) => updateField('exportIncludeCharts', checked)}
+          />
+
+          <ToggleRow
+            label="Salvar simulações automaticamente"
+            hint="Cada nova predição vai para o histórico local do navegador."
+            icon={Save}
+            checked={draft.autoSavePredictions}
+            onCheckedChange={(checked) => updateField('autoSavePredictions', checked)}
+          />
+        </Section>
+
+        <Section
+          chapter="Seção 04"
+          title="Avançado"
+          hint="Controle fino do cache e modo de depuração."
+          icon={Wrench}
+        >
+          <div className="space-y-2">
+            <Label htmlFor="cache-size" className="label-caps">
+              Tamanho do cache
+            </Label>
+            <Input
+              id="cache-size"
+              type="number"
+              value={draft.cacheSize}
+              min="10"
+              max="200"
+              onChange={(event) =>
+                updateField('cacheSize', toNumber(event.target.value, draft.cacheSize))
+              }
+              className="h-10 border-foreground/15 font-mono-data"
+            />
+            <p className="text-xs text-muted-foreground">
+              Quantas simulações ficam guardadas em memória.
             </p>
           </div>
-        </div>
-      </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Card>
-          <CardHeader className="pb-4">
+          <ToggleRow
+            label="Modo depuração"
+            hint="Mostra informações técnicas adicionais na interface."
+            icon={Wrench}
+            checked={draft.debugMode}
+            onCheckedChange={(checked) => updateField('debugMode', checked)}
+          />
+
+          <div className="flex items-center justify-between gap-4 rounded-md border border-foreground/10 bg-background px-4 py-3">
             <div className="flex items-center gap-3">
-              <div className="flex size-10 items-center justify-center rounded-lg bg-foreground/10">
-                <Calculator className="size-5 text-foreground" />
-              </div>
+              <Database className="size-4 text-foreground/70" />
               <div>
-                <CardTitle className="text-lg">Preferências de Cálculo</CardTitle>
-                <CardDescription>Métodos de predição e precisão</CardDescription>
+                <p className="text-sm font-medium">Cache local</p>
+                <p className="font-mono-data text-xs text-muted-foreground">
+                  {cacheCount} simulações armazenadas
+                </p>
               </div>
             </div>
-          </CardHeader>
-          <CardContent className="space-y-5">
-            <div className="space-y-2">
-              <Label htmlFor="interpolation-method" className="text-sm font-medium">
-                Método de Interpolação
-              </Label>
-              <Select
-                value={draft.interpolationMethod}
-                onValueChange={(value) =>
-                  updateField('interpolationMethod', value as AppSettings['interpolationMethod'])
-                }
-              >
-                <SelectTrigger id="interpolation-method" className="h-11">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="polynomial">Polinomial (2ª ordem)</SelectItem>
-                  <SelectItem value="rbf">RBF Gaussian</SelectItem>
-                  <SelectItem value="auto">Automático</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="stress-points" className="text-sm font-medium">
-                Pontos na Curva σ-ε
-              </Label>
-              <Input
-                id="stress-points"
-                type="number"
-                value={draft.stressCurvePoints}
-                min="50"
-                max="500"
-                onChange={(event) =>
-                  updateField(
-                    'stressCurvePoints',
-                    toNumber(event.target.value, draft.stressCurvePoints)
-                  )
-                }
-                className="h-11"
-              />
-            </div>
-
-            <div className="flex items-center justify-between rounded-lg border border-border p-4">
-              <div className="flex items-center gap-3">
-                <CheckCircle2 className="size-5 text-foreground" />
-                <div>
-                  <Label className="text-sm font-medium">Validação Automática</Label>
-                  <p className="text-xs text-muted-foreground">Verificar limites dos parâmetros</p>
-                </div>
-              </div>
-              <Switch
-                checked={draft.autoValidation}
-                onCheckedChange={(checked) => updateField('autoValidation', checked)}
-              />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-4">
-            <div className="flex items-center gap-3">
-              <div className="flex size-10 items-center justify-center rounded-lg bg-foreground/10">
-                <Palette className="size-5 text-foreground" />
-              </div>
-              <div>
-                <CardTitle className="text-lg">Interface</CardTitle>
-                <CardDescription>Aparência da dashboard</CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-5">
-            <div className="space-y-2">
-              <Label htmlFor="theme" className="text-sm font-medium">
-                Tema
-              </Label>
-              <Select
-                value={draft.theme}
-                onValueChange={(value) => updateField('theme', value as AppSettings['theme'])}
-              >
-                <SelectTrigger id="theme" className="h-11">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="light">
-                    <div className="flex items-center gap-2">
-                      <Sun className="size-4" />
-                      Claro
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="dark">
-                    <div className="flex items-center gap-2">
-                      <Moon className="size-4" />
-                      Escuro
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="system">
-                    <div className="flex items-center gap-2">
-                      <Monitor className="size-4" />
-                      Sistema
-                    </div>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="units" className="text-sm font-medium">
-                Sistema de Unidades
-              </Label>
-              <Select
-                value={draft.unitSystem}
-                onValueChange={(value) =>
-                  updateField('unitSystem', value as AppSettings['unitSystem'])
-                }
-              >
-                <SelectTrigger id="units" className="h-11">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="si">SI (MPa, mm, °C)</SelectItem>
-                  <SelectItem value="imperial">Imperial (psi, in, °F)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="flex items-center justify-between rounded-lg border border-border p-4">
-              <div className="flex items-center gap-3">
-                <LineChart className="size-5 text-foreground" />
-                <div>
-                  <Label className="text-sm font-medium">Gráficos Interativos</Label>
-                  <p className="text-xs text-muted-foreground">Habilitar tooltips e destaque</p>
-                </div>
-              </div>
-              <Switch
-                checked={draft.interactiveCharts}
-                onCheckedChange={(checked) => updateField('interactiveCharts', checked)}
-              />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-4">
-            <div className="flex items-center gap-3">
-              <div className="flex size-10 items-center justify-center rounded-lg bg-foreground/10">
-                <FileOutput className="size-5 text-foreground" />
-              </div>
-              <div>
-                <CardTitle className="text-lg">Exportação</CardTitle>
-                <CardDescription>Relatórios e dados</CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-5">
-            <div className="space-y-2">
-              <Label htmlFor="export-format" className="text-sm font-medium">
-                Formato Padrão
-              </Label>
-              <Select
-                value={draft.exportFormat}
-                onValueChange={(value) => updateField('exportFormat', value as ExportFormat)}
-              >
-                <SelectTrigger id="export-format" className="h-11">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="csv">CSV</SelectItem>
-                  <SelectItem value="json">JSON</SelectItem>
-                  <SelectItem value="xlsx">Excel (XLSX)</SelectItem>
-                  <SelectItem value="pdf">PDF</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-3">
-              <div className="flex items-center justify-between rounded-lg border border-border p-4">
-                <div className="flex items-center gap-3">
-                  <Zap className="size-5 text-foreground" />
-                  <div>
-                    <Label className="text-sm font-medium">Incluir Gráficos</Label>
-                    <p className="text-xs text-muted-foreground">
-                      Adicionar curvas e pontos nos arquivos
-                    </p>
-                  </div>
-                </div>
-                <Switch
-                  checked={draft.exportIncludeCharts}
-                  onCheckedChange={(checked) => updateField('exportIncludeCharts', checked)}
-                />
-              </div>
-
-              <div className="flex items-center justify-between rounded-lg border border-border p-4">
-                <div className="flex items-center gap-3">
-                  <Save className="size-5 text-foreground" />
-                  <div>
-                    <Label className="text-sm font-medium">Auto-salvar Simulações</Label>
-                    <p className="text-xs text-muted-foreground">
-                      Salvar automaticamente no histórico local
-                    </p>
-                  </div>
-                </div>
-                <Switch
-                  checked={draft.autoSavePredictions}
-                  onCheckedChange={(checked) => updateField('autoSavePredictions', checked)}
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-4">
-            <div className="flex items-center gap-3">
-              <div className="flex size-10 items-center justify-center rounded-lg bg-foreground/10">
-                <Wrench className="size-5 text-foreground" />
-              </div>
-              <div>
-                <CardTitle className="text-lg">Avançado</CardTitle>
-                <CardDescription>Configurações técnicas</CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-5">
-            <div className="space-y-2">
-              <Label htmlFor="cache-size" className="text-sm font-medium">
-                Tamanho do Cache
-              </Label>
-              <Input
-                id="cache-size"
-                type="number"
-                value={draft.cacheSize}
-                min="10"
-                max="200"
-                onChange={(event) =>
-                  updateField('cacheSize', toNumber(event.target.value, draft.cacheSize))
-                }
-                className="h-11"
-              />
-              <p className="text-xs text-muted-foreground">
-                Número de simulações mantidas em memória
-              </p>
-            </div>
-
-            <div className="flex items-center justify-between rounded-lg border border-border p-4">
-              <div className="flex items-center gap-3">
-                <Wrench className="size-5 text-muted-foreground" />
-                <div>
-                  <Label className="text-sm font-medium">Modo Debug</Label>
-                  <p className="text-xs text-muted-foreground">Exibir informações técnicas</p>
-                </div>
-              </div>
-              <Switch
-                checked={draft.debugMode}
-                onCheckedChange={(checked) => updateField('debugMode', checked)}
-              />
-            </div>
-
-            <div className="flex items-center justify-between rounded-lg border border-border p-4">
-              <div className="flex items-center gap-3">
-                <Database className="size-5 text-foreground" />
-                <div>
-                  <Label className="text-sm font-medium">Cache Local</Label>
-                  <p className="text-xs text-muted-foreground">
-                    {cacheCount} simulações armazenadas
-                  </p>
-                </div>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                className="gap-2"
-                disabled={cacheCount === 0}
-                onClick={handleClearCache}
-              >
-                <Trash2 className="size-4" />
-                Limpar
-              </Button>
-            </div>
-
             <Button
               variant="outline"
-              className="w-full h-11 gap-2 text-destructive hover:text-destructive hover:bg-destructive/10"
-              onClick={handleReset}
+              size="sm"
+              className="gap-2 border-foreground/15"
+              disabled={cacheCount === 0}
+              onClick={handleClearCache}
             >
-              <RotateCcw className="size-4" />
-              Resetar Todas Configurações
+              <Trash2 className="size-4" />
+              Limpar
             </Button>
-          </CardContent>
-        </Card>
+          </div>
+
+          <Button
+            variant="outline"
+            className="h-10 w-full gap-2 border-destructive/40 text-destructive hover:bg-destructive/10 hover:text-destructive"
+            onClick={handleReset}
+          >
+            <RotateCcw className="size-4" />
+            Restaurar tudo ao padrão
+          </Button>
+        </Section>
       </div>
 
       {status ? (
-        <div className="rounded-lg border border-foreground/10 bg-muted/40 px-4 py-3 text-sm text-muted-foreground">
+        <div className="rounded-md border border-copper/30 bg-copper-soft/40 px-4 py-3 text-sm text-copper-deep">
           {status}
         </div>
       ) : null}
 
-      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-        <Button variant="outline" className="gap-2" onClick={handleCancel} disabled={!isDirty}>
+      <div className="flex flex-col-reverse gap-3 border-t border-foreground/15 pt-4 sm:flex-row sm:justify-end">
+        <Button
+          variant="outline"
+          className="gap-2 border-foreground/15"
+          onClick={handleCancel}
+          disabled={!isDirty}
+        >
           <X className="size-4" />
-          Cancelar
+          Cancelar alterações
         </Button>
-        <Button className="gap-2 shadow-md" onClick={handleSave} disabled={!isDirty}>
+        <Button
+          className="gap-2 bg-foreground text-background hover:bg-foreground/90"
+          onClick={handleSave}
+          disabled={!isDirty}
+        >
           <Save className="size-4" />
-          Salvar Configurações
+          Salvar configurações
         </Button>
       </div>
     </div>

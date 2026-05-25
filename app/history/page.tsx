@@ -1,4 +1,5 @@
 import { DashboardLayout } from '@/components/layout/dashboard-layout'
+import { PageShell } from '@/components/layout/page-shell'
 import { HistoryClient } from '@/components/history/history-client'
 import { getRunMetrics } from '@/lib/dashboard-data'
 
@@ -23,7 +24,15 @@ export default async function HistoryPage({ searchParams }: HistoryPageProps) {
 
   return (
     <DashboardLayout>
-      <HistoryClient runs={runs} initialQuery={query} initialViewId={initialViewId} />
+      <PageShell
+        chapter="Cap. I"
+        rubric="Acervo"
+        title="Histórico de"
+        accent="ensaios"
+        description="Todos os ensaios já cadastrados, com busca, filtros e exportação por linha ou em lote."
+      >
+        <HistoryClient runs={runs} initialQuery={query} initialViewId={initialViewId} />
+      </PageShell>
     </DashboardLayout>
   )
 }

@@ -177,7 +177,7 @@ export function ProfileTests({ profiles }: ProfileTestsProps) {
                         <span className="font-mono text-foreground font-semibold">
                           {test.maxStress !== null
                             ? `${stressFormatter.format(test.maxStress)} MPa`
-                            : '—'}
+                            : 'sem dados'}
                         </span>
                       </div>
                       <div className="flex items-center justify-between">
@@ -185,7 +185,7 @@ export function ProfileTests({ profiles }: ProfileTestsProps) {
                         <span className="font-mono text-foreground">
                           {test.maxStrain !== null
                             ? `${strainFormatter.format(test.maxStrain)} mm/mm`
-                            : '—'}
+                            : 'sem dados'}
                         </span>
                       </div>
                       <div className="flex items-center justify-between">

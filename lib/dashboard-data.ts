@@ -1,5 +1,5 @@
 import { query } from '@/lib/db'
-import { formatProfileLabel, hasValidPrintParams } from '@/lib/formatters'
+import { formatProfileName, hasValidPrintParams, normalizeMaterial } from '@/lib/formatters'
 
 const STRAIN_EXPRESSION = 'COALESCE(m.deformacao_mm_mm, m.alongamento_mm_mm)'
 
@@ -10,6 +10,8 @@ type RunMetricsRow = {
   created_at: string
   source: string | null
   profile_code: string
+  material_name: string | null
+  layer_height_mm: number | null
   temperature_c: number
   speed_mm_s: number
   max_stress: number | null
@@ -30,6 +32,9 @@ export type RunMetrics = {
   createdAt: string
   source: string | null
   profileCode: string
+  material: string
+  materialRaw: string | null
+  layerHeight: number | null
   temperature: number
   speed: number
   maxStress: number | null
@@ -44,6 +49,7 @@ export type StressPoint = {
 
 export type ProfileAverages = {
   profile: string
+  material: string
   temperature: number
   speed: number
   tests: number
@@ -89,6 +95,7 @@ export type TestDetail = {
 export type ProfileDetail = {
   profile: string
   label: string
+  material: string
   temperature: number
   speed: number
   tests: TestDetail[]
@@ -152,6 +159,7 @@ export function buildProfileAverages(metrics: RunMetrics[]): ProfileAverages[] {
     const key = metric.profileCode
     const current = grouped.get(key) ?? {
       profile: metric.profileCode,
+      material: metric.material,
       temperature: metric.temperature,
       speed: metric.speed,
       tests: 0,
@@ -179,6 +187,7 @@ export function buildProfileAverages(metrics: RunMetrics[]): ProfileAverages[] {
   return Array.from(grouped.values())
     .map((item) => ({
       profile: item.profile,
+      material: item.material,
       temperature: item.temperature,
       speed: item.speed,
       tests: item.tests,
@@ -261,7 +270,12 @@ function buildProfileDetails(
     const curvePoints = pointsMap.get(metric.id) ?? []
     const current = grouped.get(key) ?? {
       profile: metric.profileCode,
-      label: formatProfileLabel(metric.temperature, metric.speed),
+      label: formatProfileName({
+        material: metric.material,
+        temperature: metric.temperature,
+        speed: metric.speed,
+      }),
+      material: metric.material,
       temperature: metric.temperature,
       speed: metric.speed,
       tests: [],
@@ -302,6 +316,8 @@ export async function getRunMetrics(): Promise<RunMetrics[]> {
         t.created_at,
         t.metadata->>'source' AS source,
         p.code AS profile_code,
+        p.layer_height_mm,
+        mt.name AS material_name,
         p.temperature_c,
         p.speed_mm_s,
         MAX(m.tensao_mpa) AS max_stress,
@@ -309,8 +325,9 @@ export async function getRunMetrics(): Promise<RunMetrics[]> {
         COUNT(m.*) AS point_count
       FROM test_runs t
       JOIN print_profiles p ON p.id = t.print_profile_id
+      LEFT JOIN materials mt ON mt.id = p.material_id
       JOIN test_measurements m ON m.test_run_id = t.id
-      GROUP BY t.id, t.test_code, t.test_number, t.created_at, t.metadata, p.code, p.temperature_c, p.speed_mm_s
+      GROUP BY t.id, t.test_code, t.test_number, t.created_at, t.metadata, p.code, p.layer_height_mm, mt.name, p.temperature_c, p.speed_mm_s
       ORDER BY t.created_at ASC
     `
   )
@@ -322,6 +339,9 @@ export async function getRunMetrics(): Promise<RunMetrics[]> {
     createdAt: new Date(row.created_at).toISOString(),
     source: row.source,
     profileCode: row.profile_code,
+    material: normalizeMaterial(row.material_name),
+    materialRaw: row.material_name,
+    layerHeight: row.layer_height_mm === null ? null : Number(row.layer_height_mm),
     temperature: Number(row.temperature_c),
     speed: Number(row.speed_mm_s),
     maxStress: row.max_stress === null ? null : Number(row.max_stress),

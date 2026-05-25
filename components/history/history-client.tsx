@@ -4,9 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { RunMetrics } from '@/lib/dashboard-data'
 import type { RunDetail } from '@/types/history'
 import { useSettings } from '@/components/settings-provider'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
@@ -24,7 +22,7 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet'
 import { StressStrainChart } from '@/components/charts/stress-strain-chart'
-import { formatDataSource } from '@/lib/formatters'
+import { formatDataSource, formatProfileTokens } from '@/lib/formatters'
 import {
   convertSpeed,
   convertStrain,
@@ -42,15 +40,12 @@ import {
 import {
   Search,
   Download,
-  Trash2,
   Eye,
-  Filter,
-  Thermometer,
-  Gauge,
-  CheckCircle2,
   Calendar,
   FileSpreadsheet,
   Loader2,
+  X,
+  SlidersHorizontal,
 } from 'lucide-react'
 
 type HistoryClientProps = {
@@ -86,13 +81,25 @@ const speedFormatter = new Intl.NumberFormat('pt-BR', {
 
 const countFormatter = new Intl.NumberFormat('pt-BR')
 
+const TEMPERATURE_COLOR_STOPS: Array<{ max: number; color: string }> = [
+  { max: 195, color: 'var(--chart-1)' },
+  { max: 205, color: 'var(--chart-2)' },
+  { max: 215, color: 'var(--chart-3)' },
+  { max: 225, color: 'var(--chart-4)' },
+  { max: 999, color: 'var(--chart-5)' },
+]
+
+function temperatureColor(temperature: number) {
+  return TEMPERATURE_COLOR_STOPS.find((stop) => temperature <= stop.max)?.color ?? 'var(--chart-5)'
+}
+
 const formatWithUnit = (
   value: number | null | undefined,
   formatter: Intl.NumberFormat,
   unit?: string
 ) => {
   if (value === null || value === undefined || !Number.isFinite(value)) {
-    return unit ? `-- ${unit}` : '--'
+    return 'sem dados'
   }
   const formatted = formatter.format(value)
   return unit ? `${formatted} ${unit}` : formatted
@@ -141,7 +148,7 @@ export function HistoryClient({
 
   const lastRunLabel = useMemo(() => {
     const last = orderedRuns[0]
-    return last ? dateFormatter.format(new Date(last.createdAt)) : '—'
+    return last ? dateFormatter.format(new Date(last.createdAt)) : 'sem registros'
   }, [orderedRuns])
 
   const sources = useMemo(() => {
@@ -157,10 +164,10 @@ export function HistoryClient({
       query.trim().length > 0 ||
       filters.source !== 'all' ||
       filters.stress !== 'all' ||
-      filters.temperatureMin ||
-      filters.temperatureMax ||
-      filters.speedMin ||
-      filters.speedMax
+      Boolean(filters.temperatureMin) ||
+      Boolean(filters.temperatureMax) ||
+      Boolean(filters.speedMin) ||
+      Boolean(filters.speedMax)
     )
   }, [filters, query])
 
@@ -181,6 +188,7 @@ export function HistoryClient({
           `ensaio ${run.testNumber}`,
           run.testCode ?? '',
           run.profileCode ?? '',
+          run.material ?? '',
           `${convertedTemp}`,
           `${convertedSpeed}`,
           run.source ?? '',
@@ -225,8 +233,8 @@ export function HistoryClient({
         setDetailCache((current) => ({ ...current, [runId]: payload }))
         setDetail(payload)
         return payload
-      } catch (error) {
-        setDetailError('Não foi possível carregar os detalhes do ensaio.')
+      } catch (_error) {
+        setDetailError('Não foi possível carregar os detalhes deste ensaio.')
         setDetail(null)
         return null
       } finally {
@@ -257,6 +265,7 @@ export function HistoryClient({
       'test_number',
       'test_code',
       'profile',
+      'material',
       `temperature (${unitLabels.temperature})`,
       `speed (${unitLabels.speed})`,
       `max_stress (${unitLabels.stress})`,
@@ -270,6 +279,7 @@ export function HistoryClient({
       run.testNumber,
       run.testCode,
       run.profileCode,
+      run.material,
       convertTemperature(run.temperature, settings.unitSystem),
       convertSpeed(run.speed, settings.unitSystem),
       convertStress(run.maxStress, settings.unitSystem),
@@ -291,6 +301,7 @@ export function HistoryClient({
           testNumber: run.testNumber,
           testCode: run.testCode,
           profileCode: run.profileCode,
+          material: run.material,
           temperature: convertTemperature(run.temperature, settings.unitSystem),
           speed: convertSpeed(run.speed, settings.unitSystem),
           maxStress: convertStress(run.maxStress, settings.unitSystem),
@@ -420,7 +431,7 @@ export function HistoryClient({
     return `
       <h1>Detalhes do Ensaio ${item.testNumber}</h1>
       ${summaryTable}
-      ${curveTable ? `<h2>Curva tensao x deformacao</h2>${curveTable}` : ''}
+      ${curveTable ? `<h2>Curva tensao por deformacao</h2>${curveTable}` : ''}
     `
   }
 
@@ -451,23 +462,69 @@ export function HistoryClient({
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight md:text-3xl">Histórico de Ensaios</h1>
-          <p className="mt-1.5 text-muted-foreground">
-            Gerencie e exporte os ensaios importados no banco
-          </p>
+      {/* Editorial KPI strip */}
+      <section className="grid grid-cols-2 divide-y divide-foreground/10 border-y border-foreground/15 md:grid-cols-3 md:divide-x md:divide-y-0">
+        <KpiCell
+          caption="Ensaios no acervo"
+          value={countFormatter.format(orderedRuns.length).padStart(3, '0')}
+          hint={`${countFormatter.format(runsWithStress)} com tensão calculada`}
+          accent
+        />
+        <KpiCell
+          caption="Última leitura"
+          value={lastRunLabel}
+          hint="Data do registro mais recente"
+        />
+        <KpiCell
+          caption="Em exibição"
+          value={countFormatter.format(filteredRuns.length).padStart(3, '0')}
+          hint={isFiltered ? 'após filtros' : 'todos os ensaios'}
+        />
+      </section>
+
+      {/* Toolbar: search + filters + export */}
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-1 items-center gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Buscar por ensaio, material, temperatura, velocidade ou perfil"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              className="h-10 border-foreground/15 bg-card pl-10 focus-visible:ring-copper"
+            />
+            {query ? (
+              <button
+                type="button"
+                onClick={() => setQuery('')}
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+              >
+                <X className="size-3.5" />
+              </button>
+            ) : null}
+          </div>
+          <Button
+            variant="outline"
+            className="h-10 gap-2 border-foreground/15"
+            onClick={() => setShowFilters((current) => !current)}
+          >
+            <SlidersHorizontal className="size-4" />
+            Filtrar
+          </Button>
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button className="gap-2 shadow-sm" disabled={!exportRuns.length}>
+            <Button
+              className="h-10 gap-2 bg-foreground text-background hover:bg-foreground/90"
+              disabled={!exportRuns.length}
+            >
               <FileSpreadsheet className="size-4" />
-              Exportar Tudo
+              Exportar
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem onSelect={() => handleExportAll(settings.exportFormat)}>
-              Exportar {settings.exportFormat.toUpperCase()} (padrão)
+              Exportar como {settings.exportFormat.toUpperCase()} (padrão)
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             {exportFormats.map((format) => (
@@ -479,294 +536,255 @@ export function HistoryClient({
         </DropdownMenu>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-3">
-        <Card className="bg-gradient-to-br from-foreground to-foreground/90 text-background border-foreground">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="flex size-10 items-center justify-center rounded-lg bg-background/20">
-                <FileSpreadsheet className="size-5 text-background" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-background">
-                  {countFormatter.format(orderedRuns.length)}
-                </p>
-                <p className="text-xs text-background/70">Total de Ensaios</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="flex size-10 items-center justify-center rounded-lg bg-muted">
-                <CheckCircle2 className="size-5 text-foreground" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{countFormatter.format(runsWithStress)}</p>
-                <p className="text-xs text-muted-foreground">Com tensão calculada</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="flex size-10 items-center justify-center rounded-lg bg-muted">
-                <Calendar className="size-5 text-foreground" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{lastRunLabel}</p>
-                <p className="text-xs text-muted-foreground">Último ensaio</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Card>
-        <CardHeader className="pb-4">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+      {showFilters ? (
+        <div className="grid gap-3 rounded-md border border-foreground/15 bg-card p-4 sm:grid-cols-2 lg:grid-cols-4">
+          <FilterField label="Origem">
+            <select
+              className="h-9 w-full rounded-md border border-foreground/15 bg-background px-3 text-sm"
+              value={filters.source}
+              onChange={(event) =>
+                setFilters((current) => ({ ...current, source: event.target.value }))
+              }
+            >
+              <option value="all">Todas</option>
+              {sources.map((source) => (
+                <option key={source} value={source}>
+                  {formatDataSource(source) ?? source}
+                </option>
+              ))}
+            </select>
+          </FilterField>
+          <FilterField label="Tensão">
+            <select
+              className="h-9 w-full rounded-md border border-foreground/15 bg-background px-3 text-sm"
+              value={filters.stress}
+              onChange={(event) =>
+                setFilters((current) => ({ ...current, stress: event.target.value }))
+              }
+            >
+              <option value="all">Todas</option>
+              <option value="with">Com tensão calculada</option>
+              <option value="without">Sem tensão calculada</option>
+            </select>
+          </FilterField>
+          <FilterField label={`Temperatura (${unitLabels.temperature})`}>
+            <div className="flex gap-2">
               <Input
-                placeholder="Buscar por ensaio, temperatura ou velocidade..."
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                className="pl-10 bg-muted/50 border-0 focus-visible:ring-1"
+                placeholder="Mín"
+                value={filters.temperatureMin}
+                onChange={(event) =>
+                  setFilters((current) => ({ ...current, temperatureMin: event.target.value }))
+                }
+                className="h-9"
+              />
+              <Input
+                placeholder="Máx"
+                value={filters.temperatureMax}
+                onChange={(event) =>
+                  setFilters((current) => ({ ...current, temperatureMax: event.target.value }))
+                }
+                className="h-9"
               />
             </div>
+          </FilterField>
+          <FilterField label={`Velocidade (${unitLabels.speed})`}>
+            <div className="flex gap-2">
+              <Input
+                placeholder="Mín"
+                value={filters.speedMin}
+                onChange={(event) =>
+                  setFilters((current) => ({ ...current, speedMin: event.target.value }))
+                }
+                className="h-9"
+              />
+              <Input
+                placeholder="Máx"
+                value={filters.speedMax}
+                onChange={(event) =>
+                  setFilters((current) => ({ ...current, speedMax: event.target.value }))
+                }
+                className="h-9"
+              />
+            </div>
+          </FilterField>
+          <div className="flex flex-wrap items-center gap-3 sm:col-span-2 lg:col-span-4">
             <Button
-              variant="outline"
-              className="gap-2"
-              onClick={() => setShowFilters((current) => !current)}
+              variant="ghost"
+              size="sm"
+              className="text-copper-deep hover:bg-copper-soft"
+              onClick={() =>
+                setFilters({
+                  source: 'all',
+                  stress: 'all',
+                  temperatureMin: '',
+                  temperatureMax: '',
+                  speedMin: '',
+                  speedMax: '',
+                })
+              }
             >
-              <Filter className="size-4" />
-              Filtrar
+              Limpar filtros
             </Button>
+            {isFiltered ? (
+              <span className="font-mono-data text-xs text-muted-foreground">
+                {countFormatter.format(filteredRuns.length)} ensaios encontrados
+              </span>
+            ) : null}
           </div>
-          {showFilters ? (
-            <div className="mt-4 grid gap-3 rounded-lg border border-border bg-muted/20 p-4 sm:grid-cols-2 lg:grid-cols-4">
-              <div className="space-y-2">
-                <Label className="text-xs text-muted-foreground">Origem</Label>
-                <select
-                  className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-                  value={filters.source}
-                  onChange={(event) =>
-                    setFilters((current) => ({ ...current, source: event.target.value }))
-                  }
-                >
-                  <option value="all">Todas</option>
-                  {sources.map((source) => (
-                    <option key={source} value={source}>
-                      {formatDataSource(source) ?? source}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="space-y-2">
-                <Label className="text-xs text-muted-foreground">Tensão</Label>
-                <select
-                  className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-                  value={filters.stress}
-                  onChange={(event) =>
-                    setFilters((current) => ({ ...current, stress: event.target.value }))
-                  }
-                >
-                  <option value="all">Todas</option>
-                  <option value="with">Com tensão</option>
-                  <option value="without">Sem tensão</option>
-                </select>
-              </div>
-              <div className="space-y-2">
-                <Label className="text-xs text-muted-foreground">
-                  Temperatura ({unitLabels.temperature})
-                </Label>
-                <div className="flex gap-2">
-                  <Input
-                    placeholder="Min"
-                    value={filters.temperatureMin}
-                    onChange={(event) =>
-                      setFilters((current) => ({ ...current, temperatureMin: event.target.value }))
-                    }
-                  />
-                  <Input
-                    placeholder="Max"
-                    value={filters.temperatureMax}
-                    onChange={(event) =>
-                      setFilters((current) => ({ ...current, temperatureMax: event.target.value }))
-                    }
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label className="text-xs text-muted-foreground">
-                  Velocidade ({unitLabels.speed})
-                </Label>
-                <div className="flex gap-2">
-                  <Input
-                    placeholder="Min"
-                    value={filters.speedMin}
-                    onChange={(event) =>
-                      setFilters((current) => ({ ...current, speedMin: event.target.value }))
-                    }
-                  />
-                  <Input
-                    placeholder="Max"
-                    value={filters.speedMax}
-                    onChange={(event) =>
-                      setFilters((current) => ({ ...current, speedMax: event.target.value }))
-                    }
-                  />
-                </div>
-              </div>
-              <div className="sm:col-span-2 lg:col-span-4 flex flex-wrap gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() =>
-                    setFilters({
-                      source: 'all',
-                      stress: 'all',
-                      temperatureMin: '',
-                      temperatureMax: '',
-                      speedMin: '',
-                      speedMax: '',
-                    })
-                  }
-                >
-                  Limpar filtros
-                </Button>
-                {isFiltered ? (
-                  <span className="text-xs text-muted-foreground">
-                    {filteredRuns.length} ensaios encontrados
-                  </span>
-                ) : null}
-              </div>
-            </div>
-          ) : null}
-        </CardHeader>
-        <CardContent>
-          {filteredRuns.length === 0 ? (
-            <div className="flex h-full items-center justify-center rounded-lg border border-dashed border-border p-6 text-sm text-muted-foreground">
-              Nenhum ensaio encontrado.
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {filteredRuns.map((run) => {
-                const tempValue = convertTemperature(run.temperature, settings.unitSystem)
-                const speedValue = convertSpeed(run.speed, settings.unitSystem)
-                const maxStress = convertStress(run.maxStress, settings.unitSystem)
-                const maxStrain = convertStrain(run.maxStrain)
+        </div>
+      ) : null}
 
-                return (
-                  <div
-                    key={run.id}
-                    className="group flex flex-col gap-4 rounded-xl border border-border bg-card p-4 transition-all duration-200 hover:border-foreground/20 hover:bg-muted/30 hover:shadow-sm sm:flex-row sm:items-center sm:justify-between"
-                  >
-                    <div className="flex-1 space-y-3">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="inline-flex items-center rounded-md bg-foreground text-background px-2.5 py-1 font-mono text-sm font-semibold">
-                          Ensaio {run.testNumber}
-                        </span>
-                        <Badge variant="secondary" className="gap-1 font-normal">
-                          <CheckCircle2 className="size-3 text-foreground" />
-                          {run.maxStress !== null ? 'Com tensão' : 'Sem tensão'}
-                        </Badge>
-                        {formatDataSource(run.source) ? (
-                          <Badge variant="outline" className="gap-1 text-[11px] font-normal">
-                            <FileSpreadsheet className="size-3" />
-                            {formatDataSource(run.source)}
-                          </Badge>
-                        ) : null}
-                        <span className="flex items-center gap-1 text-xs text-muted-foreground">
+      {/* Dense list */}
+      {filteredRuns.length === 0 ? (
+        <div className="flex items-center justify-center rounded-md border border-dashed border-foreground/20 bg-card p-10 text-center">
+          <div>
+            <p className="font-display text-2xl italic">Nenhum ensaio por aqui ainda.</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Ajuste os filtros ou importe um novo arquivo para começar.
+            </p>
+          </div>
+        </div>
+      ) : (
+        <article className="overflow-hidden rounded-md border border-foreground/15 bg-card">
+          {/* Header row (lg+) */}
+          <div className="hidden grid-cols-[1.6fr_1.1fr_0.8fr_0.8fr_0.9fr_0.9fr_0.7fr_88px] items-center gap-3 border-b border-foreground/10 bg-muted/40 px-5 py-2.5 lg:grid">
+            <span className="label-caps">Ensaio</span>
+            <span className="label-caps">Perfil</span>
+            <span className="label-caps">Temp.</span>
+            <span className="label-caps">Vel.</span>
+            <span className="label-caps">σ máx</span>
+            <span className="label-caps">ε máx</span>
+            <span className="label-caps">Pontos</span>
+            <span aria-hidden="true" />
+          </div>
+
+          <ul className="divide-y divide-foreground/8">
+            {filteredRuns.map((run) => {
+              const tokens = formatProfileTokens({
+                material: run.material,
+                temperature: run.temperature,
+                speed: run.speed,
+              })
+              const accentColor = temperatureColor(run.temperature)
+              const tempValue = convertTemperature(run.temperature, settings.unitSystem)
+              const speedValue = convertSpeed(run.speed, settings.unitSystem)
+              const maxStress = convertStress(run.maxStress, settings.unitSystem)
+              const maxStrain = convertStrain(run.maxStrain)
+
+              return (
+                <li key={run.id} className="group">
+                  <div className="grid grid-cols-1 gap-3 px-5 py-3.5 transition-colors hover:bg-muted/40 lg:grid-cols-[1.6fr_1.1fr_0.8fr_0.8fr_0.9fr_0.9fr_0.7fr_88px] lg:items-center">
+                    {/* Ensaio col */}
+                    <div className="flex items-center gap-3">
+                      <span
+                        className="h-9 w-1 rounded-full"
+                        style={{ backgroundColor: accentColor }}
+                        aria-hidden="true"
+                      />
+                      <div className="min-w-0">
+                        <div className="flex items-baseline gap-2">
+                          <span className="font-display text-lg italic">
+                            Ensaio {String(run.testNumber).padStart(2, '0')}
+                          </span>
+                          {formatDataSource(run.source) ? (
+                            <span className="label-caps text-foreground/60">
+                              {formatDataSource(run.source)}
+                            </span>
+                          ) : null}
+                        </div>
+                        <p className="flex items-center gap-1.5 font-mono-data text-[11px] text-muted-foreground">
                           <Calendar className="size-3" />
                           {dateFormatter.format(new Date(run.createdAt))}
-                        </span>
-                      </div>
-
-                      <div className="flex flex-wrap gap-4">
-                        <div className="flex items-center gap-2 rounded-lg bg-muted px-3 py-1.5">
-                          <Thermometer className="size-4 text-foreground" />
-                          <span className="text-sm">
-                            <span className="text-muted-foreground">Temp:</span>{' '}
-                            <span className="font-semibold">
-                              {formatWithUnit(tempValue, tempFormatter, unitLabels.temperature)}
-                            </span>
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2 rounded-lg bg-muted px-3 py-1.5">
-                          <Gauge className="size-4 text-foreground" />
-                          <span className="text-sm">
-                            <span className="text-muted-foreground">Vel:</span>{' '}
-                            <span className="font-semibold">
-                              {formatWithUnit(speedValue, speedFormatter, unitLabels.speed)}
-                            </span>
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="flex flex-wrap gap-4 text-sm">
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-muted-foreground">σ máx:</span>
-                          <span className="font-semibold text-foreground">
-                            {maxStress !== null
-                              ? `${stressFormatter.format(maxStress)} ${unitLabels.stress}`
-                              : '—'}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-muted-foreground">ε máx:</span>
-                          <span className="font-semibold text-foreground">
-                            {maxStrain !== null
-                              ? `${strainFormatter.format(maxStrain)} ${unitLabels.strain}`
-                              : '—'}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-muted-foreground">Pontos:</span>
-                          <span className="font-semibold text-foreground">
-                            {countFormatter.format(run.pointCount)}
-                          </span>
-                        </div>
+                        </p>
                       </div>
                     </div>
 
-                    <div className="flex gap-1 sm:gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-9 w-9 hover:bg-foreground/10 hover:text-foreground"
+                    {/* Perfil col */}
+                    <div className="hidden flex-col lg:flex">
+                      <span className="font-display italic">{tokens.material}</span>
+                      <span className="font-mono-data text-[11px] text-muted-foreground">
+                        {run.profileCode}
+                      </span>
+                    </div>
+
+                    {/* Mobile pills row */}
+                    <div className="flex flex-wrap items-center gap-2 lg:hidden">
+                      <Pill>{tokens.material}</Pill>
+                      <Pill>{tokens.temperature ?? 'sem temp.'}</Pill>
+                      <Pill>{tokens.speed ?? 'sem vel.'}</Pill>
+                      <Pill mono>{countFormatter.format(run.pointCount)} pts</Pill>
+                    </div>
+
+                    {/* Temp/Speed/Stress/Strain/Points (desktop) */}
+                    <span className="hidden font-mono-data text-sm tabular-nums lg:inline">
+                      {formatWithUnit(tempValue, tempFormatter, unitLabels.temperature)}
+                    </span>
+                    <span className="hidden font-mono-data text-sm tabular-nums lg:inline">
+                      {formatWithUnit(speedValue, speedFormatter, unitLabels.speed)}
+                    </span>
+                    <span className="hidden font-mono-data text-sm tabular-nums lg:inline">
+                      {maxStress !== null ? (
+                        <>
+                          {stressFormatter.format(maxStress)}
+                          <span className="text-muted-foreground"> {unitLabels.stress}</span>
+                        </>
+                      ) : (
+                        <span className="text-muted-foreground">sem dados</span>
+                      )}
+                    </span>
+                    <span className="hidden font-mono-data text-sm tabular-nums lg:inline">
+                      {maxStrain !== null ? strainFormatter.format(maxStrain) : (
+                        <span className="text-muted-foreground">sem dados</span>
+                      )}
+                    </span>
+                    <span className="hidden font-mono-data text-sm tabular-nums text-muted-foreground lg:inline">
+                      {countFormatter.format(run.pointCount)}
+                    </span>
+
+                    {/* Mobile stress row */}
+                    <div className="flex items-center justify-between gap-3 lg:hidden">
+                      <div className="flex items-baseline gap-1">
+                        <span className="font-display text-2xl leading-none">
+                          {maxStress !== null ? stressFormatter.format(maxStress) : 'sem'}
+                        </span>
+                        <span className="label-caps">{unitLabels.stress}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <ActionButton
+                          aria-label="Visualizar"
+                          onClick={() => openDetail(run.id)}
+                          icon={<Eye className="size-4" />}
+                        />
+                        <ActionButton
+                          aria-label="Baixar"
+                          onClick={() => handleExportRun(run.id, settings.exportFormat)}
+                          icon={<Download className="size-4" />}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Actions (desktop) */}
+                    <div className="hidden items-center justify-end gap-1 lg:flex">
+                      <ActionButton
+                        aria-label="Visualizar"
                         onClick={() => openDetail(run.id)}
-                      >
-                        <Eye className="size-4" />
-                        <span className="sr-only">Visualizar</span>
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-9 w-9 hover:bg-foreground/10 hover:text-foreground"
+                        icon={<Eye className="size-4" />}
+                      />
+                      <ActionButton
+                        aria-label="Baixar"
                         onClick={() => handleExportRun(run.id, settings.exportFormat)}
-                      >
-                        <Download className="size-4" />
-                        <span className="sr-only">Baixar</span>
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-9 w-9 hover:bg-foreground/10 hover:text-foreground"
-                      >
-                        <Trash2 className="size-4" />
-                        <span className="sr-only">Excluir</span>
-                      </Button>
+                        icon={<Download className="size-4" />}
+                      />
                     </div>
                   </div>
-                )
-              })}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                </li>
+              )
+            })}
+          </ul>
+        </article>
+      )}
 
+      {/* Detail drawer */}
       <Sheet
         open={detailOpen}
         onOpenChange={(open) => {
@@ -779,90 +797,93 @@ export function HistoryClient({
         }}
       >
         <SheetContent side="right" className="w-full sm:max-w-xl">
-          <SheetHeader>
-            <SheetTitle>
-              {detail ? `Ensaio ${detail.testNumber}` : detailId ? `Ensaio ${detailId}` : 'Ensaio'}
+          <SheetHeader className="space-y-1 border-b border-foreground/10 pb-4">
+            <span className="label-caps-copper">Folha de leitura</span>
+            <SheetTitle className="font-display text-3xl italic">
+              {detail ? `Ensaio ${String(detail.testNumber).padStart(2, '0')}` : detailId ? `Ensaio ${String(detailId).padStart(2, '0')}` : 'Ensaio'}
             </SheetTitle>
-            <SheetDescription>Detalhes do ensaio e curva tensão x deformação</SheetDescription>
+            <SheetDescription className="text-sm">
+              Curva, propriedades e exportação do ensaio escolhido.
+            </SheetDescription>
           </SheetHeader>
-          <div className="mt-6 space-y-4">
+          <div className="mt-6 space-y-5 px-1">
             {detailLoading ? (
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Loader2 className="size-4 animate-spin" />
-                Carregando detalhes...
+                Carregando detalhes
               </div>
             ) : null}
             {detailError ? (
-              <div className="rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
+              <div className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
                 {detailError}
               </div>
             ) : null}
             {detail ? (
               <>
                 <div className="flex flex-wrap items-center gap-2">
-                  <Badge variant="secondary" className="gap-1 font-normal">
-                    <CheckCircle2 className="size-3 text-foreground" />
-                    {detail.maxStress !== null ? 'Com tensão' : 'Sem tensão'}
-                  </Badge>
+                  {(() => {
+                    const tokens = formatProfileTokens({
+                      material: (detail as any).material,
+                      temperature: detail.temperature,
+                      speed: detail.speed,
+                    })
+                    return (
+                      <>
+                        <Pill>{tokens.material}</Pill>
+                        {tokens.temperature ? <Pill>{tokens.temperature}</Pill> : null}
+                        {tokens.speed ? <Pill>{tokens.speed}</Pill> : null}
+                      </>
+                    )
+                  })()}
                   {formatDataSource(detail.source) ? (
-                    <Badge variant="outline" className="gap-1 text-[11px] font-normal">
-                      <FileSpreadsheet className="size-3" />
-                      {formatDataSource(detail.source)}
-                    </Badge>
+                    <Pill mono>{formatDataSource(detail.source)}</Pill>
                   ) : null}
-                  <Badge variant="outline" className="text-[11px] font-normal">
-                    {detail.profileCode}
-                  </Badge>
                 </div>
 
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <div className="rounded-lg border border-border bg-background px-4 py-3 text-sm">
-                    <p className="text-xs text-muted-foreground">Temperatura</p>
-                    <p className="font-semibold">
-                      {formatWithUnit(
-                        convertTemperature(detail.temperature, settings.unitSystem),
-                        tempFormatter,
-                        unitLabels.temperature
-                      )}
-                    </p>
-                  </div>
-                  <div className="rounded-lg border border-border bg-background px-4 py-3 text-sm">
-                    <p className="text-xs text-muted-foreground">Velocidade</p>
-                    <p className="font-semibold">
-                      {formatWithUnit(
-                        convertSpeed(detail.speed, settings.unitSystem),
-                        speedFormatter,
-                        unitLabels.speed
-                      )}
-                    </p>
-                  </div>
-                  <div className="rounded-lg border border-border bg-background px-4 py-3 text-sm">
-                    <p className="text-xs text-muted-foreground">σ máx</p>
-                    <p className="font-semibold">
-                      {detail.maxStress !== null
+                <div className="grid grid-cols-2 gap-3">
+                  <DetailMetric
+                    label="Temperatura"
+                    value={formatWithUnit(
+                      convertTemperature(detail.temperature, settings.unitSystem),
+                      tempFormatter,
+                      unitLabels.temperature
+                    )}
+                  />
+                  <DetailMetric
+                    label="Velocidade"
+                    value={formatWithUnit(
+                      convertSpeed(detail.speed, settings.unitSystem),
+                      speedFormatter,
+                      unitLabels.speed
+                    )}
+                  />
+                  <DetailMetric
+                    label="σ máx"
+                    value={
+                      detail.maxStress !== null
                         ? `${stressFormatter.format(
-                            convertStress(detail.maxStress, settings.unitSystem) ?? detail.maxStress
+                            convertStress(detail.maxStress, settings.unitSystem) ??
+                              detail.maxStress
                           )} ${unitLabels.stress}`
-                        : '—'}
-                    </p>
-                  </div>
-                  <div className="rounded-lg border border-border bg-background px-4 py-3 text-sm">
-                    <p className="text-xs text-muted-foreground">ε máx</p>
-                    <p className="font-semibold">
-                      {detail.maxStrain !== null
+                        : 'sem dados'
+                    }
+                  />
+                  <DetailMetric
+                    label="ε máx"
+                    value={
+                      detail.maxStrain !== null
                         ? `${strainFormatter.format(detail.maxStrain)} ${unitLabels.strain}`
-                        : '—'}
-                    </p>
-                  </div>
-                  <div className="rounded-lg border border-border bg-background px-4 py-3 text-sm sm:col-span-2">
-                    <p className="text-xs text-muted-foreground">Data</p>
-                    <p className="font-semibold">
-                      {dateFormatter.format(new Date(detail.createdAt))}
-                    </p>
-                  </div>
+                        : 'sem dados'
+                    }
+                  />
+                  <DetailMetric
+                    label="Data"
+                    value={dateFormatter.format(new Date(detail.createdAt))}
+                    span={2}
+                  />
                 </div>
 
-                <div className="rounded-xl border border-border p-4">
+                <div className="rounded-md border border-foreground/15 bg-card p-4">
                   <StressStrainChart
                     curve={detail.points}
                     unitSystem={settings.unitSystem}
@@ -872,16 +893,16 @@ export function HistoryClient({
 
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button className="gap-2 w-full">
+                    <Button className="w-full gap-2 bg-foreground text-background hover:bg-foreground/90">
                       <Download className="size-4" />
-                      Exportar Ensaio
+                      Exportar este ensaio
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem
                       onSelect={() => handleExportRun(detail.id, settings.exportFormat)}
                     >
-                      Exportar {settings.exportFormat.toUpperCase()} (padrão)
+                      Exportar como {settings.exportFormat.toUpperCase()} (padrão)
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     {exportFormats.map((format) => (
@@ -899,6 +920,85 @@ export function HistoryClient({
           </div>
         </SheetContent>
       </Sheet>
+    </div>
+  )
+}
+
+function KpiCell({
+  caption,
+  value,
+  hint,
+  accent,
+}: {
+  caption: string
+  value: string
+  hint?: string
+  accent?: boolean
+}) {
+  return (
+    <div className="group relative px-5 py-5">
+      <div className="space-y-2">
+        <span className={accent ? 'label-caps-copper' : 'label-caps'}>{caption}</span>
+        <p
+          className={`font-display text-[32px] leading-none tracking-tight md:text-[40px] ${
+            accent ? 'text-copper-deep' : 'text-foreground'
+          }`}
+        >
+          {value}
+        </p>
+        {hint ? (
+          <p className="font-sans text-[11px] leading-snug text-muted-foreground">{hint}</p>
+        ) : null}
+      </div>
+    </div>
+  )
+}
+
+function FilterField({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="space-y-1.5">
+      <Label className="label-caps">{label}</Label>
+      {children}
+    </div>
+  )
+}
+
+function Pill({ children, mono = false }: { children: React.ReactNode; mono?: boolean }) {
+  return (
+    <span
+      className={`inline-flex items-center rounded-full border border-foreground/15 bg-background px-2.5 py-0.5 text-[11px] ${
+        mono ? 'font-mono-data' : ''
+      }`}
+    >
+      {children}
+    </span>
+  )
+}
+
+function ActionButton({
+  icon,
+  ...props
+}: React.ButtonHTMLAttributes<HTMLButtonElement> & { icon: React.ReactNode }) {
+  return (
+    <button
+      type="button"
+      {...props}
+      className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-transparent text-foreground/60 transition-all hover:border-foreground/15 hover:bg-background hover:text-copper-deep"
+    >
+      {icon}
+    </button>
+  )
+}
+
+function DetailMetric({ label, value, span = 1 }: { label: string; value: string; span?: 1 | 2 }) {
+  return (
+    <div
+      className={`rounded-md border border-foreground/15 bg-card px-4 py-3 ${
+        span === 2 ? 'col-span-2' : ''
+      }`}
+    >
+      <p className="label-caps">{label}</p>
+      <p className="mt-1 font-mono-data text-sm tabular-nums">{value}</p>
     </div>
   )
 }

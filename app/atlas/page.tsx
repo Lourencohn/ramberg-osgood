@@ -1,6 +1,5 @@
-import { Layers } from 'lucide-react'
-
 import { DashboardLayout } from '@/components/layout/dashboard-layout'
+import { PageShell } from '@/components/layout/page-shell'
 import { MaterialAtlasClient } from '@/components/atlas/material-atlas-client'
 import { getRambergOsgoodTrainingData } from '@/lib/prediction-data'
 
@@ -11,25 +10,16 @@ export default async function AtlasPage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-4">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-foreground to-foreground/80 text-background shadow-md">
-              <Layers className="size-5" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
-                Atlas Paramétrico 3D
-              </h1>
-              <p className="text-muted-foreground">
-                Explore o espaço de E, σ₀, n e propriedades derivadas em 3D.
-              </p>
-            </div>
-          </div>
-        </div>
-
+      <PageShell
+        chapter="Cap. VII"
+        rubric="Mapeamento"
+        title="Atlas"
+        accent="paramétrico"
+        description="Veja em três dimensões como o módulo E, a tensão de escoamento σ₀ e o expoente n se relacionam entre todos os perfis cadastrados."
+        fullBleed
+      >
         <MaterialAtlasClient trainingData={trainingData} />
-      </div>
+      </PageShell>
     </DashboardLayout>
   )
 }

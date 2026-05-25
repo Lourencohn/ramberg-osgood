@@ -1,10 +1,6 @@
-import { DashboardLayout } from '@/components/layout/dashboard-layout'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import Link from 'next/link'
 import {
   Info,
-  BookOpen,
   Calculator,
   Settings2,
   BarChart3,
@@ -12,318 +8,400 @@ import {
   Thermometer,
   Gauge,
   CheckCircle2,
-  AlertTriangle,
-  Zap,
   Target,
   TrendingUp,
+  Sparkles,
+  GitCompare,
+  AlertTriangle,
 } from 'lucide-react'
+
+import { DashboardLayout } from '@/components/layout/dashboard-layout'
+import { PageShell } from '@/components/layout/page-shell'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 export default function DocsPage() {
   return (
     <DashboardLayout>
-      <div className="space-y-6">
-        <div className="flex items-center gap-3">
-          <div className="flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-foreground to-foreground/80 text-background shadow-md">
-            <BookOpen className="size-5" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight md:text-3xl">Documentação</h1>
-            <p className="text-muted-foreground">
-              Guias técnicos e referências do sistema de predição
-            </p>
-          </div>
-        </div>
-
+      <PageShell
+        chapter="Cap. XI"
+        rubric="Referência"
+        title="Guia do"
+        accent="sistema"
+        description="O essencial sobre o que o ResistencIA calcula, com qual modelo e em quais faixas de parâmetros."
+      >
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto gap-1 p-1">
-            <TabsTrigger value="overview" className="gap-2 py-2.5">
+          <TabsList className="grid h-auto w-full grid-cols-2 gap-1 border border-foreground/15 bg-background p-1 sm:grid-cols-4">
+            <TabsTrigger
+              value="overview"
+              className="gap-2 py-2.5 data-[state=active]:bg-foreground data-[state=active]:text-background"
+            >
               <Lightbulb className="size-4" />
-              <span className="hidden sm:inline">Visão Geral</span>
-              <span className="sm:hidden">Geral</span>
+              Visão geral
             </TabsTrigger>
-            <TabsTrigger value="model" className="gap-2 py-2.5">
+            <TabsTrigger
+              value="model"
+              className="gap-2 py-2.5 data-[state=active]:bg-foreground data-[state=active]:text-background"
+            >
               <Calculator className="size-4" />
-              <span className="hidden sm:inline">Modelo</span>
-              <span className="sm:hidden">Modelo</span>
+              Modelo
             </TabsTrigger>
-            <TabsTrigger value="parameters" className="gap-2 py-2.5">
+            <TabsTrigger
+              value="parameters"
+              className="gap-2 py-2.5 data-[state=active]:bg-foreground data-[state=active]:text-background"
+            >
               <Settings2 className="size-4" />
-              <span className="hidden sm:inline">Parâmetros</span>
-              <span className="sm:hidden">Params</span>
+              Parâmetros
             </TabsTrigger>
-            <TabsTrigger value="interpretation" className="gap-2 py-2.5">
+            <TabsTrigger
+              value="interpretation"
+              className="gap-2 py-2.5 data-[state=active]:bg-foreground data-[state=active]:text-background"
+            >
               <BarChart3 className="size-4" />
-              <span className="hidden sm:inline">Resultados</span>
-              <span className="sm:hidden">Result.</span>
+              Resultados
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="overview" className="space-y-4">
-            <Card>
-              <CardHeader className="pb-4">
-                <div className="flex items-center gap-3">
-                  <div className="flex size-10 items-center justify-center rounded-lg bg-foreground/10">
-                    <Zap className="size-5 text-foreground" />
-                  </div>
-                  <div>
-                    <CardTitle>Sobre o Sistema</CardTitle>
-                    <CardDescription>
-                      Sistema de predição de propriedades mecânicas para PLA
-                    </CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  O ResistencIA utiliza modelos matemáticos avançados para prever as propriedades
-                  mecânicas de peças fabricadas em PLA através do processo de impressão 3D FDM
-                  (Fused Deposition Modeling).
-                </p>
+          <TabsContent value="overview" className="space-y-5">
+            <Section chapter="Capítulo introdutório" title="O que o sistema faz">
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                O ResistencIA usa ensaios reais de tração para estimar como uma peça impressa em
+                FDM vai se comportar mecanicamente. Você informa a temperatura, a velocidade e o
+                material; o sistema devolve a curva de tensão por deformação esperada e as
+                propriedades chave.
+              </p>
 
-                <div className="grid gap-3 sm:grid-cols-2">
-                  {[
-                    { icon: Target, text: 'Predição de resistência à tração' },
-                    { icon: TrendingUp, text: 'Cálculo do módulo de Young' },
-                    { icon: BarChart3, text: 'Estimativa de alongamento' },
-                    { icon: Calculator, text: 'Curvas tensão-deformação' },
-                  ].map((item, i) => (
-                    <div key={i} className="flex items-center gap-3 rounded-lg bg-muted/50 p-3">
-                      <item.icon className="size-5 text-foreground" />
-                      <span className="text-sm font-medium">{item.text}</span>
+              <div className="grid gap-2 sm:grid-cols-2">
+                {[
+                  { icon: Target, text: 'Resistência à tração máxima (σ máx)' },
+                  { icon: TrendingUp, text: 'Módulo de elasticidade (E)' },
+                  { icon: BarChart3, text: 'Alongamento até a ruptura (ε)' },
+                  { icon: Calculator, text: 'Curva σ por ε completa' },
+                ].map((item) => (
+                  <div
+                    key={item.text}
+                    className="flex items-center gap-3 rounded-md border border-foreground/10 bg-background px-3 py-2.5"
+                  >
+                    <item.icon className="size-4 shrink-0 text-copper-deep" />
+                    <span className="text-sm">{item.text}</span>
+                  </div>
+                ))}
+              </div>
+            </Section>
+
+            <InfoCallout
+              icon={Info}
+              title="Aplicação na engenharia"
+              body="Os resultados nascem de ajustes sobre ensaios reais. Para aplicações críticas de engenharia, valide sempre com novos ensaios próprios antes de confiar na predição."
+            />
+
+            <Section chapter="Por onde começar" title="Fluxo recomendado">
+              <ol className="space-y-3 text-sm">
+                {[
+                  {
+                    label: 'Importe seus ensaios',
+                    href: '/import',
+                    body: 'Envie arquivos CSV ou TXT com os pontos de tração para alimentar o banco.',
+                  },
+                  {
+                    label: 'Gere uma predição',
+                    href: '/predict',
+                    body: 'Informe temperatura e velocidade. O sistema interpola a partir do que já existe.',
+                  },
+                  {
+                    label: 'Compare ensaios',
+                    href: '/compare',
+                    body: 'Coloque dois ou mais perfis lado a lado para entender diferenças.',
+                  },
+                ].map((step, index) => (
+                  <li key={step.href} className="flex items-start gap-3">
+                    <span className="flex size-7 shrink-0 items-center justify-center rounded-full border border-copper bg-copper-soft font-mono-data text-xs text-copper-deep">
+                      {String(index + 1).padStart(2, '0')}
+                    </span>
+                    <div className="space-y-0.5">
+                      <Link
+                        href={step.href}
+                        className="font-display text-lg italic text-foreground hover:text-copper-deep"
+                      >
+                        {step.label}
+                      </Link>
+                      <p className="text-sm text-muted-foreground">{step.body}</p>
                     </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Alert className="border-foreground/20 bg-foreground/5">
-              <Info className="size-4 text-foreground" />
-              <AlertTitle className="text-foreground">Importante</AlertTitle>
-              <AlertDescription>
-                Os resultados são baseados em modelos de metamodelagem e devem ser validados
-                experimentalmente para aplicações críticas de engenharia.
-              </AlertDescription>
-            </Alert>
+                  </li>
+                ))}
+              </ol>
+            </Section>
           </TabsContent>
 
-          <TabsContent value="model" className="space-y-4">
-            <Card>
-              <CardHeader className="pb-4">
-                <div className="flex items-center gap-3">
-                  <div className="flex size-10 items-center justify-center rounded-lg bg-foreground/10">
-                    <Calculator className="size-5 text-foreground" />
-                  </div>
-                  <div>
-                    <CardTitle>Modelo de Ramberg-Osgood</CardTitle>
-                    <CardDescription>
-                      Equação constitutiva para comportamento elasto-plástico
-                    </CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-5">
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  O modelo de Ramberg-Osgood é utilizado para descrever o comportamento
-                  tensão-deformação de materiais com plasticidade.
+          <TabsContent value="model" className="space-y-5">
+            <Section chapter="Equação base" title="Ramberg-Osgood">
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                A equação de Ramberg-Osgood descreve o comportamento de materiais que combinam uma
+                parcela elástica linear com uma parcela plástica não linear. É a relação central que
+                o sistema usa para representar cada curva.
+              </p>
+
+              <div className="rounded-md border border-foreground/15 bg-background p-6 text-center">
+                <p className="font-mono-data text-xl font-semibold tabular-nums">
+                  ε = σ / E + (σ / K)^(1/n)
                 </p>
-
-                <div className="rounded-xl bg-gradient-to-br from-foreground/10 to-foreground/5 border border-foreground/20 p-6 text-center">
-                  <p className="font-mono text-lg font-semibold text-foreground">
-                    ε = σ/E + (σ/K)^(1/n)
-                  </p>
-                </div>
-
-                <div className="grid gap-2 sm:grid-cols-2">
-                  {[
-                    { symbol: 'ε', name: 'Deformação total' },
-                    { symbol: 'σ', name: 'Tensão aplicada' },
-                    { symbol: 'E', name: 'Módulo de elasticidade' },
-                    { symbol: 'K', name: 'Coeficiente de resistência' },
-                    { symbol: 'n', name: 'Expoente de encruamento' },
-                  ].map((item) => (
-                    <div
-                      key={item.symbol}
-                      className="flex items-center gap-3 rounded-lg border border-border p-3"
-                    >
-                      <span className="flex size-8 items-center justify-center rounded bg-foreground font-mono font-bold text-background">
-                        {item.symbol}
-                      </span>
-                      <span className="text-sm text-muted-foreground">{item.name}</span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="pb-4">
-                <CardTitle className="text-lg">Metamodelagem</CardTitle>
-                <CardDescription>
-                  Interpolação de propriedades em função dos parâmetros
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  As propriedades mecânicas (σ_UTS, E, ε_break) são calculadas através de funções de
-                  interpolação que relacionam temperatura e velocidade de impressão.
+                <p className="mt-2 font-display text-xs italic text-muted-foreground">
+                  deformação total = parcela elástica + parcela plástica
                 </p>
-                <div className="space-y-2">
-                  {[
-                    { text: 'Interpolação polinomial de segunda ordem', icon: CheckCircle2 },
-                    { text: 'Função de Base Radial (RBF) - Gaussian', icon: CheckCircle2 },
-                    { text: 'Validação cruzada com dados experimentais', icon: CheckCircle2 },
-                  ].map((item, i) => (
-                    <div key={i} className="flex items-center gap-2 text-sm">
-                      <item.icon className="size-4 text-foreground" />
-                      <span>{item.text}</span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+              </div>
+
+              <div className="grid gap-2 sm:grid-cols-2">
+                {[
+                  { symbol: 'ε', name: 'Deformação total' },
+                  { symbol: 'σ', name: 'Tensão aplicada' },
+                  { symbol: 'E', name: 'Módulo de elasticidade' },
+                  { symbol: 'K', name: 'Coeficiente de resistência' },
+                  { symbol: 'n', name: 'Expoente de encruamento' },
+                ].map((item) => (
+                  <div
+                    key={item.symbol}
+                    className="flex items-center gap-3 rounded-md border border-foreground/10 bg-background px-3 py-2.5"
+                  >
+                    <span className="flex size-9 items-center justify-center rounded-md border border-copper bg-copper-soft font-display text-xl italic text-copper-deep">
+                      {item.symbol}
+                    </span>
+                    <span className="text-sm">{item.name}</span>
+                  </div>
+                ))}
+              </div>
+            </Section>
+
+            <Section chapter="Interpolação" title="Metamodelagem">
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                As propriedades de cada combinação de temperatura e velocidade saem de funções de
+                interpolação treinadas com os ensaios já cadastrados. O sistema tenta dois caminhos
+                e escolhe o que melhor se aproxima dos dados.
+              </p>
+              <ul className="space-y-2">
+                {[
+                  'Interpolação polinomial de segunda ordem',
+                  'Função de base radial gaussiana (RBF)',
+                  'Validação cruzada com os ensaios reais cadastrados',
+                ].map((item) => (
+                  <li key={item} className="flex items-center gap-2 text-sm">
+                    <CheckCircle2 className="size-4 shrink-0 text-copper-deep" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </Section>
           </TabsContent>
 
-          <TabsContent value="parameters" className="space-y-4">
-            <Card>
-              <CardHeader className="pb-4">
-                <div className="flex items-center gap-3">
-                  <div className="flex size-10 items-center justify-center rounded-lg bg-foreground/10">
-                    <Settings2 className="size-5 text-foreground" />
-                  </div>
-                  <div>
-                    <CardTitle>Limites dos Parâmetros</CardTitle>
-                    <CardDescription>Faixas válidas para os parâmetros de entrada</CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="rounded-xl border border-foreground/20 bg-foreground/5 p-5">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="flex size-10 items-center justify-center rounded-lg bg-foreground/10">
-                      <Thermometer className="size-5 text-foreground" />
-                    </div>
-                    <h4 className="font-semibold">Temperatura de Extrusão</h4>
-                  </div>
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    <div className="flex items-center justify-between rounded-lg bg-card px-4 py-3">
-                      <span className="text-sm text-muted-foreground">Mínimo</span>
-                      <span className="font-mono font-bold text-foreground">190°C</span>
-                    </div>
-                    <div className="flex items-center justify-between rounded-lg bg-card px-4 py-3">
-                      <span className="text-sm text-muted-foreground">Máximo</span>
-                      <span className="font-mono font-bold text-foreground">230°C</span>
-                    </div>
-                  </div>
-                  <p className="mt-3 text-xs text-muted-foreground">
-                    Temperaturas típicas para impressão de PLA padrão
-                  </p>
-                </div>
+          <TabsContent value="parameters" className="space-y-5">
+            <Section chapter="Faixas de validade" title="Parâmetros de entrada">
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                Os limites abaixo refletem as faixas em que os ensaios atuais foram realizados. Fora
+                delas a confiança da predição cai.
+              </p>
 
-                <div className="rounded-xl border border-foreground/20 bg-muted p-5">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="flex size-10 items-center justify-center rounded-lg bg-foreground/10">
-                      <Gauge className="size-5 text-foreground" />
-                    </div>
-                    <h4 className="font-semibold">Velocidade de Impressão</h4>
-                  </div>
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    <div className="flex items-center justify-between rounded-lg bg-card px-4 py-3">
-                      <span className="text-sm text-muted-foreground">Mínimo</span>
-                      <span className="font-mono font-bold text-foreground">20 mm/s</span>
-                    </div>
-                    <div className="flex items-center justify-between rounded-lg bg-card px-4 py-3">
-                      <span className="text-sm text-muted-foreground">Máximo</span>
-                      <span className="font-mono font-bold text-foreground">80 mm/s</span>
-                    </div>
-                  </div>
-                  <p className="mt-3 text-xs text-muted-foreground">
-                    Velocidades recomendadas para qualidade estrutural
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+              <ParamCard
+                icon={Thermometer}
+                title="Temperatura de extrusão"
+                hint="Faixas típicas para PLA padrão."
+                min="190°C"
+                max="230°C"
+              />
+
+              <ParamCard
+                icon={Gauge}
+                title="Velocidade de impressão"
+                hint="Velocidades recomendadas para qualidade estrutural."
+                min="20 mm/s"
+                max="100 mm/s"
+              />
+            </Section>
           </TabsContent>
 
-          <TabsContent value="interpretation" className="space-y-4">
-            <Card>
-              <CardHeader className="pb-4">
-                <div className="flex items-center gap-3">
-                  <div className="flex size-10 items-center justify-center rounded-lg bg-foreground/10">
-                    <BarChart3 className="size-5 text-foreground" />
-                  </div>
-                  <div>
-                    <CardTitle>Interpretação dos Resultados</CardTitle>
-                    <CardDescription>Como analisar as propriedades previstas</CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="rounded-xl border border-foreground/20 bg-foreground/5 p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-semibold text-foreground">Resistência à Tração (σ_UTS)</h4>
-                    <span className="text-xs font-mono font-semibold px-2 py-1 rounded-full bg-foreground text-background">
-                      40-60 MPa
-                    </span>
-                  </div>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    Tensão máxima que o material suporta antes da ruptura. Maior é melhor para
-                    aplicações estruturais.
-                  </p>
-                </div>
+          <TabsContent value="interpretation" className="space-y-5">
+            <Section chapter="Como ler" title="Resultados">
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                Cada predição mostra três números principais. As faixas indicadas são valores
+                típicos para PLA no banco atual.
+              </p>
 
-                <div className="rounded-xl border border-foreground/20 bg-muted p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-semibold text-foreground">Módulo de Young (E)</h4>
-                    <span className="text-xs font-mono font-semibold px-2 py-1 rounded-full bg-foreground/80 text-background">
-                      3000-3800 MPa
-                    </span>
-                  </div>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    Rigidez do material na região elástica. Maior rigidez significa menor deformação
-                    sob carga.
-                  </p>
-                </div>
+              <ResultCard
+                title="Resistência à tração (σ máx)"
+                range="40 a 60 MPa"
+                body="Tensão mais alta que o material aguenta antes de romper. Quanto maior, mais estrutural é a peça."
+              />
+              <ResultCard
+                title="Módulo de elasticidade (E)"
+                range="3000 a 3800 MPa"
+                body="Rigidez na parte linear da curva. Maior rigidez significa menos deformação sob a mesma carga."
+              />
+              <ResultCard
+                title="Alongamento na ruptura (ε)"
+                range="3% a 6%"
+                body="Quanto a peça consegue deformar até romper. Valores maiores indicam mais ductilidade."
+              />
+            </Section>
 
-                <div className="rounded-xl border border-foreground/20 bg-foreground/5 p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-semibold text-foreground">
-                      Alongamento na Ruptura (ε_break)
-                    </h4>
-                    <span className="text-xs font-mono font-semibold px-2 py-1 rounded-full bg-foreground/60 text-background">
-                      3-6%
-                    </span>
-                  </div>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    Deformação percentual até a ruptura. Indica ductilidade do material impresso.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Alert className="border-foreground/20 bg-muted">
-              <AlertTriangle className="size-4 text-foreground" />
-              <AlertTitle className="text-foreground">Tendências Gerais</AlertTitle>
-              <AlertDescription>
-                <ul className="mt-2 space-y-2 text-sm">
+            <InfoCallout
+              icon={AlertTriangle}
+              title="Tendências observadas nos ensaios"
+              body={
+                <ul className="mt-1 space-y-1.5">
                   <li className="flex items-start gap-2">
-                    <span className="mt-1.5 size-1.5 rounded-full bg-foreground flex-shrink-0" />
-                    Temperaturas mais baixas geralmente aumentam a resistência mas reduzem adesão
-                    entre camadas
+                    <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-copper" />
+                    Temperaturas mais baixas costumam aumentar a resistência, mas reduzem a adesão
+                    entre camadas.
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="mt-1.5 size-1.5 rounded-full bg-foreground flex-shrink-0" />
-                    Velocidades menores permitem melhor fusão entre filamentos
+                    <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-copper" />
+                    Velocidades mais baixas permitem melhor fusão entre filamentos.
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="mt-1.5 size-1.5 rounded-full bg-foreground flex-shrink-0" />
-                    Existe um compromisso ótimo entre temperatura e velocidade
+                    <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-copper" />
+                    Existe sempre um ponto ótimo entre temperatura e velocidade para cada peça.
                   </li>
                 </ul>
-              </AlertDescription>
-            </Alert>
+              }
+            />
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              <ShortcutLink
+                href="/predict"
+                icon={Sparkles}
+                title="Gerar uma predição"
+                hint="Aplique tudo isso a um caso novo."
+              />
+              <ShortcutLink
+                href="/compare"
+                icon={GitCompare}
+                title="Comparar ensaios"
+                hint="Veja como cada parâmetro muda o resultado."
+              />
+            </div>
           </TabsContent>
         </Tabs>
-      </div>
+      </PageShell>
     </DashboardLayout>
+  )
+}
+
+function Section({
+  chapter,
+  title,
+  children,
+}: {
+  chapter: string
+  title: string
+  children: React.ReactNode
+}) {
+  return (
+    <section className="rounded-md border border-foreground/15 bg-card">
+      <div className="border-b border-foreground/10 px-5 py-4">
+        <span className="label-caps-copper">{chapter}</span>
+        <h2 className="mt-1 font-display text-2xl italic leading-tight">{title}</h2>
+      </div>
+      <div className="space-y-4 px-5 py-5">{children}</div>
+    </section>
+  )
+}
+
+function InfoCallout({
+  icon: Icon,
+  title,
+  body,
+}: {
+  icon: React.ComponentType<{ className?: string }>
+  title: string
+  body: React.ReactNode
+}) {
+  return (
+    <div className="flex items-start gap-3 rounded-md border border-copper/40 bg-copper-soft/40 p-4">
+      <Icon className="mt-0.5 size-4 shrink-0 text-copper-deep" />
+      <div className="space-y-1 text-sm">
+        <p className="font-display text-base italic text-foreground">{title}</p>
+        <div className="text-muted-foreground">{body}</div>
+      </div>
+    </div>
+  )
+}
+
+function ParamCard({
+  icon: Icon,
+  title,
+  hint,
+  min,
+  max,
+}: {
+  icon: React.ComponentType<{ className?: string }>
+  title: string
+  hint: string
+  min: string
+  max: string
+}) {
+  return (
+    <div className="rounded-md border border-foreground/10 bg-background p-5">
+      <div className="mb-3 flex items-center gap-3">
+        <span className="flex size-9 items-center justify-center rounded-md border border-foreground/15 text-copper-deep">
+          <Icon className="size-4" />
+        </span>
+        <h4 className="font-display text-lg italic">{title}</h4>
+      </div>
+      <div className="grid gap-2 sm:grid-cols-2">
+        <ParamBound label="Mínimo" value={min} />
+        <ParamBound label="Máximo" value={max} />
+      </div>
+      <p className="mt-3 text-xs text-muted-foreground">{hint}</p>
+    </div>
+  )
+}
+
+function ParamBound({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-center justify-between rounded-md border border-foreground/10 bg-card px-3 py-2">
+      <span className="label-caps">{label}</span>
+      <span className="font-mono-data text-sm font-semibold tabular-nums">{value}</span>
+    </div>
+  )
+}
+
+function ResultCard({ title, range, body }: { title: string; range: string; body: string }) {
+  return (
+    <div className="rounded-md border border-foreground/10 bg-background p-4">
+      <div className="flex items-start justify-between gap-3">
+        <h4 className="font-display text-lg italic">{title}</h4>
+        <span className="shrink-0 rounded-full border border-copper bg-copper-soft px-2.5 py-0.5 font-mono-data text-[11px] tabular-nums text-copper-deep">
+          {range}
+        </span>
+      </div>
+      <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{body}</p>
+    </div>
+  )
+}
+
+function ShortcutLink({
+  href,
+  icon: Icon,
+  title,
+  hint,
+}: {
+  href: string
+  icon: React.ComponentType<{ className?: string }>
+  title: string
+  hint: string
+}) {
+  return (
+    <Link
+      href={href}
+      className="group flex items-center gap-3 rounded-md border border-foreground/15 bg-card p-4 transition-colors hover:border-copper hover:bg-copper-soft/30"
+    >
+      <span className="flex size-10 items-center justify-center rounded-md border border-foreground/15 bg-background text-copper-deep transition-colors group-hover:border-copper">
+        <Icon className="size-4" />
+      </span>
+      <div className="flex-1">
+        <p className="font-display text-base italic">{title}</p>
+        <p className="text-xs text-muted-foreground">{hint}</p>
+      </div>
+      <span aria-hidden="true" className="font-mono-data text-sm text-foreground/40">
+        →
+      </span>
+    </Link>
   )
 }

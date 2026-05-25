@@ -110,7 +110,7 @@ export function PredictionForm({ trainingData, onResult }: PredictionFormProps) 
   }
 
   const formatRange = (min: number, max: number, unit: string, formatter: Intl.NumberFormat) =>
-    `${formatter.format(min)} ${unit}–${formatter.format(max)} ${unit}`
+    `${formatter.format(min)} a ${formatter.format(max)} ${unit}`
 
   const validateInput = (input: PredictionInput, raw: PredictionInput) => {
     const baseErrors: string[] = []

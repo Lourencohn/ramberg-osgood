@@ -62,7 +62,7 @@ const countFormatter = new Intl.NumberFormat('pt-BR')
 function getDifferenceInfo(val1: number | null, val2: number | null): DifferenceInfo {
   if (val1 === null || val2 === null || val1 === 0) {
     return {
-      value: '—',
+      value: 'sem dados',
       isPositive: false,
       isEqual: false,
       label: 'sem dados',
@@ -194,7 +194,7 @@ function RunComparison({ left, right }: { left: RunMetrics; right: RunMetrics })
                     <span className="text-sm font-bold text-foreground">
                       {run.maxStress !== null
                         ? `${stressFormatter.format(run.maxStress)} MPa`
-                        : '—'}
+                        : 'sem dados'}
                     </span>
                   </div>
                   <div className="h-px bg-border" />
@@ -203,7 +203,7 @@ function RunComparison({ left, right }: { left: RunMetrics; right: RunMetrics })
                     <span className="text-sm font-bold text-foreground">
                       {run.maxStrain !== null
                         ? `${strainFormatter.format(run.maxStrain)} mm/mm`
-                        : '—'}
+                        : 'sem dados'}
                     </span>
                   </div>
                   <div className="h-px bg-border" />
@@ -317,7 +317,7 @@ function AverageComparison({ left, right }: { left: ProfileAverages; right: Prof
                     <span className="text-sm font-bold text-foreground">
                       {profile.avgMaxStress !== null
                         ? `${stressFormatter.format(profile.avgMaxStress)} MPa`
-                        : '—'}
+                        : 'sem dados'}
                     </span>
                   </div>
                   <div className="h-px bg-border" />
@@ -328,7 +328,7 @@ function AverageComparison({ left, right }: { left: ProfileAverages; right: Prof
                     <span className="text-sm font-bold text-foreground">
                       {profile.avgMaxStrain !== null
                         ? `${strainFormatter.format(profile.avgMaxStrain)} mm/mm`
-                        : '—'}
+                        : 'sem dados'}
                     </span>
                   </div>
                   <div className="h-px bg-border" />

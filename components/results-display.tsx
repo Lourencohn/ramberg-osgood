@@ -597,7 +597,7 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
                       <span>Temperatura ({unitLabels.temperature})</span>
                       <span className="font-mono text-foreground">
                         {diagnostics
-                          ? `${formatTemperatureValue(diagnostics.tempMin)}–${formatTemperatureValue(
+                          ? `${formatTemperatureValue(diagnostics.tempMin)} a ${formatTemperatureValue(
                               diagnostics.tempMax
                             )}`
                           : '--'}
@@ -626,7 +626,7 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
                       <span>Velocidade ({unitLabels.speed})</span>
                       <span className="font-mono text-foreground">
                         {diagnostics
-                          ? `${formatSpeedValue(diagnostics.speedMin)}–${formatSpeedValue(
+                          ? `${formatSpeedValue(diagnostics.speedMin)} a ${formatSpeedValue(
                               diagnostics.speedMax
                             )}`
                           : '--'}
