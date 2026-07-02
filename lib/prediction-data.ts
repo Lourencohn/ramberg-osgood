@@ -73,6 +73,7 @@ export async function getRambergOsgoodTrainingData(): Promise<RambergOsgoodTrain
         AND p.temperature_c > 0
         AND p.speed_mm_s IS NOT NULL
         AND p.speed_mm_s > 0
+        AND m.point_index % 10 = 0
       ORDER BY p.code, t.id, m.point_index
     `
   )

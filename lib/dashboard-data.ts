@@ -377,6 +377,7 @@ async function fetchTestPoints(): Promise<Map<number, StressPoint[]>> {
       JOIN test_measurements m ON m.test_run_id = t.id
       WHERE m.tensao_mpa IS NOT NULL
         AND ${STRAIN_EXPRESSION} IS NOT NULL
+        AND m.point_index % 20 = 0
       ORDER BY t.id, m.point_index
     `
   )
