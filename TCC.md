@@ -30,8 +30,6 @@ Birigui - SP
 
 Trabalho de Conclusão de Curso apresentado ao Instituto Federal de Educação, Ciência e Tecnologia de São Paulo, Campus Birigui, como requisito parcial para a obtenção do título de Bacharel em Engenharia da Computação.
 
-Área de conhecimento (Tabela CNPq): 3.08.01.00-4 (Materiais e Componentes de Construção Mecânica).
-
 ---
 
 ## RESUMO
@@ -63,7 +61,7 @@ Fused Deposition Modeling (FDM) additive manufacturing has become an essential t
 - Figura 9 — Interface do módulo de predição da plataforma ResistencIA.
 - Figura 10 — Ajuste do modelo de Ramberg-Osgood sobre ensaio experimental (módulo Calibração).
 - Figura 11 — Superfície de resposta da tensão máxima no plano temperatura × velocidade (módulo Atlas 3D).
-- Figura 12 — Comparação de curvas tensão-deformação médias por condição de impressão.
+- Figura 12 — Sobreposição de curvas experimentais e curva predita para condição fora do treinamento.
 - Figura 13 — Tensão máxima por condição: valores da plataforma e valores dos relatórios EMIC.
 
 ## LISTA DE TABELAS
@@ -96,6 +94,7 @@ Referências Bibliográficas
 Apêndice A — Modelo de dados da plataforma
 Apêndice B — Algoritmo de ajuste do modelo constitutivo
 Apêndice C — Resultados individuais por corpo de prova
+Apêndice D — Guia de figuras para a diagramação final
 
 ---
 
@@ -662,6 +661,231 @@ A plataforma organiza-se nos seguintes módulos:
 
 O acesso é controlado por autenticação própria: as senhas são protegidas por função de derivação de chave *scrypt* com sal individual por usuário, e as sessões utilizam tokens aleatórios entregues em cookies *httpOnly*, armazenados no banco exclusivamente na forma de resumo criptográfico (SHA-256), de modo que um eventual vazamento da base não compromete sessões ativas nem senhas. Essas decisões seguem as práticas correntes de defesa em profundidade para aplicações web.
 
+### 7.9.5 Tecnologias e organização do código
+
+A escolha da pilha tecnológica atendeu a três critérios: executar o núcleo numérico no próprio navegador (para interatividade sem latência de rede), garantir tipagem estática de ponta a ponta (para evitar erros de unidade e de estrutura de dados em um sistema que mistura grandezas físicas) e manter a base de dados relacional como única fonte de verdade. O resultado é uma aplicação Next.js escrita integralmente em TypeScript, organizada em três camadas:
+
+- **`lib/`**: o núcleo de domínio, com módulos puros e sem dependência de interface: `ramberg-osgood.ts` (avaliação e inversão do modelo), `ramberg-osgood-fit.ts` (ajuste de parâmetros), `metamodel.ts` (interpolação RBF), `mechanical-properties.ts` (propriedades derivadas), `prediction.ts` (orquestração da predição) e `prediction-data.ts` (montagem dos pontos de treinamento a partir do banco);
+- **`app/`**: as rotas e páginas da aplicação, uma por módulo funcional (predição, comparação, atlas, calibração, importação, histórico, simulação, verificação);
+- **`components/`**: os componentes visuais reutilizáveis, incluindo os gráficos interativos construídos com Recharts.
+
+Por serem funções puras (sem estado nem efeitos colaterais), os módulos de `lib/` executam identicamente no servidor e no navegador. Isso permite que o mesmo código de ajuste rode no servidor, ao montar os pontos de treinamento, e no cliente, na calibração interativa. A tipagem central do domínio ilustra o cuidado com a semântica física dos dados:
+
+```typescript
+export interface RambergOsgoodParams {
+  E: number
+  sigma_0: number
+  n: number
+}
+
+export interface StressStrainPoint {
+  strain: number
+  stress: number
+}
+
+export interface PredictionInput {
+  temperature: number
+  speed: number
+}
+```
+
+Outra decisão transversal é o determinismo: todos os processos estocásticos (o ajuste multi-start) usam um gerador congruencial linear com semente explícita, derivada do código do perfil de impressão. Duas execuções sobre os mesmos dados produzem exatamente os mesmos parâmetros, requisito de reprodutibilidade científica que geradores aleatórios comuns não atendem.
+
+### 7.9.6 O núcleo de cálculo do modelo
+
+O módulo `ramberg-osgood.ts` implementa as duas direções do modelo. A direção natural (tensão para deformação) é a transcrição literal da equação constitutiva; a direção inversa usa o método de Newton-Raphson da Seção 6.3.3, com derivada analítica, estimativa inicial elástica e tolerância de 10⁻⁶:
+
+```typescript
+export function calculateStrain(stress: number, params: RambergOsgoodParams): number {
+  const { E, sigma_0, n } = params
+  const elasticStrain = stress / E
+  const plasticStrain = 0.002 * Math.pow(stress / sigma_0, n)
+  return elasticStrain + plasticStrain
+}
+
+export function calculateStress(strain: number, params: RambergOsgoodParams): number {
+  const { E, sigma_0, n } = params
+  const tolerance = 1e-6
+  const maxIterations = 100
+  let stress = E * strain
+  for (let i = 0; i < maxIterations; i++) {
+    const f = stress / E + 0.002 * Math.pow(stress / sigma_0, n) - strain
+    const df = 1 / E + (0.002 * n * Math.pow(stress / sigma_0, n - 1)) / sigma_0
+    const newStress = stress - f / df
+    if (Math.abs(newStress - stress) < tolerance) {
+      return newStress
+    }
+    stress = newStress
+  }
+  return stress
+}
+```
+
+Como a função constitutiva é estritamente crescente e convexa para tensões positivas, a iteração converge de forma quadrática. Na prática, para os parâmetros típicos do PLA deste trabalho, a convergência ocorre em 3 a 5 iterações por ponto; uma curva completa de 180 pontos exige menos de mil avaliações da equação, o que corresponde a frações de milissegundo em qualquer dispositivo moderno. É essa economia que permite recalcular a curva inteira a cada movimento dos controles deslizantes da interface.
+
+### 7.9.7 A implementação do ajuste
+
+O ajuste de `ramberg-osgood-fit.ts` materializa o algoritmo da Seção 6.4.2. A função de perda soma os quadrados dos resíduos no espaço das deformações, e o laço de busca perturba os três parâmetros com passos gaussianos multiplicativos de amplitude decrescente, sempre respeitando os limites físicos:
+
+```typescript
+const DEFAULT_BOUNDS = {
+  E: [500, 10000],
+  sigma_0: [5, 200],
+  n: [1, 30],
+}
+
+function loss(params: RambergOsgoodParams, points: StressStrainPoint[]) {
+  let error = 0
+  for (const point of points) {
+    const predicted = calculateStrain(point.stress, params)
+    const diff = predicted - point.strain
+    error += diff * diff
+  }
+  return error
+}
+
+for (let i = 0; i < iterationsPerRun; i += 1) {
+  const candidate = clampParams({
+    E: params.E * (1 + randomNormal(rng) * step),
+    sigma_0: params.sigma_0 * (1 + randomNormal(rng) * step),
+    n: params.n * (1 + randomNormal(rng) * step),
+  }, bounds)
+  const candidateResult = loss(candidate, sample)
+  if (candidateResult.error < result.error) {
+    params = candidate
+    result = candidateResult
+  }
+  step *= 0.9995
+}
+```
+
+Três detalhes de implementação merecem registro. Primeiro, a perturbação é multiplicativa (cada parâmetro é escalado por um fator próximo de 1), o que respeita as ordens de grandeza muito distintas de E (centenas a milhares) e de n (unidades); uma perturbação aditiva única seria grande demais para n e pequena demais para E. Segundo, o passo decai geometricamente (fator 0,9995 por iteração), fazendo a busca migrar de exploração ampla para refinamento local, no espírito do recozimento simulado. Terceiro, as estimativas iniciais são extraídas dos próprios dados (a secante das pequenas deformações para E, a tensão próxima de 0,2% para σ₀), o que coloca o primeiro reinício já na bacia de atração correta na maioria dos casos; os reinícios aleatórios subsequentes protegem contra os casos restantes.
+
+### 7.9.8 A implementação do metamodelo
+
+O módulo `metamodel.ts` implementa a interpolação RBF da Seção 6.5.2 em três passos: normalização das coordenadas de processo, cálculo dos pesos gaussianos e média ponderada com limitação aos valores observados:
+
+```typescript
+function rbfWeights(input: PredictionInput, points: RambergOsgoodTrainingPoint[]) {
+  const ranges = computeRanges(points)
+  const inputTemp = normalize(input.temperature, ranges.tempMin, ranges.tempMax)
+  const inputSpeed = normalize(input.speed, ranges.speedMin, ranges.speedMax)
+  const epsilon = computeEpsilon(points, ranges)
+  return points.map((point) => {
+    const dx = inputTemp - normalize(point.temperature, ranges.tempMin, ranges.tempMax)
+    const dy = inputSpeed - normalize(point.speed, ranges.speedMin, ranges.speedMax)
+    const dist = Math.sqrt(dx * dx + dy * dy)
+    return Math.exp(-Math.pow(epsilon * dist, 2))
+  })
+}
+
+function interpolateValue(points, weights, getter, min, max) {
+  const weightSum = weights.reduce((sum, weight) => sum + weight, 0)
+  if (!weightSum) return clamp(getter(points[0]), min, max)
+  const value =
+    points.reduce((sum, point, index) => sum + getter(point) * weights[index], 0) / weightSum
+  return clamp(value, min, max)
+}
+```
+
+O parâmetro de forma `epsilon` é calibrado em `computeEpsilon` como o inverso da distância média entre todos os pares de pontos de treinamento no espaço normalizado. Com a malha fatorial 3 × 3 deste trabalho, isso produz gaussianas cuja largura é comparável ao espaçamento da malha: perto de uma condição ensaiada, seu peso domina; entre condições, várias contribuem. A limitação final (`clamp`) ao intervalo observado implementa a salvaguarda anti-extrapolação discutida na fundamentação. Há ainda um atalho de fidelidade: se a consulta coincide exatamente com uma condição ensaiada, a função retorna os parâmetros medidos daquela condição, sem interpolação.
+
+### 7.9.9 A montagem dos pontos de treinamento
+
+O elo entre o banco de dados e o metamodelo é o módulo `prediction-data.ts`, executado no servidor. Uma única consulta SQL recupera todas as medições válidas com seus perfis de impressão:
+
+```sql
+SELECT
+  p.code AS profile_code,
+  p.temperature_c,
+  p.speed_mm_s,
+  t.id AS test_run_id,
+  COALESCE(m.deformacao_mm_mm, m.alongamento_mm_mm) AS strain,
+  m.tensao_mpa AS stress
+FROM test_runs t
+JOIN print_profiles p ON p.id = t.print_profile_id
+JOIN test_measurements m ON m.test_run_id = t.id
+WHERE m.tensao_mpa IS NOT NULL
+  AND COALESCE(m.deformacao_mm_mm, m.alongamento_mm_mm) IS NOT NULL
+ORDER BY p.code, t.id, m.point_index
+```
+
+O código então agrupa os pontos por ensaio, remove o trecho inicial espúrio de cada curva, reduz a densidade de amostragem para no máximo 600 pontos por ensaio (as curvas brutas têm até 924), reúne os ensaios de um mesmo perfil e executa um único ajuste de Ramberg-Osgood sobre o conjunto de pontos do perfil, com semente derivada do código do perfil:
+
+```typescript
+const fit = fitRambergOsgoodCurve(profileEntry.points, {
+  seed: hashSeed(profileEntry.profile),
+  sampleSize: Math.min(400, profileEntry.points.length),
+  curvePoints: 120,
+  maxStrain,
+})
+
+trainingData.push({
+  profile: profileEntry.profile,
+  temperature: profileEntry.temperature,
+  speed: profileEntry.speed,
+  E: fit.params.E,
+  sigma_0: fit.params.sigma_0,
+  n: fit.params.n,
+  maxStrain,
+  rmse: fit.rmse,
+  pointsUsed: fit.pointsUsed,
+  validationPoints,
+})
+```
+
+Ajustar sobre o conjunto agregado dos cinco ensaios do perfil, em vez de ajustar cada ensaio e tirar a média dos parâmetros, é uma decisão deliberada: a média de parâmetros de um modelo não linear não corresponde, em geral, à curva média (consequência direta da equifinalidade da Seção 6.4.3); o ajuste sobre os dados agregados produz a curva que melhor representa a condição como um todo. A deformação máxima do ponto de treinamento, por sua vez, é a média das deformações máximas individuais, por ser uma grandeza escalar de média bem definida.
+
+### 7.9.10 O fluxo de predição de ponta a ponta
+
+A orquestração final está em `prediction.ts`, cuja função principal encadeia metamodelo, geração de curva e propriedades derivadas:
+
+```typescript
+export async function predictProperties(
+  input: PredictionInput,
+  trainingData: RambergOsgoodTrainingPoint[],
+  options: { method?: 'polynomial' | 'rbf'; curvePoints?: number } = {}
+): Promise<PredictionResult> {
+  const method = options.method ?? 'rbf'
+  const curvePoints = options.curvePoints ?? 180
+  const interpolation = rbfInterpolation(input, trainingData)
+  const rambergOsgood = {
+    E: interpolation.E,
+    sigma_0: interpolation.sigma_0,
+    n: interpolation.n,
+  }
+  const maxStrain = interpolation.maxStrain > 0 ? interpolation.maxStrain : 0.08
+  const curve = generateStressStrainCurve(rambergOsgood, maxStrain, curvePoints)
+  const properties = calculateMechanicalProperties(rambergOsgood, maxStrain)
+  return { input, rambergOsgood, properties, curve, interpolationMethod: method }
+}
+```
+
+O percurso completo de uma predição, do clique do usuário ao gráfico, é o seguinte:
+
+1. O usuário acessa a página de predição. Por ser um componente de servidor com renderização dinâmica, o servidor consulta o PostgreSQL, executa a montagem da Seção 7.9.9 e entrega à página os nove pontos de treinamento já ajustados;
+2. No navegador, o usuário define temperatura e velocidade com controles deslizantes. A cada alteração, `predictProperties` executa localmente: o metamodelo RBF interpola E, σ₀, n e ε_max; o gerador de curvas varre 180 deformações igualmente espaçadas e inverte o modelo por Newton-Raphson em cada uma; as propriedades derivadas saem das formas fechadas da Seção 6.3.4;
+3. O componente de visualização redesenha a curva prevista, sobrepondo, quando solicitado, os pontos experimentais de validação das condições vizinhas;
+4. Se o usuário salva a predição, o resultado é persistido no banco com os parâmetros de entrada, permitindo auditoria posterior no histórico.
+
+Um exemplo numérico concreto ilustra o fluxo. Para a consulta em 205 °C e 97 mm/s (combinação que não foi ensaiada), o metamodelo treinado com as nove condições da série A retorna E = 765 MPa, σ₀ = 15,1 MPa, n = 1,67 e ε_max = 7,7%. A curva gerada a partir desses parâmetros atinge 48,4 MPa na deformação máxima, com o método de Newton-Raphson convergindo em 4 iterações por ponto. O valor situa-se dentro da faixa observada nos corpos de prova individuais das condições vizinhas (que alcançam até 50,3 MPa), e a leitura correta, conforme a validação da Seção 8.6, é a da curva como um todo, não a dos parâmetros isolados.
+
+### 7.9.11 Propriedades derivadas em código
+
+O fechamento da cadeia é o cálculo das propriedades de engenharia em `mechanical-properties.ts`. A integral analítica da Seção 6.3.4 aparece como uma função de energia avaliada em dois limites, o escoamento (resiliência) e a tensão máxima (tenacidade):
+
+```typescript
+function calculateEnergy(params: RambergOsgoodParams, stressLimit: number) {
+  const { E, sigma_0, n } = params
+  if (!Number.isFinite(stressLimit) || stressLimit <= 0) return 0
+  const elasticTerm = (stressLimit * stressLimit) / (2 * E)
+  const plasticTerm = (0.002 * n * Math.pow(stressLimit, n + 1)) / ((n + 1) * Math.pow(sigma_0, n))
+  return elasticTerm + plasticTerm
+}
+```
+
+A correspondência linha a linha entre esse código e a expressão matemática da fundamentação não é acidental: foi um critério de projeto manter o núcleo numérico legível contra as equações do texto, de modo que a verificação do software possa ser feita por inspeção direta, além dos testes de validação externa (comparação com os relatórios EMIC, Seção 8.3.2) e de validação cruzada (Seção 8.6) que quantificam seu comportamento de ponta a ponta.
+
 ---
 
 # 8 RESULTADOS E DISCUSSÃO
@@ -809,7 +1033,7 @@ A validação expõe também os limites do esquema. As condições de vértice c
 
 | Fonte | Material/processo | Tensão máx. (MPa) | Módulo (GPa) | Def. ruptura (%) |
 |---|---|---|---|---|
-| Este trabalho (série A) | PLA FDM, 190–220 °C, 90–100 mm/s | 41,7 a 47,0 | 0,52 a 0,63 (aparente)† | 7,3 a 8,8 |
+| Este trabalho (série A) | PLA FDM, 190 a 220 °C, 90 a 100 mm/s | 41,7 a 47,0 | 0,52 a 0,63 (aparente)† | 7,3 a 8,8 |
 | Tymrak et al. (2014) | PLA FDM, impressoras abertas | 28,5 a 56,6 | 3,3 (extensometria) | n/d |
 | Chacón et al. (2017) | PLA FDM, várias orientações | 30 a 89 (aprox.) | n/d | n/d |
 | Lanzotti et al. (2015) | PLA FDM, impressora aberta | 30 a 55 (aprox.) | n/d | n/d |
@@ -1078,3 +1302,29 @@ O gerador pseudoaleatório é um gerador congruencial linear com semente fixa, g
 | A22-5 | 42,37 | 50,3 | 585 | 8,7 | 2,27 | 819 | 7,1 | 1,29 | 0,987 |
 
 *Fonte: elaborada pelos autores, a partir do processamento da plataforma ResistencIA.*
+
+---
+
+# APÊNDICE D — GUIA DE FIGURAS PARA A DIAGRAMAÇÃO FINAL
+
+Este apêndice orienta a montagem final do trabalho. Todas as tabelas do texto (Tabelas 1 a 8 e A1) já estão completas com dados reais; nenhuma tabela está pendente. As figuras, referenciadas ao longo do texto por marcadores em itálico, devem ser produzidas conforme o quadro abaixo e inseridas nas seções indicadas. Após a inserção, este apêndice deve ser removido da versão de defesa.
+
+| Figura | Conteúdo | Como obter | Inserir na seção |
+|--------|----------|------------|-------------------|
+| 1 | Esquema do processo FDM: filamento, tracionador, hotend, bico, mesa e eixos de movimentação | Desenhar em ferramenta vetorial (ou adaptar esquema com fonte citada) | 2.3 |
+| 2 | Rota de produção do PLA: fermentação, ácido lático, lactídeo, polimerização | Desenhar diagrama simples de blocos | 3.2 |
+| 3 | Curva tensão-deformação típica com regiões elástica e plástica, escoamento por offset e propriedades assinaladas | Gerar no módulo Calibração da plataforma com um ensaio real, anotando as regiões | 4.6 |
+| 4 | Corpo de prova ASTM D638 Tipo I com dimensões nominais cotadas | Foto de um corpo de prova impresso ao lado do desenho cotado | 7.3 |
+| 5 | Máquina EMIC DL30000N com corpo de prova montado nas garras | Foto no laboratório do campus | 7.4 |
+| 6 | Curvas brutas de uma condição com a região de acomodação destacada e as mesmas curvas corrigidas | Módulo Comparação da plataforma (antes e depois da correção); alternativa: gráfico do relatório EMIC A12.pdf | 8.2 |
+| 7 | Efeito do expoente n na forma da curva do modelo (n baixo, médio e alto com E e σ₀ fixos) | Módulo Calibração: variar n com os controles e capturar as três curvas | 6.3.2 |
+| 8 | Fluxo de dados da plataforma: importação, banco, ajuste, metamodelo, predição, visualização | Desenhar diagrama de blocos (a ordem das etapas está na Seção 7.9.10) | 7.9.1 |
+| 9 | Interface do módulo de predição com curva prevista para uma condição não ensaiada | Captura de tela de /predict com 205 °C e 97 mm/s (exemplo trabalhado na Seção 7.9.10) | 7.9.10 |
+| 10 | Ajuste do modelo sobre um ensaio experimental com métricas visíveis | Captura de tela de /calibracao com um ensaio da condição A12 | 8.5 |
+| 11 | Superfície de resposta 3D da tensão máxima no plano temperatura × velocidade | Captura de tela de /atlas | 8.6 |
+| 12 | Sobreposição de curvas experimentais e curva predita para uma condição retirada do treinamento | Módulo Comparação: ensaios de A12 mais a predição para 210 °C e 100 mm/s | 8.6 |
+| 13 | Barras comparativas da tensão máxima por condição: plataforma versus relatórios EMIC | Montar em planilha com os dados das Tabelas 3 e 4 | 8.3.2 |
+
+*Fonte: elaborado pelos autores.*
+
+Recomendações de captura: usar tema claro da interface, janela maximizada em 1920 × 1080 e zoom do navegador em 100%; exportar os gráficos da plataforma pelo botão de exportação quando disponível, para obter imagem sem elementos de navegação; nas fotos de laboratório, incluir escala ou objeto de referência. Todas as figuras devem receber legenda no padrão das tabelas (fonte, ano) e citação no corpo do texto na seção indicada.
