@@ -3,10 +3,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
-import type { PredictionResult, RambergOsgoodTrainingPoint } from '@/types'
-import { rbfInterpolation } from '@/lib/metamodel'
+import type { PredictionResult, RambergOsgoodTrainingPoint, StressStrainPoint } from '@/types'
+import { rbfCurveInterpolation, rbfInterpolation } from '@/lib/metamodel'
 import { cn } from '@/lib/utils'
-import { calculateMechanicalProperties } from '@/lib/mechanical-properties'
+import { calculatePropertiesFromCurve } from '@/lib/mechanical-properties'
+import { useSettings } from '@/components/settings-provider'
 import {
   Select,
   SelectContent,
@@ -15,21 +16,16 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 
-type MetricKey =
-  | 'E'
-  | 'sigma_0'
-  | 'n'
-  | 'yieldStress'
-  | 'ultimateStress'
-  | 'ductility'
-  | 'resilience'
-  | 'toughness'
+type CurveMetricKey = 'ultimateStress' | 'ductility' | 'modulus' | 'toughness'
+
+type MetricKey = CurveMetricKey | 'E' | 'sigma_0' | 'n'
 
 type MetricConfig = {
   key: MetricKey
   label: string
   unit: string
   description: string
+  modelParameter: boolean
   formatter: (value: number) => string
 }
 
@@ -55,61 +51,65 @@ const stressFormatter = new Intl.NumberFormat('pt-BR', {
   maximumFractionDigits: 1,
 })
 
+const modulusFormatter = new Intl.NumberFormat('pt-BR', {
+  maximumFractionDigits: 0,
+})
+
 const METRICS: MetricConfig[] = [
   {
-    key: 'yieldStress',
-    label: 'Tensao de escoamento',
-    unit: 'MPa',
-    description: 'Inicio do regime plastico (offset de 0,2%).',
-    formatter: (value) => stressFormatter.format(value),
-  },
-  {
     key: 'ultimateStress',
-    label: 'Tensao maxima',
+    label: 'Tensão máxima',
     unit: 'MPa',
-    description: 'Maior tensao prevista ate o limite experimental.',
+    description: 'Maior tensão da curva prevista.',
+    modelParameter: false,
     formatter: (value) => stressFormatter.format(value),
   },
   {
     key: 'ductility',
-    label: 'Ductilidade',
+    label: 'Deformação na tensão máxima',
     unit: '%',
-    description: 'Deformacao total prevista no limite experimental.',
+    description: 'Deformação em que a curva prevista atinge a tensão máxima.',
+    modelParameter: false,
+    formatter: (value) => numberFormatter.format(value),
+  },
+  {
+    key: 'modulus',
+    label: 'Módulo aparente',
+    unit: 'MPa',
+    description: 'Inclinação do trecho inicial da curva prevista.',
+    modelParameter: false,
+    formatter: (value) => modulusFormatter.format(value),
+  },
+  {
+    key: 'toughness',
+    label: 'Tenacidade até a tensão máxima',
+    unit: 'MJ/m³',
+    description: 'Energia por volume absorvida até a tensão máxima.',
+    modelParameter: false,
     formatter: (value) => numberFormatter.format(value),
   },
   {
     key: 'E',
-    label: 'Modulo de elasticidade (E)',
+    label: 'Parâmetro E do modelo',
     unit: 'MPa',
-    description: 'Rigidez inicial do material.',
-    formatter: (value) => numberFormatter.format(value),
+    description: 'Rigidez do ajuste de Ramberg-Osgood.',
+    modelParameter: true,
+    formatter: (value) => modulusFormatter.format(value),
   },
   {
     key: 'sigma_0',
-    label: 'Tensao de referencia (σ₀)',
+    label: 'Parâmetro σ₀ do modelo',
     unit: 'MPa',
-    description: 'Tensao associada ao deslocamento de 0,2%.',
+    description: 'Tensão de referência do ajuste de Ramberg-Osgood.',
+    modelParameter: true,
     formatter: (value) => stressFormatter.format(value),
   },
   {
     key: 'n',
-    label: 'Expoente de encruamento (n)',
+    label: 'Parâmetro n do modelo',
     unit: '',
-    description: 'Sensibilidade da curva a deformacao plastica.',
-    formatter: (value) => numberFormatter.format(value),
-  },
-  {
-    key: 'resilience',
-    label: 'Resiliência',
-    unit: 'MJ/m³',
-    description: 'Energia elastica acumulada ate o escoamento.',
-    formatter: (value) => numberFormatter.format(value),
-  },
-  {
-    key: 'toughness',
-    label: 'Tenacidade',
-    unit: 'MJ/m³',
-    description: 'Energia total acumulada ate o limite experimental.',
+    description: 'Expoente do ajuste de Ramberg-Osgood.',
+    modelParameter: true,
     formatter: (value) => numberFormatter.format(value),
   },
 ]
@@ -121,13 +121,9 @@ function mapColor(t: number) {
   return color
 }
 
-function average(values: number[], fallback: number) {
-  if (!values.length) return fallback
-  return values.reduce((sum, value) => sum + value, 0) / values.length
-}
-
-function isFiniteNumber(value: number) {
-  return Number.isFinite(value)
+function curveMetrics(curve: StressStrainPoint[]): Record<CurveMetricKey, number> {
+  const { ultimateStress, ductility, modulus, toughness } = calculatePropertiesFromCurve(curve)
+  return { ultimateStress, ductility, modulus, toughness }
 }
 
 export function ResponseSurfaceChart({
@@ -135,9 +131,11 @@ export function ResponseSurfaceChart({
   result,
   className,
 }: ResponseSurfaceChartProps) {
-  const [metricKey, setMetricKey] = useState<MetricKey>('yieldStress')
+  const { settings } = useSettings()
+  const [metricKey, setMetricKey] = useState<MetricKey>('ultimateStress')
   const [isReady, setIsReady] = useState(false)
   const containerRef = useRef<HTMLDivElement | null>(null)
+  const curvePoints = result?.curve.length ? result.curve.length - 1 : settings.stressCurvePoints
 
   const gridData = useMemo(() => {
     const validTraining = trainingData.filter(
@@ -173,79 +171,30 @@ export function ResponseSurfaceChart({
     const rows = Math.max(minResolution, Math.round(baseResolution * (speedRange / maxRange)))
     const points: SurfacePoint[] = []
 
-    const strainValues = validTraining
-      .map((point) => point.maxStrain)
-      .filter((value) => isFiniteNumber(value) && value > 0)
-    const fallbackParams = {
-      E: average(
-        validTraining.map((point) => point.E),
-        3000
-      ),
-      sigma_0: average(
-        validTraining.map((point) => point.sigma_0),
-        50
-      ),
-      n: average(
-        validTraining.map((point) => point.n),
-        8
-      ),
-      maxStrain: average(strainValues, 0.08),
-    }
-
     for (let row = 0; row < rows; row += 1) {
       const speed = speedMin + (speedRange * row) / (rows - 1)
       for (let col = 0; col < cols; col += 1) {
         const temperature = tempMin + (tempRange * col) / (cols - 1)
-        const interpolation = rbfInterpolation({ temperature, speed }, validTraining)
-        const safeE = isFiniteNumber(interpolation.E) ? interpolation.E : fallbackParams.E
-        const safeSigma0 = isFiniteNumber(interpolation.sigma_0)
-          ? interpolation.sigma_0
-          : fallbackParams.sigma_0
-        const safeN = isFiniteNumber(interpolation.n) ? interpolation.n : fallbackParams.n
-        const maxStrain =
-          isFiniteNumber(interpolation.maxStrain) && interpolation.maxStrain > 0
-            ? interpolation.maxStrain
-            : fallbackParams.maxStrain
-        const properties = calculateMechanicalProperties(
-          { E: safeE, sigma_0: safeSigma0, n: safeN },
-          maxStrain
-        )
+        const input = { temperature, speed }
+        const { curve } = rbfCurveInterpolation(input, validTraining, curvePoints, {
+          exactMatch: false,
+        })
+        const params = rbfInterpolation(input, validTraining, { exactMatch: false })
 
         points.push({
           temperature,
           speed,
-          values: {
-            E: safeE,
-            sigma_0: safeSigma0,
-            n: safeN,
-            yieldStress: properties.yieldStress,
-            ultimateStress: properties.ultimateStress,
-            ductility: properties.ductility,
-            resilience: properties.resilience,
-            toughness: properties.toughness,
-          },
+          values: { ...curveMetrics(curve), E: params.E, sigma_0: params.sigma_0, n: params.n },
         })
       }
     }
 
-    const trainingPoints = validTraining.map((point) => {
-      const props = calculateMechanicalProperties(
-        { E: point.E, sigma_0: point.sigma_0, n: point.n },
-        point.maxStrain
-      )
+    const trainingPoints: SurfacePoint[] = validTraining.map((point) => {
+      const input = { temperature: point.temperature, speed: point.speed }
+      const { curve } = rbfCurveInterpolation(input, validTraining, curvePoints)
       return {
-        temperature: point.temperature,
-        speed: point.speed,
-        values: {
-          E: point.E,
-          sigma_0: point.sigma_0,
-          n: point.n,
-          yieldStress: props.yieldStress,
-          ultimateStress: props.ultimateStress,
-          ductility: props.ductility,
-          resilience: props.resilience,
-          toughness: props.toughness,
-        },
+        ...input,
+        values: { ...curveMetrics(curve), E: point.E, sigma_0: point.sigma_0, n: point.n },
       }
     })
 
@@ -264,40 +213,41 @@ export function ResponseSurfaceChart({
         discarded: trainingData.length - validTraining.length,
       },
     }
-  }, [trainingData])
+  }, [trainingData, curvePoints])
+
+  const predictionPoint = useMemo((): SurfacePoint | null => {
+    if (!result) return null
+    const { ultimateStress, ductility, modulus, toughness } = result.properties
+    const { E, sigma_0, n } = result.rambergOsgood
+    return {
+      temperature: result.input.temperature,
+      speed: result.input.speed,
+      values: { ultimateStress, ductility, modulus, toughness, E, sigma_0, n },
+    }
+  }, [result])
 
   const surface = useMemo(() => {
     if (!gridData) return null
     const values = gridData.points.map((point) => point.values[metricKey])
+    const testedValues = gridData.trainingPoints.map((point) => point.values[metricKey])
+    const predictionValues = predictionPoint ? [predictionPoint.values[metricKey]] : []
+    const scaleValues = [...values, ...testedValues, ...predictionValues]
     const zMin = Math.min(...values)
     const zMax = Math.max(...values)
-    if (!Number.isFinite(zMin) || !Number.isFinite(zMax)) return null
+    const scaleMin = Math.min(...scaleValues)
+    const scaleMax = Math.max(...scaleValues)
+    if (!Number.isFinite(scaleMin) || !Number.isFinite(scaleMax)) return null
     return {
-      values,
       zMin,
       zMax,
+      testedMin: Math.min(...testedValues),
+      testedMax: Math.max(...testedValues),
+      scaleMin,
+      scaleMax,
     }
-  }, [gridData, metricKey])
+  }, [gridData, metricKey, predictionPoint])
 
   const metric = METRICS.find((entry) => entry.key === metricKey) ?? METRICS[0]
-
-  const predictionPoint = useMemo(() => {
-    if (!result) return null
-    return {
-      temperature: result.input.temperature,
-      speed: result.input.speed,
-      values: {
-        E: result.rambergOsgood.E,
-        sigma_0: result.rambergOsgood.sigma_0,
-        n: result.rambergOsgood.n,
-        yieldStress: result.properties.yieldStress,
-        ultimateStress: result.properties.ultimateStress,
-        ductility: result.properties.ductility,
-        resilience: result.properties.resilience,
-        toughness: result.properties.toughness,
-      },
-    }
-  }, [result])
 
   useEffect(() => {
     const container = containerRef.current
@@ -340,20 +290,35 @@ export function ResponseSurfaceChart({
 
     const { width, depth } = gridData.axisScale
     const height = 0.7
+    const zRange = surface.zMax - surface.zMin || 1
+    const scaleRange = surface.scaleMax - surface.scaleMin || 1
+
+    const mapX = (temperature: number) => {
+      const ratio =
+        (temperature - gridData.bounds.tempMin) /
+        (gridData.bounds.tempMax - gridData.bounds.tempMin || 1)
+      return (ratio - 0.5) * width
+    }
+    const mapY = (speed: number) => {
+      const ratio =
+        (speed - gridData.bounds.speedMin) /
+        (gridData.bounds.speedMax - gridData.bounds.speedMin || 1)
+      return (ratio - 0.5) * depth
+    }
+    const mapZ = (value: number) => ((value - surface.scaleMin) / scaleRange) * height
+
     const geometry = new THREE.PlaneGeometry(width, depth, gridData.cols - 1, gridData.rows - 1)
     const positions = geometry.attributes.position as THREE.BufferAttribute
     const colors = new Float32Array(positions.count * 3)
-    const zRange = surface.zMax - surface.zMin || 1
 
-    for (let index = 0; index < positions.count; index += 1) {
-      const value = surface.values[index]
-      const normalized = (value - surface.zMin) / zRange
-      positions.setZ(index, normalized * height)
-      const color = mapColor(normalized)
+    gridData.points.forEach((point, index) => {
+      const value = point.values[metricKey]
+      positions.setXYZ(index, mapX(point.temperature), mapY(point.speed), mapZ(value))
+      const color = mapColor((value - surface.zMin) / zRange)
       colors[index * 3] = color.r
       colors[index * 3 + 1] = color.g
       colors[index * 3 + 2] = color.b
-    }
+    })
 
     geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3))
     geometry.computeVertexNormals()
@@ -394,20 +359,6 @@ export function ResponseSurfaceChart({
     const axisLines = new THREE.LineSegments(axisGeometry, axisMaterial)
     scene.add(axisLines)
 
-    const mapX = (temperature: number) => {
-      const ratio =
-        (temperature - gridData.bounds.tempMin) /
-        (gridData.bounds.tempMax - gridData.bounds.tempMin || 1)
-      return (ratio - 0.5) * width
-    }
-    const mapY = (speed: number) => {
-      const ratio =
-        (speed - gridData.bounds.speedMin) /
-        (gridData.bounds.speedMax - gridData.bounds.speedMin || 1)
-      return (ratio - 0.5) * depth
-    }
-    const mapZ = (value: number) => ((value - surface.zMin) / zRange) * height
-
     let pointsGeometry: THREE.BufferGeometry | null = null
     let pointsMaterial: THREE.PointsMaterial | null = null
     if (gridData.trainingPoints.length) {
@@ -431,8 +382,7 @@ export function ResponseSurfaceChart({
 
     let predictionGeometry: THREE.SphereGeometry | null = null
     let predictionMaterial: THREE.MeshStandardMaterial | null = null
-    const predictionValue = predictionPoint?.values[metricKey]
-    if (predictionPoint && typeof predictionValue === 'number') {
+    if (predictionPoint) {
       predictionGeometry = new THREE.SphereGeometry(0.045, 18, 18)
       predictionMaterial = new THREE.MeshStandardMaterial({
         color: 0xf97316,
@@ -443,7 +393,7 @@ export function ResponseSurfaceChart({
       predictionMesh.position.set(
         mapX(predictionPoint.temperature),
         mapY(predictionPoint.speed),
-        mapZ(predictionValue)
+        mapZ(predictionPoint.values[metricKey])
       )
       scene.add(predictionMesh)
     }
@@ -504,16 +454,18 @@ export function ResponseSurfaceChart({
     )
   }
 
-  const zRange = surface.zMax - surface.zMin || 1
   const surfaceMin = metric.formatter(surface.zMin)
   const surfaceMax = metric.formatter(surface.zMax)
-  const surfaceSpan = metric.formatter(zRange)
-  const currentValue = predictionPoint?.values[metricKey]
+  const surfaceSpan = metric.formatter(surface.zMax - surface.zMin)
   const predictionValue = predictionPoint
-    ? typeof currentValue === 'number'
-      ? metric.formatter(currentValue)
-      : 'não atingido'
+    ? metric.formatter(predictionPoint.values[metricKey])
     : null
+  const isTestedCondition =
+    predictionPoint !== null &&
+    gridData.trainingPoints.some(
+      (point) =>
+        point.temperature === predictionPoint.temperature && point.speed === predictionPoint.speed
+    )
   const metricUnitLabel = metric.unit || 'adimensional'
 
   return (
@@ -536,6 +488,15 @@ export function ResponseSurfaceChart({
           </SelectContent>
         </Select>
       </div>
+
+      {metric.modelParameter ? (
+        <p className="rounded-lg border border-border bg-white dark:bg-black dark:text-white px-3 py-2 text-xs text-muted-foreground">
+          E, σ₀ e n são parâmetros de ajuste do Ramberg-Osgood, não propriedades físicas
+          independentes. Como o PLA rompe ainda quase em regime linear, combinações muito diferentes
+          dos três descrevem a mesma curva. Por isso o ajuste de cada condição e o da previsão podem
+          ficar longe desta superfície, que mostra só a média ponderada dos ajustes.
+        </p>
+      ) : null}
 
       <div className="grid min-h-0 flex-1 gap-3 md:grid-cols-[minmax(0,1fr)_220px]">
         <div className="flex flex-col rounded-xl border border-border bg-white dark:bg-black dark:text-white p-3">
@@ -562,6 +523,17 @@ export function ResponseSurfaceChart({
               Amplitude: <span className="font-mono text-foreground">{surfaceSpan}</span>{' '}
               {metricUnitLabel}
             </p>
+            <p>
+              Ensaios:{' '}
+              <span className="font-mono text-foreground">
+                {metric.formatter(surface.testedMin)}
+              </span>{' '}
+              a{' '}
+              <span className="font-mono text-foreground">
+                {metric.formatter(surface.testedMax)}
+              </span>{' '}
+              {metricUnitLabel}
+            </p>
             {predictionValue ? (
               <p>
                 Atual: <span className="font-mono text-foreground">{predictionValue}</span>{' '}
@@ -586,6 +558,16 @@ export function ResponseSurfaceChart({
             </p>
             <p>Interpolacao RBF (Gaussiana) com normalizacao min-max.</p>
             <p>Marcadores escuros: ensaios reais. Marcador laranja: previsao atual.</p>
+            <p>
+              A superfície é a média ponderada dos perfis, a mesma que a previsão usa fora das
+              condições ensaiadas.
+            </p>
+            {isTestedCondition ? (
+              <p>
+                Condição ensaiada. A previsão repete o próprio ensaio em vez da média ponderada, por
+                isso o marcador laranja pode ficar fora da superfície.
+              </p>
+            ) : null}
             {gridData.meta.discarded > 0 ? (
               <p>{gridData.meta.discarded} perfis ignorados por dados incompletos.</p>
             ) : null}

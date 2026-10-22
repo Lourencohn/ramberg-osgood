@@ -13,6 +13,10 @@ interface ProcessCoordinates {
   speed: number
 }
 
+interface InterpolationOptions {
+  exactMatch?: boolean
+}
+
 function normalize(value: number, min: number, max: number) {
   if (max === min) return 0
   return (value - min) / (max - min)
@@ -130,7 +134,8 @@ export function rbfInterpolateScalar(
 
 export function rbfInterpolation(
   input: PredictionInput,
-  data: RambergOsgoodTrainingPoint[]
+  data: RambergOsgoodTrainingPoint[],
+  { exactMatch = true }: InterpolationOptions = {}
 ): InterpolationResult {
   const validData = data.filter(
     (point) =>
@@ -152,15 +157,17 @@ export function rbfInterpolation(
     return { E: 3000, sigma_0: 50, n: 8, maxStrain: 0.08 }
   }
 
-  const exactMatch = validData.find(
-    (point) => point.temperature === input.temperature && point.speed === input.speed
-  )
-  if (exactMatch) {
+  const coincident = exactMatch
+    ? validData.find(
+        (point) => point.temperature === input.temperature && point.speed === input.speed
+      )
+    : undefined
+  if (coincident) {
     return {
-      E: exactMatch.E,
-      sigma_0: exactMatch.sigma_0,
-      n: exactMatch.n,
-      maxStrain: exactMatch.maxStrain,
+      E: coincident.E,
+      sigma_0: coincident.sigma_0,
+      n: coincident.n,
+      maxStrain: coincident.maxStrain,
     }
   }
 
@@ -190,7 +197,8 @@ export function rbfInterpolation(
 export function rbfCurveInterpolation(
   input: PredictionInput,
   data: RambergOsgoodTrainingPoint[],
-  points = 180
+  points = 180,
+  { exactMatch = true }: InterpolationOptions = {}
 ): { curve: StressStrainPoint[]; maxStrain: number } {
   const validData = data.filter(
     (point) =>
@@ -203,7 +211,7 @@ export function rbfCurveInterpolation(
   )
   if (!validData.length) return { curve: [], maxStrain: 0 }
 
-  const weights = profileWeights(input, validData)
+  const weights = exactMatch ? profileWeights(input, validData) : rbfWeights(input, validData)
   const weightSum = weights.reduce((sum, weight) => sum + weight, 0) || 1
   const maxStrain =
     validData.reduce((sum, point, index) => sum + point.maxStrain * weights[index], 0) / weightSum
