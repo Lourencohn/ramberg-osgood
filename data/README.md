@@ -67,6 +67,6 @@ O corpo de prova `Axy-k` está em `T<temperatura>_V<velocidade>/test_k/`.
 ## Arquivos `processed.csv` antigos
 
 As versões anteriores do repositório tinham, em cada `test_*/`, um `processed.csv` copiado das
-planilhas. Eles herdavam os problemas acima e não são mais usados por nenhum script. A importação
-(`npm run db:import`) e a análise (`npm run analysis`) partem sempre de `raw.txt` e
-`specimens.csv`.
+planilhas. Eles herdavam os problemas acima e foram removidos; continuam disponíveis no histórico
+do git. A importação (`npm run db:import`) e a análise (`npm run analysis`) partem sempre de
+`raw.txt` e `specimens.csv`.
