@@ -44,18 +44,31 @@ prova ou do perfil. Assim, rodar de novo produz os mesmos números.
 4. **Metamodelo e validação cruzada** (deixa uma condição de fora, LOOCV). Para cada uma das 9
    condições, a curva é prevista com as outras 8 e comparada com os ensaios. Duas rotas são
    avaliadas:
-   - a rota da plataforma: interpolação das curvas por funções de base radial (RBF) e reajuste
-     de Ramberg-Osgood sobre a curva interpolada. A curva prevista é a média ponderada, com pesos
-     RBF gaussianos, das curvas ajustadas de cada condição de treinamento, tomadas na deformação
-     normalizada u = ε / ε_max; a deformação máxima prevista é a média ponderada das deformações
-     máximas. Grandezas escalares interpoladas ficam limitadas ao intervalo dos valores de
-     treinamento;
-   - a interpolação direta da tensão máxima.
+   - a rota da plataforma: regressão linear das curvas em temperatura e velocidade e reajuste de
+     Ramberg-Osgood sobre a curva prevista. Em cada deformação normalizada u = ε / ε_max, a tensão
+     prevista é o plano σ(u) = a(u) + b(u)·T + c(u)·v ajustado por mínimos quadrados às curvas
+     ajustadas das condições de treinamento; a deformação máxima prevista sai do mesmo plano. Como
+     a regressão é linear nos dados, isso equivale a uma combinação das curvas de treinamento com
+     pesos que somam 1 e podem ser negativos, o que permite extrapolar;
+   - a regressão direta da tensão máxima.
 
    Para comparação, também é calculado o erro de um preditor ingênuo (média das outras
    condições).
 
-5. **Superfície de resposta e exemplo**: tensão máxima prevista em uma grade de 190 a 220 °C e
+5. **Escolha do metamodelo** (`scripts/analysis/metamodel-comparison.ts`). Dez candidatos são
+   comparados pelo erro entre a curva prevista e as curvas medidas dos corpos de prova da condição
+   deixada de fora (RMSE em 201 deformações de zero até a maior deformação de pico; além do fim de
+   uma curva vale a sua última tensão): médias ponderadas gaussianas (a da versão anterior e uma
+   com ε ajustado), RBF gaussiana interpolante, spline de placa fina interpolante e suavizante, e
+   regressões de 1 + v até a quadrática completa. Hiperparâmetros (ε, λ) são escolhidos por
+   validação cruzada interna, sem ver a condição de teste. A comparação usa dois esquemas: deixar
+   uma condição de fora (interpolação) e deixar um nível inteiro de temperatura ou velocidade de
+   fora (extrapolação de um nível). Completam a escolha a seleção aninhada (o modelo é escolhido
+   dentro de cada rodada), o teste de Wilcoxon pareado contra o modelo anterior, o teste F de falta
+   de ajuste com o erro puro das réplicas, o teste de Bartlett de igualdade de variâncias e a
+   comparação, nas condições já ensaiadas, entre repetir o ajuste da condição e usar a regressão
+   (deixando um corpo de prova de fora).
+6. **Superfície de resposta e exemplo**: tensão máxima prevista em uma grade de 190 a 220 °C e
    90 a 100 mm/s, e a curva prevista para 205 °C e 97 mm/s.
 
 ## Saídas (`results/`)
@@ -69,6 +82,12 @@ prova ou do perfil. Assim, rodar de novo produz os mesmos números.
 | `treinamento.csv`                   | parâmetros de Ramberg-Osgood por condição (dados de treino do metamodelo)         |
 | `validacao_cruzada.csv`             | resultado da validação cruzada por condição                                       |
 | `superficie_resposta.csv`           | grade da superfície de resposta                                                   |
+| `metamodelos_resumo.csv`            | erro médio de cada candidato a metamodelo nos dois esquemas de validação          |
+| `metamodelos_por_condicao.csv`      | erro de cada candidato em cada condição prevista                                  |
+| `metamodelos_selecao_aninhada.csv`  | modelo escolhido em cada rodada da seleção aninhada                               |
+| `metamodelos_ensaiadas.csv`         | ajuste da própria condição × regressão, por corpo de prova deixado de fora        |
+| `falta_de_ajuste.csv`               | teste F de falta de ajuste dos modelos lineares, por propriedade                  |
+| `homogeneidade_variancias.csv`      | teste de Bartlett entre as condições, por propriedade                             |
 | `curvas/*.csv`                      | curvas brutas, corrigidas, ajustadas, previstas na validação cruzada e do exemplo |
 | `resumo.json`                       | números-resumo citados no texto (faixas, erros médios, exemplo)                   |
 
@@ -84,3 +103,18 @@ prova ou do perfil. Assim, rodar de novo produz os mesmos números.
   material.
 - A interpolação é feita no espaço das curvas, e não diretamente nos parâmetros (E, σ₀, n). Na
   validação cruzada, interpolar os parâmetros errou mais do que o preditor ingênuo.
+- A regressão linear foi adotada porque teve o menor erro de curva nos dois esquemas, foi a mais
+  escolhida na seleção aninhada e passou no teste de falta de ajuste para tensão máxima,
+  deformação na tensão máxima e tenacidade. Para esses três, o plano explica as médias das nove
+  condições dentro do ruído das réplicas, e as variâncias entre condições não diferem (Bartlett),
+  que são as hipóteses do teorema de Gauss-Markov. O módulo aparente reprova a falta de ajuste e
+  tem variâncias desiguais. Nele a média ponderada anterior erra um pouco menos na validação
+  cruzada (23,8 contra 25,7 MPa, diferença de 0,3% do módulo).
+- Com 9 condições, a vantagem sobre a média ponderada anterior é consistente (melhor em 7 de 9
+  condições e em 14 de 18 previsões de nível), mas só o esquema de nível fica abaixo de 5% no
+  Wilcoxon (p = 0,048; sem o ensaio A00-3, p = 0,074), e as 18 previsões não são independentes. É
+  evidência forte de que o modelo não piora e provável de que melhora, não prova definitiva.
+- O domínio de entrada da plataforma vai uma distância entre níveis além dos ensaios (180 a
+  230 °C, 85 a 105 mm/s). Essa é a distância de extrapolação medida no esquema de nível, e a
+  alavancagem da regressão no canto mais distante desse domínio fica abaixo da maior alavancagem
+  testada ali.

@@ -1,0 +1,298 @@
+esquema,modelo,condicao,rmse_curva_mpa,erro_tensao_max_mpa,erro_deformacao_pico_pp,hiperparametro
+deixa uma condição de fora,Média global (referência ingênua),T190_V90,2.8877076,4.105494,-0.07898688,
+deixa uma condição de fora,Média global (referência ingênua),T190_V95,0.90518165,0.5940285,-0.28489138,
+deixa uma condição de fora,Média global (referência ingênua),T190_V100,0.73070377,-1.6089505,-0.87359714,
+deixa uma condição de fora,Média global (referência ingênua),T210_V90,1.7581409,2.6024557,-0.03475995,
+deixa uma condição de fora,Média global (referência ingênua),T210_V95,2.0176051,-0.25928895,0.37784673,
+deixa uma condição de fora,Média global (referência ingênua),T210_V100,1.3737635,-2.33231,-0.046499604,
+deixa uma condição de fora,Média global (referência ingênua),T220_V90,1.5678613,0.70874385,0.4445373,
+deixa uma condição de fora,Média global (referência ingênua),T220_V95,1.2719596,1.0261672,0.55962878,
+deixa uma condição de fora,Média global (referência ingênua),T220_V100,2.5112758,-3.3593142,-0.06327785,
+deixa uma condição de fora,"Média ponderada gaussiana, ε = 1/distância média",T190_V90,2.3375514,3.2805012,-0.026715166,
+deixa uma condição de fora,"Média ponderada gaussiana, ε = 1/distância média",T190_V95,0.57290887,0.41361006,-0.16730213,
+deixa uma condição de fora,"Média ponderada gaussiana, ε = 1/distância média",T190_V100,0.64944919,-1.0739719,-0.76239277,
+deixa uma condição de fora,"Média ponderada gaussiana, ε = 1/distância média",T210_V90,1.6957771,1.6454406,-0.20224936,
+deixa uma condição de fora,"Média ponderada gaussiana, ε = 1/distância média",T210_V95,1.8980967,-0.32099242,0.31520113,
+deixa uma condição de fora,"Média ponderada gaussiana, ε = 1/distância média",T210_V100,0.89641537,-1.4731156,-0.053289968,
+deixa uma condição de fora,"Média ponderada gaussiana, ε = 1/distância média",T220_V90,1.5539474,-0.39522286,0.25755149,
+deixa uma condição de fora,"Média ponderada gaussiana, ε = 1/distância média",T220_V95,0.94970704,1.0939936,0.43117796,
+deixa uma condição de fora,"Média ponderada gaussiana, ε = 1/distância média",T220_V100,2.0027547,-2.8206049,-0.18375795,
+deixa uma condição de fora,"Média ponderada gaussiana, ε ajustado",T190_V90,1.9067248,3.1493002,0.1295028,2.8
+deixa uma condição de fora,"Média ponderada gaussiana, ε ajustado",T190_V95,0.77828886,0.48967378,0.15329149,4
+deixa uma condição de fora,"Média ponderada gaussiana, ε ajustado",T190_V100,0.6318509,-0.89471022,-0.57557523,2.8
+deixa uma condição de fora,"Média ponderada gaussiana, ε ajustado",T210_V90,2.2574364,1.5885741,-0.41998444,4
+deixa uma condição de fora,"Média ponderada gaussiana, ε ajustado",T210_V95,1.7364538,-0.53511602,0.20660879,2
+deixa uma condição de fora,"Média ponderada gaussiana, ε ajustado",T210_V100,0.56689091,-0.70024048,-0.0822115,2
+deixa uma condição de fora,"Média ponderada gaussiana, ε ajustado",T220_V90,2.4236642,-1.5544984,0.36926199,4
+deixa uma condição de fora,"Média ponderada gaussiana, ε ajustado",T220_V95,0.79069849,1.0496887,0.33119201,2
+deixa uma condição de fora,"Média ponderada gaussiana, ε ajustado",T220_V100,1.7898118,-2.4364117,-0.23053644,2
+deixa uma condição de fora,"RBF gaussiana interpolante + constante, ε ajustado",T190_V90,1.9853085,3.1632703,0.069206921,2
+deixa uma condição de fora,"RBF gaussiana interpolante + constante, ε ajustado",T190_V95,0.48620748,0.7299711,0.03567411,2
+deixa uma condição de fora,"RBF gaussiana interpolante + constante, ε ajustado",T190_V100,0.60395011,-0.95679775,-0.68809956,2
+deixa uma condição de fora,"RBF gaussiana interpolante + constante, ε ajustado",T210_V90,1.8890554,1.3568592,-0.25549703,1.4
+deixa uma condição de fora,"RBF gaussiana interpolante + constante, ε ajustado",T210_V95,2.3507422,-2.6603567,0.072830511,1.4
+deixa uma condição de fora,"RBF gaussiana interpolante + constante, ε ajustado",T210_V100,1.2218974,1.9991252,0.090967669,1.4
+deixa uma condição de fora,"RBF gaussiana interpolante + constante, ε ajustado",T220_V90,3.6869506,-2.9910092,0.25536495,0.5
+deixa uma condição de fora,"RBF gaussiana interpolante + constante, ε ajustado",T220_V95,1.5053801,1.5577694,0.021088696,1.4
+deixa uma condição de fora,"RBF gaussiana interpolante + constante, ε ajustado",T220_V100,2.234794,-2.5703501,-0.14584729,1.4
+deixa uma condição de fora,Spline de placa fina interpolante + plano,T190_V90,1.2512394,0.9632992,0.25686694,
+deixa uma condição de fora,Spline de placa fina interpolante + plano,T190_V95,0.61742782,0.1520134,0.049855832,
+deixa uma condição de fora,Spline de placa fina interpolante + plano,T190_V100,0.71028033,1.2538213,-0.34698855,
+deixa uma condição de fora,Spline de placa fina interpolante + plano,T210_V90,1.5471903,0.46256812,-0.34522087,
+deixa uma condição de fora,Spline de placa fina interpolante + plano,T210_V95,2.1246676,-1.8805602,0.13493574,
+deixa uma condição de fora,Spline de placa fina interpolante + plano,T210_V100,0.61298918,1.1603896,0.16237344,
+deixa uma condição de fora,Spline de placa fina interpolante + plano,T220_V90,2.3197489,-2.2009109,0.16593249,
+deixa uma condição de fora,Spline de placa fina interpolante + plano,T220_V95,1.1449053,1.4350618,0.097898208,
+deixa uma condição de fora,Spline de placa fina interpolante + plano,T220_V100,1.5637409,-1.5800473,-0.30756878,
+deixa uma condição de fora,"Spline de placa fina suavizante + plano, λ ajustado",T190_V90,1.2145091,1.1990262,0.21903281,0.1
+deixa uma condição de fora,"Spline de placa fina suavizante + plano, λ ajustado",T190_V95,0.82402381,0.19872716,0.12945711,1
+deixa uma condição de fora,"Spline de placa fina suavizante + plano, λ ajustado",T190_V100,0.6476662,0.88005272,-0.38679984,0.3
+deixa uma condição de fora,"Spline de placa fina suavizante + plano, λ ajustado",T210_V90,1.435619,0.17204413,-0.36980534,0.1
+deixa uma condição de fora,"Spline de placa fina suavizante + plano, λ ajustado",T210_V95,1.8500518,-0.49025495,0.26605036,1
+deixa uma condição de fora,"Spline de placa fina suavizante + plano, λ ajustado",T210_V100,0.61298918,1.1603896,0.16237344,0
+deixa uma condição de fora,"Spline de placa fina suavizante + plano, λ ajustado",T220_V90,2.3197489,-2.2009109,0.16593249,0
+deixa uma condição de fora,"Spline de placa fina suavizante + plano, λ ajustado",T220_V95,0.86779767,1.437557,0.19621291,0.3
+deixa uma condição de fora,"Spline de placa fina suavizante + plano, λ ajustado",T220_V100,1.5597039,-1.5698669,-0.30920561,0.003
+deixa uma condição de fora,Regressão 1 + v,T190_V90,2.2778294,1.4230583,-0.36678694,
+deixa uma condição de fora,Regressão 1 + v,T190_V95,0.90518165,0.5940285,-0.28489138,
+deixa uma condição de fora,Regressão 1 + v,T190_V100,1.712456,1.1118123,-0.80562416,
+deixa uma condição de fora,Regressão 1 + v,T210_V90,1.0167172,-0.45591911,-0.3123538,
+deixa uma condição de fora,Regressão 1 + v,T210_V95,2.0176051,-0.25928895,0.37784673,
+deixa uma condição de fora,Regressão 1 + v,T210_V100,0.61205643,0.77084282,0.21234204,
+deixa uma condição de fora,Regressão 1 + v,T220_V90,2.7503235,-2.7661679,0.27755051,
+deixa uma condição de fora,Regressão 1 + v,T220_V95,1.2719596,1.0261672,0.55962878,
+deixa uma condição de fora,Regressão 1 + v,T220_V100,1.877225,-0.59785984,0.19169189,
+deixa uma condição de fora,Regressão linear 1 + T + v,T190_V90,1.3048845,1.582259,0.1843471,
+deixa uma condição de fora,Regressão linear 1 + T + v,T190_V95,0.85197491,0.31000233,0.15674352,
+deixa uma condição de fora,Regressão linear 1 + T + v,T190_V100,0.56913003,0.19929802,-0.42071634,
+deixa uma condição de fora,Regressão linear 1 + T + v,T210_V90,1.258385,-0.40042178,-0.41703444,
+deixa uma condição de fora,Regressão linear 1 + T + v,T210_V95,1.8198893,-0.20053049,0.29918855,
+deixa uma condição de fora,Regressão linear 1 + T + v,T210_V100,0.56556553,0.8398412,0.11349135,
+deixa uma condição de fora,Regressão linear 1 + T + v,T220_V90,1.8355229,-3.0518094,-0.14904694,
+deixa uma condição de fora,Regressão linear 1 + T + v,T220_V95,0.77855982,1.5186327,0.27336258,
+deixa uma condição de fora,Regressão linear 1 + T + v,T220_V100,1.5280299,-0.53913165,-0.25322206,
+deixa uma condição de fora,Regressão 1 + T + v + T·v,T190_V90,1.1967468,-0.35920758,-0.024564854,
+deixa uma condição de fora,Regressão 1 + T + v + T·v,T190_V95,0.85197491,0.31000233,0.15674352,
+deixa uma condição de fora,Regressão 1 + T + v + T·v,T190_V100,1.2536328,1.4185252,-0.52281653,
+deixa uma condição de fora,Regressão 1 + T + v + T·v,T210_V90,1.3250381,-0.14067122,-0.39502484,
+deixa uma condição de fora,Regressão 1 + T + v + T·v,T210_V95,1.8198893,-0.20053049,0.29918855,
+deixa uma condição de fora,Regressão 1 + T + v + T·v,T210_V100,0.54699505,0.58624847,0.086336949,
+deixa uma condição de fora,Regressão 1 + T + v + T·v,T220_V90,1.8472233,-2.607494,-0.017351264,
+deixa uma condição de fora,Regressão 1 + T + v + T·v,T220_V95,0.77855982,1.5186327,0.27336258,
+deixa uma condição de fora,Regressão 1 + T + v + T·v,T220_V100,1.6179928,-2.8808678,-0.57422078,
+deixa uma condição de fora,Regressão 1 + T + v + v²,T190_V90,1.3542904,2.6453264,0.41268609,
+deixa uma condição de fora,Regressão 1 + T + v + v²,T190_V95,0.80949581,-1.5018786,-0.18180432,
+deixa uma condição de fora,Regressão 1 + T + v + v²,T190_V100,0.69073171,0.79952984,-0.26416454,
+deixa uma condição de fora,Regressão 1 + T + v + v²,T210_V90,1.189598,0.17740944,-0.30544011,
+deixa uma condição de fora,Regressão 1 + T + v + v²,T210_V95,1.6935154,-1.0587429,0.10658781,
+deixa uma condição de fora,Regressão 1 + T + v + v²,T210_V100,0.60024718,1.5212889,0.26982882,
+deixa uma condição de fora,Regressão 1 + T + v + v²,T220_V90,2.0560126,-2.6103196,0.014750738,
+deixa uma condição de fora,Regressão 1 + T + v + v²,T220_V95,1.0616352,0.87401452,0.027642155,
+deixa uma condição de fora,Regressão 1 + T + v + v²,T220_V100,1.4969334,0.10397903,-0.10014829,
+deixa uma condição de fora,Regressão quadrática completa,T190_V90,1.4590149,3.1818859,0.6560018,
+deixa uma condição de fora,Regressão quadrática completa,T190_V95,0.73714289,-1.3016555,-0.17985524,
+deixa uma condição de fora,Regressão quadrática completa,T190_V100,1.7828642,4.55943,-0.11157511,
+deixa uma condição de fora,Regressão quadrática completa,T210_V90,1.4884001,-0.25841329,-0.45397819,
+deixa uma condição de fora,Regressão quadrática completa,T210_V95,2.090905,-1.8632352,0.12291258,
+deixa uma condição de fora,Regressão quadrática completa,T210_V100,0.74483208,0.91471884,0.32768269,
+deixa uma condição de fora,Regressão quadrática completa,T220_V90,2.5433952,-1.4552759,0.39393057,
+deixa uma condição de fora,Regressão quadrática completa,T220_V95,1.3951619,1.7942716,0.05694266,
+deixa uma condição de fora,Regressão quadrática completa,T220_V100,1.5715655,-2.2199474,-0.49358023,
+deixa um nível inteiro de fora,Média global (referência ingênua),T190_V90,3.1534014,3.6795346,-0.25354025,
+deixa um nível inteiro de fora,Média global (referência ingênua),T190_V95,1.3545453,0.62263986,-0.43656647,
+deixa um nível inteiro de fora,Média global (referência ingênua),T190_V100,0.99797667,-1.1201847,-0.95986048,
+deixa um nível inteiro de fora,Média global (referência ingênua),T210_V90,1.5593332,2.4995891,0.013041107,
+deixa um nível inteiro de fora,Média global (referência ingênua),T210_V95,1.987975,-0.19205036,0.3798026,
+deixa um nível inteiro de fora,Média global (referência ingênua),T210_V100,1.2953686,-1.8855729,0.0026058585,
+deixa um nível inteiro de fora,Média global (referência ingênua),T220_V90,1.874225,0.40037165,0.53453512,
+deixa um nível inteiro de fora,Média global (referência ingênua),T220_V95,1.630485,0.6268144,0.63683866,
+deixa um nível inteiro de fora,Média global (referência ingênua),T220_V100,2.7559727,-3.1541161,0.083143872,
+deixa um nível inteiro de fora,Média global (referência ingênua),T190_V90,3.0977865,4.7551687,-0.021204564,
+deixa um nível inteiro de fora,Média global (referência ingênua),T210_V90,2.0944843,3.4331381,0.018108262,
+deixa um nível inteiro de fora,Média global (referência ingênua),T220_V90,1.3008184,1.7399811,0.44415026,
+deixa um nível inteiro de fora,Média global (referência ingênua),T190_V95,0.74149037,0.98668025,-0.15655765,
+deixa um nível inteiro de fora,Média global (referência ingênua),T210_V95,2.0436478,0.029904972,0.43254289,
+deixa um nível inteiro de fora,Média global (referência ingênua),T220_V95,1.2999626,1.2548302,0.59412694,
+deixa um nível inteiro de fora,Média global (referência ingênua),T190_V100,0.93401803,-2.6817495,-0.92221592,
+deixa um nível inteiro de fora,Média global (referência ingênua),T210_V100,1.6793005,-3.5892227,-0.18701811,
+deixa um nível inteiro de fora,Média global (referência ingênua),T220_V100,2.7178272,-4.4517055,-0.2019321,
+deixa um nível inteiro de fora,"Média ponderada gaussiana, ε = 1/distância média",T190_V90,2.3721011,2.5508476,-0.17184684,
+deixa um nível inteiro de fora,"Média ponderada gaussiana, ε = 1/distância média",T190_V95,0.96824265,0.16607542,-0.36555185,
+deixa um nível inteiro de fora,"Média ponderada gaussiana, ε = 1/distância média",T190_V100,0.93505432,-0.84719215,-0.8742678,
+deixa um nível inteiro de fora,"Média ponderada gaussiana, ε = 1/distância média",T210_V90,1.4862752,1.6339128,-0.14190368,
+deixa um nível inteiro de fora,"Média ponderada gaussiana, ε = 1/distância média",T210_V95,1.8386963,-0.24934277,0.30451884,
+deixa um nível inteiro de fora,"Média ponderada gaussiana, ε = 1/distância média",T210_V100,0.91442562,-1.0222278,0.024874867,
+deixa um nível inteiro de fora,"Média ponderada gaussiana, ε = 1/distância média",T220_V90,1.7292466,-0.48328449,0.32942174,
+deixa um nível inteiro de fora,"Média ponderada gaussiana, ε = 1/distância média",T220_V95,1.1496318,0.46493509,0.43250141,
+deixa um nível inteiro de fora,"Média ponderada gaussiana, ε = 1/distância média",T220_V100,2.0434569,-2.5428433,-0.096515476,
+deixa um nível inteiro de fora,"Média ponderada gaussiana, ε = 1/distância média",T190_V90,2.5668398,3.1894352,-0.11422605,
+deixa um nível inteiro de fora,"Média ponderada gaussiana, ε = 1/distância média",T210_V90,1.8722691,1.5637621,-0.26190501,
+deixa um nível inteiro de fora,"Média ponderada gaussiana, ε = 1/distância média",T220_V90,1.1743056,-0.2506723,0.092664641,
+deixa um nível inteiro de fora,"Média ponderada gaussiana, ε = 1/distância média",T190_V95,0.49692495,0.75292381,-0.053805013,
+deixa um nível inteiro de fora,"Média ponderada gaussiana, ε = 1/distância média",T210_V95,1.9472875,0.05921673,0.39441311,
+deixa um nível inteiro de fora,"Média ponderada gaussiana, ε = 1/distância média",T220_V95,1.0293764,1.4234814,0.49938057,
+deixa um nível inteiro de fora,"Média ponderada gaussiana, ε = 1/distância média",T190_V100,0.72875005,-1.82178,-0.83657719,
+deixa um nível inteiro de fora,"Média ponderada gaussiana, ε = 1/distância média",T210_V100,1.066653,-3.002779,-0.28455985,
+deixa um nível inteiro de fora,"Média ponderada gaussiana, ε = 1/distância média",T220_V100,2.0915516,-3.9754828,-0.3700865,
+deixa um nível inteiro de fora,"Média ponderada gaussiana, ε ajustado",T190_V90,2.8255287,3.2624604,-0.2094654,0.5
+deixa um nível inteiro de fora,"Média ponderada gaussiana, ε ajustado",T190_V95,1.1092158,0.37961136,-0.38871044,0.5
+deixa um nível inteiro de fora,"Média ponderada gaussiana, ε ajustado",T190_V100,0.87443539,-1.1846837,-0.90694518,0.5
+deixa um nível inteiro de fora,"Média ponderada gaussiana, ε ajustado",T210_V90,1.5158094,1.2778083,-0.22513598,1.4
+deixa um nível inteiro de fora,"Média ponderada gaussiana, ε ajustado",T210_V95,1.7373776,-0.32202284,0.24618158,1.4
+deixa um nível inteiro de fora,"Média ponderada gaussiana, ε ajustado",T210_V100,0.72092874,-0.55617425,0.028341043,1.4
+deixa um nível inteiro de fora,"Média ponderada gaussiana, ε ajustado",T220_V90,1.8211584,-0.84042995,0.3043318,1.4
+deixa um nível inteiro de fora,"Média ponderada gaussiana, ε ajustado",T220_V95,1.0288054,0.39489497,0.37569932,1.4
+deixa um nível inteiro de fora,"Média ponderada gaussiana, ε ajustado",T220_V100,1.84586,-2.2127933,-0.13531321,1.4
+deixa um nível inteiro de fora,"Média ponderada gaussiana, ε ajustado",T190_V90,2.1516347,3.4047235,0.087592322,2
+deixa um nível inteiro de fora,"Média ponderada gaussiana, ε ajustado",T210_V90,2.0702022,1.2988379,-0.36898979,2
+deixa um nível inteiro de fora,"Média ponderada gaussiana, ε ajustado",T220_V90,1.1203799,-0.58273961,-0.031584035,2
+deixa um nível inteiro de fora,"Média ponderada gaussiana, ε ajustado",T190_V95,0.6707358,0.52876081,0.10586428,2
+deixa um nível inteiro de fora,"Média ponderada gaussiana, ε ajustado",T210_V95,1.8221203,0.05740326,0.33532431,2
+deixa um nível inteiro de fora,"Média ponderada gaussiana, ε ajustado",T220_V95,0.83855293,1.6440267,0.41396591,2
+deixa um nível inteiro de fora,"Média ponderada gaussiana, ε ajustado",T190_V100,0.68279392,-1.6049287,-0.74923053,1.4
+deixa um nível inteiro de fora,"Média ponderada gaussiana, ε ajustado",T210_V100,0.98208238,-3.0143788,-0.32428766,1.4
+deixa um nível inteiro de fora,"Média ponderada gaussiana, ε ajustado",T220_V100,2.0097599,-4.0448575,-0.43198857,1.4
+deixa um nível inteiro de fora,"RBF gaussiana interpolante + constante, ε ajustado",T190_V90,3.1534014,3.6795347,-0.25354024,8
+deixa um nível inteiro de fora,"RBF gaussiana interpolante + constante, ε ajustado",T190_V95,1.3545453,0.6226399,-0.43656646,8
+deixa um nível inteiro de fora,"RBF gaussiana interpolante + constante, ε ajustado",T190_V100,0.99797667,-1.1201847,-0.95986047,8
+deixa um nível inteiro de fora,"RBF gaussiana interpolante + constante, ε ajustado",T210_V90,1.3238512,0.24231405,-0.3452981,1
+deixa um nível inteiro de fora,"RBF gaussiana interpolante + constante, ε ajustado",T210_V95,1.7301796,-1.6918754,0.0095370379,1
+deixa um nível inteiro de fora,"RBF gaussiana interpolante + constante, ε ajustado",T210_V100,0.60393785,1.6286947,0.24312629,1
+deixa um nível inteiro de fora,"RBF gaussiana interpolante + constante, ε ajustado",T220_V90,2.575301,-0.40881663,0.60300225,0.7
+deixa um nível inteiro de fora,"RBF gaussiana interpolante + constante, ε ajustado",T220_V95,0.82550877,0.079539482,0.24379948,0.7
+deixa um nível inteiro de fora,"RBF gaussiana interpolante + constante, ε ajustado",T220_V100,1.8894298,-1.6275654,-0.0743983,0.7
+deixa um nível inteiro de fora,"RBF gaussiana interpolante + constante, ε ajustado",T190_V90,2.7950156,4.8457593,0.09746064,1.4
+deixa um nível inteiro de fora,"RBF gaussiana interpolante + constante, ε ajustado",T210_V90,1.9598518,3.4340565,0.066734414,1.4
+deixa um nível inteiro de fora,"RBF gaussiana interpolante + constante, ε ajustado",T220_V90,1.3783729,1.6452215,0.46926844,1.4
+deixa um nível inteiro de fora,"RBF gaussiana interpolante + constante, ε ajustado",T190_V95,0.59502343,0.65557582,0.090438732,2
+deixa um nível inteiro de fora,"RBF gaussiana interpolante + constante, ε ajustado",T210_V95,2.1092027,-0.31017601,0.39973748,2
+deixa um nível inteiro de fora,"RBF gaussiana interpolante + constante, ε ajustado",T220_V95,0.818584,1.9698568,0.41279632,2
+deixa um nível inteiro de fora,"RBF gaussiana interpolante + constante, ε ajustado",T190_V100,0.85774641,-2.3526417,-0.88358738,1.4
+deixa um nível inteiro de fora,"RBF gaussiana interpolante + constante, ε ajustado",T210_V100,1.4714789,-3.4077425,-0.23223574,1.4
+deixa um nível inteiro de fora,"RBF gaussiana interpolante + constante, ε ajustado",T220_V100,2.5843724,-4.3716227,-0.26190866,1.4
+deixa um nível inteiro de fora,Spline de placa fina interpolante + plano,T190_V90,2.5124159,-0.26797187,0.6269068,
+deixa um nível inteiro de fora,Spline de placa fina interpolante + plano,T190_V95,2.8473082,-1.2566317,0.4725066,
+deixa um nível inteiro de fora,Spline de placa fina interpolante + plano,T190_V100,2.3266117,-0.73714042,0.03240692,
+deixa um nível inteiro de fora,Spline de placa fina interpolante + plano,T210_V90,1.3103705,0.4299836,-0.30489993,
+deixa um nível inteiro de fora,Spline de placa fina interpolante + plano,T210_V95,1.7795952,-1.3142709,0.10085797,
+deixa um nível inteiro de fora,Spline de placa fina interpolante + plano,T210_V100,0.58450184,1.1441086,0.21475523,
+deixa um nível inteiro de fora,Spline de placa fina interpolante + plano,T220_V90,2.185596,-1.6889913,0.24468744,
+deixa um nível inteiro de fora,Spline de placa fina interpolante + plano,T220_V95,0.72319566,0.36303869,0.18367279,
+deixa um nível inteiro de fora,Spline de placa fina interpolante + plano,T220_V100,1.5087286,-0.84057966,-0.19482246,
+deixa um nível inteiro de fora,Spline de placa fina interpolante + plano,T190_V90,1.3261243,-0.52490224,-0.29661928,
+deixa um nível inteiro de fora,Spline de placa fina interpolante + plano,T210_V90,1.2880381,-2.6360795,-0.76433166,
+deixa um nível inteiro de fora,Spline de placa fina interpolante + plano,T220_V90,1.8984994,-4.6774805,-0.55763604,
+deixa um nível inteiro de fora,Spline de placa fina interpolante + plano,T190_V95,0.89315589,0.35370194,0.17139135,
+deixa um nível inteiro de fora,Spline de placa fina interpolante + plano,T210_V95,2.0699211,-0.3711931,0.37124811,
+deixa um nível inteiro de fora,Spline de placa fina interpolante + plano,T220_V95,0.83080057,2.0354824,0.32953539,
+deixa um nível inteiro de fora,Spline de placa fina interpolante + plano,T190_V100,0.58934111,0.088517338,-0.53397235,
+deixa um nível inteiro de fora,Spline de placa fina interpolante + plano,T210_V100,0.60561476,-1.418398,-0.29403555,
+deixa um nível inteiro de fora,Spline de placa fina interpolante + plano,T220_V100,1.584788,-2.5460135,-0.54116446,
+deixa um nível inteiro de fora,"Spline de placa fina suavizante + plano, λ ajustado",T190_V90,1.2678303,-0.47709441,0.10827959,10000
+deixa um nível inteiro de fora,"Spline de placa fina suavizante + plano, λ ajustado",T190_V95,1.2680054,-1.4076415,0.040705117,10000
+deixa um nível inteiro de fora,"Spline de placa fina suavizante + plano, λ ajustado",T190_V100,0.92572558,-1.0241123,-0.36713565,10000
+deixa um nível inteiro de fora,"Spline de placa fina suavizante + plano, λ ajustado",T210_V90,1.191505,-0.26897901,-0.38395714,10000
+deixa um nível inteiro de fora,"Spline de placa fina suavizante + plano, λ ajustado",T210_V95,1.7223082,-0.10408871,0.27222454,10000
+deixa um nível inteiro de fora,"Spline de placa fina suavizante + plano, λ ajustado",T210_V100,0.5682353,1.0589982,0.18445997,10000
+deixa um nível inteiro de fora,"Spline de placa fina suavizante + plano, λ ajustado",T220_V90,2.185596,-1.6889913,0.24468744,0
+deixa um nível inteiro de fora,"Spline de placa fina suavizante + plano, λ ajustado",T220_V95,0.72319566,0.36303869,0.18367279,0
+deixa um nível inteiro de fora,"Spline de placa fina suavizante + plano, λ ajustado",T220_V100,1.5087286,-0.84057966,-0.19482246,0
+deixa um nível inteiro de fora,"Spline de placa fina suavizante + plano, λ ajustado",T190_V90,1.5026104,-0.53501374,-0.31923885,10000
+deixa um nível inteiro de fora,"Spline de placa fina suavizante + plano, λ ajustado",T210_V90,1.5426496,-2.440999,-0.79479497,10000
+deixa um nível inteiro de fora,"Spline de placa fina suavizante + plano, λ ajustado",T220_V90,1.6343959,-4.4261306,-0.62618658,10000
+deixa um nível inteiro de fora,"Spline de placa fina suavizante + plano, λ ajustado",T190_V95,0.92217386,0.29869316,0.17183908,10000
+deixa um nível inteiro de fora,"Spline de placa fina suavizante + plano, λ ajustado",T210_V95,1.8483643,0.167491,0.36686363,10000
+deixa um nível inteiro de fora,"Spline de placa fina suavizante + plano, λ ajustado",T220_V95,0.79040378,1.8052258,0.33140951,10000
+deixa um nível inteiro de fora,"Spline de placa fina suavizante + plano, λ ajustado",T190_V100,0.72207528,-0.12665369,-0.62888036,0.3
+deixa um nível inteiro de fora,"Spline de placa fina suavizante + plano, λ ajustado",T210_V100,0.81348012,-1.2978536,-0.36101543,0.3
+deixa um nível inteiro de fora,"Spline de placa fina suavizante + plano, λ ajustado",T220_V100,1.6777055,-2.2502801,-0.6051202,0.3
+deixa um nível inteiro de fora,Regressão 1 + v,T190_V90,2.3528421,1.5531866,-0.36899687,
+deixa um nível inteiro de fora,Regressão 1 + v,T190_V95,1.3545453,0.62263986,-0.43656647,
+deixa um nível inteiro de fora,Regressão 1 + v,T190_V100,1.7545199,1.0061633,-0.84440386,
+deixa um nível inteiro de fora,Regressão 1 + v,T210_V90,0.94940031,-0.35700179,-0.27638676,
+deixa um nível inteiro de fora,Regressão 1 + v,T210_V95,1.987975,-0.19205036,0.3798026,
+deixa um nível inteiro de fora,Regressão 1 + v,T210_V100,0.71843403,0.97101801,0.29203373,
+deixa um nível inteiro de fora,Regressão 1 + v,T220_V90,2.8381485,-2.5282859,0.35534624,
+deixa um nível inteiro de fora,Regressão 1 + v,T220_V95,1.630485,0.6268144,0.63683866,
+deixa um nível inteiro de fora,Regressão 1 + v,T220_V100,1.8789276,-0.22545848,0.26233274,
+deixa um nível inteiro de fora,Regressão 1 + v,T190_V90,2.189976,-1.0216469,-0.74829733,
+deixa um nível inteiro de fora,Regressão 1 + v,T210_V90,1.3944693,-2.3436774,-0.7089845,
+deixa um nível inteiro de fora,Regressão 1 + v,T220_V90,1.9034405,-4.0368344,-0.2829425,
+deixa um nível inteiro de fora,Regressão 1 + v,T190_V95,0.74149037,0.98668025,-0.15655765,
+deixa um nível inteiro de fora,Regressão 1 + v,T210_V95,2.0436478,0.029904972,0.43254289,
+deixa um nível inteiro de fora,Regressão 1 + v,T220_V95,1.2999626,1.2548302,0.59412694,
+deixa um nível inteiro de fora,Regressão 1 + v,T190_V100,1.7177912,-0.54696852,-1.0652353,
+deixa um nível inteiro de fora,Regressão 1 + v,T210_V100,0.76478016,-1.4544418,-0.33003751,
+deixa um nível inteiro de fora,Regressão 1 + v,T220_V100,1.5916556,-2.3169245,-0.34495151,
+deixa um nível inteiro de fora,Regressão linear 1 + T + v,T190_V90,1.2678208,-0.47711573,0.10826317,
+deixa um nível inteiro de fora,Regressão linear 1 + T + v,T190_V95,1.2679783,-1.4076625,0.040693573,
+deixa um nível inteiro de fora,Regressão linear 1 + T + v,T190_V100,0.92571331,-1.024139,-0.36714381,
+deixa um nível inteiro de fora,Regressão linear 1 + T + v,T210_V90,1.1914994,-0.26900999,-0.38396028,
+deixa um nível inteiro de fora,Regressão linear 1 + T + v,T210_V95,1.7223082,-0.10405856,0.27222908,
+deixa um nível inteiro de fora,Regressão linear 1 + T + v,T210_V100,0.56823518,1.0590098,0.18446021,
+deixa um nível inteiro de fora,Regressão linear 1 + T + v,T220_V90,1.7835698,-2.8124561,-0.099190814,
+deixa um nível inteiro de fora,Regressão linear 1 + T + v,T220_V95,0.72371982,0.34264428,0.1823016,
+deixa um nível inteiro de fora,Regressão linear 1 + T + v,T220_V100,1.5083236,-0.50962861,-0.19220432,
+deixa um nível inteiro de fora,Regressão linear 1 + T + v,T190_V90,1.5026117,-0.53502991,-0.31923947,
+deixa um nível inteiro de fora,Regressão linear 1 + T + v,T210_V90,1.5426548,-2.4410008,-0.79479608,
+deixa um nível inteiro de fora,Regressão linear 1 + T + v,T220_V90,1.6343934,-4.426128,-0.62618879,
+deixa um nível inteiro de fora,Regressão linear 1 + T + v,T190_V95,0.92217449,0.29869197,0.17183909,
+deixa um nível inteiro de fora,Regressão linear 1 + T + v,T210_V95,1.84836,0.16750263,0.36686354,
+deixa um nível inteiro de fora,Regressão linear 1 + T + v,T220_V95,0.79040318,1.8052208,0.33140955,
+deixa um nível inteiro de fora,Regressão linear 1 + T + v,T190_V100,0.70880094,-0.99832329,-0.73829657,
+deixa um nível inteiro de fora,Regressão linear 1 + T + v,T210_V100,0.93907336,-1.3641708,-0.39542526,
+deixa um nível inteiro de fora,Regressão linear 1 + T + v,T220_V100,1.7852108,-1.9558407,-0.60650251,
+deixa um nível inteiro de fora,Regressão 1 + T + v + T·v,T190_V90,2.4226655,-0.83744915,0.65945817,
+deixa um nível inteiro de fora,Regressão 1 + T + v + T·v,T190_V95,1.2679783,-1.4076625,0.040693573,
+deixa um nível inteiro de fora,Regressão 1 + T + v + T·v,T190_V100,1.3132848,-0.66380561,-0.91833881,
+deixa um nível inteiro de fora,Regressão 1 + T + v + T·v,T210_V90,1.2611469,-0.0015734675,-0.36271619,
+deixa um nível inteiro de fora,Regressão 1 + T + v + T·v,T210_V95,1.7223082,-0.10405856,0.27222908,
+deixa um nível inteiro de fora,Regressão 1 + T + v + T·v,T210_V100,0.57419241,0.79157329,0.16321613,
+deixa um nível inteiro de fora,Regressão 1 + T + v + T·v,T220_V90,1.873814,-1.3519703,0.24875168,
+deixa um nível inteiro de fora,Regressão 1 + T + v + T·v,T220_V95,0.72371982,0.34264428,0.1823016,
+deixa um nível inteiro de fora,Regressão 1 + T + v + T·v,T220_V100,1.6108599,-1.9701144,-0.54014681,
+deixa um nível inteiro de fora,Regressão 1 + T + v + T·v,T190_V90,1.6756684,0.17487063,-0.32361343,
+deixa um nível inteiro de fora,Regressão 1 + T + v + T·v,T210_V90,1.517283,-2.5829809,-0.79392128,
+deixa um nível inteiro de fora,Regressão 1 + T + v + T·v,T220_V90,1.8149901,-4.9940484,-0.62268962,
+deixa um nível inteiro de fora,Regressão 1 + T + v + T·v,T190_V95,0.92217449,0.29869197,0.17183909,
+deixa um nível inteiro de fora,Regressão 1 + T + v + T·v,T210_V95,1.84836,0.16750263,0.36686354,
+deixa um nível inteiro de fora,Regressão 1 + T + v + T·v,T220_V95,0.79040318,1.8052208,0.33140955,
+deixa um nível inteiro de fora,Regressão 1 + T + v + T·v,T190_V100,1.7299441,2.5254924,-0.43631322,
+deixa um nível inteiro de fora,Regressão 1 + T + v + T·v,T210_V100,0.85081957,-2.0689339,-0.45582193,
+deixa um nível inteiro de fora,Regressão 1 + T + v + T·v,T220_V100,1.9202948,-4.7748932,-0.84808919,
+deixa um nível inteiro de fora,Regressão 1 + T + v + v²,T190_V90,1.2739923,0.12616758,0.22492622,
+deixa um nível inteiro de fora,Regressão 1 + T + v + v²,T190_V95,1.2602094,-2.6142291,-0.19263252,
+deixa um nível inteiro de fora,Regressão 1 + T + v + v²,T190_V100,0.94014044,-0.42085572,-0.25048077,
+deixa um nível inteiro de fora,Regressão 1 + T + v + v²,T210_V90,1.1856985,0.19840018,-0.3009381,
+deixa um nível inteiro de fora,Regressão 1 + T + v + v²,T210_V95,1.6848596,-1.0388789,0.10618473,
+deixa um nível inteiro de fora,Regressão 1 + T + v + v²,T210_V100,0.59958714,1.52642,0.26748239,
+deixa um nível inteiro de fora,Regressão 1 + T + v + v²,T220_V90,1.962535,-2.669138,-0.0088386467,
+deixa um nível inteiro de fora,Regressão 1 + T + v + v²,T220_V95,0.83075889,0.056008211,0.0015972621,
+deixa um nível inteiro de fora,Regressão 1 + T + v + v²,T220_V100,1.4943363,-0.36631058,-0.10185215,
+deixa um nível inteiro de fora,Regressão 1 + T + v + v²,T190_V90,,,,
+deixa um nível inteiro de fora,Regressão 1 + T + v + v²,T210_V90,,,,
+deixa um nível inteiro de fora,Regressão 1 + T + v + v²,T220_V90,,,,
+deixa um nível inteiro de fora,Regressão 1 + T + v + v²,T190_V95,,,,
+deixa um nível inteiro de fora,Regressão 1 + T + v + v²,T210_V95,,,,
+deixa um nível inteiro de fora,Regressão 1 + T + v + v²,T220_V95,,,,
+deixa um nível inteiro de fora,Regressão 1 + T + v + v²,T190_V100,,,,
+deixa um nível inteiro de fora,Regressão 1 + T + v + v²,T210_V100,,,,
+deixa um nível inteiro de fora,Regressão 1 + T + v + v²,T220_V100,,,,
+deixa um nível inteiro de fora,Regressão quadrática completa,T190_V90,,,,
+deixa um nível inteiro de fora,Regressão quadrática completa,T190_V95,,,,
+deixa um nível inteiro de fora,Regressão quadrática completa,T190_V100,,,,
+deixa um nível inteiro de fora,Regressão quadrática completa,T210_V90,,,,
+deixa um nível inteiro de fora,Regressão quadrática completa,T210_V95,,,,
+deixa um nível inteiro de fora,Regressão quadrática completa,T210_V100,,,,
+deixa um nível inteiro de fora,Regressão quadrática completa,T220_V90,,,,
+deixa um nível inteiro de fora,Regressão quadrática completa,T220_V95,,,,
+deixa um nível inteiro de fora,Regressão quadrática completa,T220_V100,,,,
+deixa um nível inteiro de fora,Regressão quadrática completa,T190_V90,,,,
+deixa um nível inteiro de fora,Regressão quadrática completa,T210_V90,,,,
+deixa um nível inteiro de fora,Regressão quadrática completa,T220_V90,,,,
+deixa um nível inteiro de fora,Regressão quadrática completa,T190_V95,,,,
+deixa um nível inteiro de fora,Regressão quadrática completa,T210_V95,,,,
+deixa um nível inteiro de fora,Regressão quadrática completa,T220_V95,,,,
+deixa um nível inteiro de fora,Regressão quadrática completa,T190_V100,,,,
+deixa um nível inteiro de fora,Regressão quadrática completa,T210_V100,,,,
+deixa um nível inteiro de fora,Regressão quadrática completa,T220_V100,,,,

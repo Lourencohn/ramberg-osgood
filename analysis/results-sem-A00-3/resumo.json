@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-10-09T14:59:36.126Z",
+  "gerado_em": "2026-10-22T21:20:53.713Z",
   "excluidos": [
     "A00-3"
   ],
@@ -34,41 +34,94 @@
   },
   "validacao_cruzada": {
     "tensao_max_curva": {
-      "mae": 1.287109385442275,
-      "rmse": 1.5506826892742456,
-      "maePct": 2.9292085409542126
+      "mae": 0.9293853440842091,
+      "rmse": 1.3372144061650797,
+      "maePct": 2.1150987775554753
     },
-    "tensao_max_rbf": {
-      "mae": 1.2813109855929588,
-      "rmse": 1.5465289285943145,
-      "maePct": 2.9160125200451983
+    "tensao_max_direta": {
+      "mae": 0.6126871826508875,
+      "rmse": 0.845077607236048,
+      "maePct": 1.3943558711115018
     },
     "tensao_max_parametros": {
-      "mae": 4.864337015639334,
-      "rmse": 5.228220597688634,
-      "maePct": 11.070277082467513
+      "mae": 4.601887511768934,
+      "rmse": 5.472015737024119,
+      "maePct": 10.47299348170952
     },
     "tensao_max_media_das_outras_mae": 1.7100631732496447,
-    "modulo_rbf_mae": 24.20498492361546,
-    "modulo_rbf_mae_pct": 4.196253807349761,
+    "modulo_direto_mae": 19.755385978205723,
+    "modulo_direto_mae_pct": 3.4248570651176182,
     "parametros_erro_relativo_pct": {
-      "E": 10.784129139667996,
-      "sigma0": 212.3888665429715,
-      "n": 59.110287119898295
+      "E": 11.364377362006506,
+      "sigma0": 242.11921887318977,
+      "n": 108.28205514385057
     },
-    "rmse_curva_prevista_medio_mpa": 1.2643286928408484,
+    "rmse_curva_prevista_medio_mpa": 1.0661445900590896,
     "rmse_curva_ajustada_medio_mpa": 0.8270968545368396
+  },
+  "metamodelos": {
+    "modelo_adotado": "Regressão linear 1 + T + v",
+    "modelo_anterior": "Média ponderada gaussiana, ε = 1/distância média",
+    "testes_pareados": [
+      {
+        "esquema": "deixa uma condição de fora",
+        "previsoes": 9,
+        "melhores_rmse_curva": 7,
+        "wilcoxon_p_rmse_curva": 0.30078125,
+        "melhores_tensao_max": 6,
+        "wilcoxon_p_tensao_max": 0.42578125
+      },
+      {
+        "esquema": "deixa um nível inteiro de fora",
+        "previsoes": 18,
+        "melhores_rmse_curva": 14,
+        "wilcoxon_p_rmse_curva": 0.0736846923828125,
+        "melhores_tensao_max": 10,
+        "wilcoxon_p_tensao_max": 0.7337265014648438
+      }
+    ],
+    "selecao_aninhada": {
+      "rmse_curva_medio_mpa": 1.3379960510229216,
+      "escolhas": {
+        "Regressão linear 1 + T + v": 6,
+        "Média ponderada gaussiana, ε ajustado": 1,
+        "Regressão 1 + T + v + v²": 2
+      }
+    },
+    "condicoes_ensaiadas": {
+      "rmse_curva_condicao_mpa": 1.7016806519110448,
+      "rmse_curva_regressao_mpa": 1.1878903066130029,
+      "corpos_de_prova": 44,
+      "regressao_melhor_em": 31,
+      "wilcoxon_p": 0.0003109193568271426
+    },
+    "dominio_validado": {
+      "temperatura_c": [
+        180,
+        230
+      ],
+      "velocidade_mm_s": [
+        85,
+        105
+      ],
+      "alavancagem_maxima_no_dominio": 1.2857142857142856,
+      "alavancagem_maxima_validada": 4.583333333333333
+    },
+    "modulo_mae_mpa": {
+      "adotado": 20.326214248822705,
+      "anterior": 20.0304207432459
+    }
   },
   "exemplo": {
     "entrada": {
       "temperatura_c": 205,
       "velocidade_mm_s": 97
     },
-    "E_mpa": 663.2581522621148,
-    "sigma0_mpa": 10.403274295376185,
-    "n": 1.1179481331118335,
-    "deformacao_max": 0.07674938836737787,
-    "tensao_na_deformacao_max_mpa": 44.24500040031956,
-    "tensao_max_rbf_direta_mpa": 44.273685846723055
+    "E_mpa": 585.8067070103908,
+    "sigma0_mpa": 53.940970521322875,
+    "n": 2.693930190771436,
+    "deformacao_max": 0.07792553769366088,
+    "tensao_na_deformacao_max_mpa": 44.96603700696106,
+    "tensao_max_direta_mpa": 44.668502539870275
   }
 }

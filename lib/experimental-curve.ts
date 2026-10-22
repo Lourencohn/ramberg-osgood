@@ -84,6 +84,43 @@ export function buildExperimentalRun(
   }
 }
 
+function predictEstimate(
+  input: PredictionInput,
+  profiles: RambergOsgoodTrainingPoint[],
+  read: (run: ExperimentalRun) => number | null
+): Estimate | null {
+  const groups = profiles
+    .map((profile) => ({
+      profile,
+      values: (profile.runs ?? [])
+        .map(read)
+        .filter((value): value is number => value !== null && Number.isFinite(value)),
+    }))
+    .filter((group) => group.values.length)
+  if (!groups.length) return null
+
+  const weights = profileWeights(
+    input,
+    groups.map((group) => group.profile)
+  )
+  const means = groups.map(
+    (group) => group.values.reduce((sum, value) => sum + value, 0) / group.values.length
+  )
+  const mean = means.reduce((sum, value, index) => sum + weights[index] * value, 0)
+  const replicateDegrees = groups.reduce((sum, group) => sum + group.values.length - 1, 0)
+  const replicateSquares = groups.reduce(
+    (sum, group, index) =>
+      sum + group.values.reduce((acc, value) => acc + (value - means[index]) ** 2, 0),
+    0
+  )
+  const replicateVariance = replicateDegrees > 0 ? replicateSquares / replicateDegrees : 0
+  const estimateVarianceFactor = groups.reduce(
+    (sum, group, index) => sum + weights[index] ** 2 / group.values.length,
+    0
+  )
+  return { mean, deviation: Math.sqrt(replicateVariance * (1 + estimateVarianceFactor)) }
+}
+
 export function predictExperimentalCurve(
   input: PredictionInput,
   trainingData: RambergOsgoodTrainingPoint[]
@@ -91,46 +128,34 @@ export function predictExperimentalCurve(
   const profiles = trainingData.filter((profile) => profile.runs?.length)
   if (!profiles.length) return null
 
-  const weights = profileWeights(input, profiles)
-  const weightSum = weights.reduce((sum, weight) => sum + weight, 0)
-  if (!(weightSum > 0)) return null
-
-  const runs = profiles.flatMap((profile, index) => {
-    const profileRuns = profile.runs ?? []
-    return profileRuns.map((run) => ({
-      run,
-      weight: weights[index] / profileRuns.length,
-    }))
-  })
-
-  const estimate = (entries: typeof runs, read: (run: ExperimentalRun) => number): Estimate => {
-    const total = entries.reduce((sum, entry) => sum + entry.weight, 0)
-    const mean = entries.reduce((sum, entry) => sum + entry.weight * read(entry.run), 0) / total
-    const variance =
-      entries.reduce((sum, entry) => sum + entry.weight * (read(entry.run) - mean) ** 2, 0) / total
-    return { mean, deviation: Math.sqrt(variance) }
-  }
-
+  const estimate = (read: (run: ExperimentalRun) => number | null) =>
+    predictEstimate(input, profiles, read)
   const lastIndex = NORMALIZED_POINTS - 1
-  const peakStrain = estimate(runs, (run) => run.peakStrain)
+  const peakStrain = estimate((run) => run.peakStrain)
+  const ultimateStress = estimate((run) => run.normalizedStress[lastIndex])
+  if (!peakStrain || !ultimateStress || !(peakStrain.mean > 0)) return null
+
   const curve = Array.from({ length: NORMALIZED_POINTS }, (_, index) => {
-    const { mean, deviation } = estimate(runs, (run) => run.normalizedStress[index])
+    const { mean, deviation } = estimate((run) => run.normalizedStress[index]) ?? {
+      mean: 0,
+      deviation: 0,
+    }
     return { strain: (index / lastIndex) * peakStrain.mean, stress: mean, deviation }
   })
-  const runsWithModulus = runs.filter((entry) => entry.run.modulus !== null)
+  const weights = profileWeights(input, profiles)
 
   return {
     curve,
-    ultimateStress: estimate(runs, (run) => run.normalizedStress[lastIndex]),
+    ultimateStress,
     peakStrain,
-    modulus: runsWithModulus.length ? estimate(runsWithModulus, (run) => run.modulus ?? 0) : null,
+    modulus: estimate((run) => run.modulus),
     toughness: calculatePropertiesFromCurve(curve).toughness,
     sources: profiles
       .map((profile, index) => ({
         profile: profile.profile,
         temperature: profile.temperature,
         speed: profile.speed,
-        weight: weights[index] / weightSum,
+        weight: weights[index],
       }))
       .sort((a, b) => b.weight - a.weight),
   }

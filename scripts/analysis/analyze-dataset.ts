@@ -7,11 +7,12 @@ import {
 } from '@/lib/tensile-processing'
 import { fitRambergOsgoodCurve, seedFromString } from '@/lib/ramberg-osgood-fit'
 import { buildTrainingPoint, downsample } from '@/lib/training-data'
-import { rbfInterpolateScalar, rbfInterpolation } from '@/lib/metamodel'
+import { predictParameters, predictScalar } from '@/lib/metamodel'
 import { predictProperties } from '@/lib/prediction'
 import { calculateStress } from '@/lib/ramberg-osgood'
 import type { RambergOsgoodTrainingPoint, StressStrainPoint } from '@/types'
 import { mean, sampleStd, twoWayAnova } from './stats'
+import { compareMetamodels } from './metamodel-comparison'
 
 const ROOT = path.resolve(__dirname, '..', '..')
 const DATA_DIR = path.join(ROOT, 'data')
@@ -379,17 +380,17 @@ async function crossValidation() {
         )!
         return mean(byCondition(c).map(getter))
       })
-    const directStress = rbfInterpolateScalar(
+    const directStress = predictScalar(
       input,
       train,
       means((r) => r.processed.properties.maxStress)
     )
-    const directModulus = rbfInterpolateScalar(
+    const directModulus = predictScalar(
       input,
       train,
       means((r) => r.processed.properties.apparentModulus)
     )
-    const paramInterpolation = rbfInterpolation(input, train)
+    const paramInterpolation = predictParameters(input, train)
     const paramStress = calculateStress(paramInterpolation.maxStrain, paramInterpolation)
     const predictedPoint = { ...left, ...prediction.rambergOsgood, maxStrain: left.maxStrain }
     rows.push({
@@ -398,10 +399,10 @@ async function crossValidation() {
       velocidade_mm_s: left.speed,
       tensao_max_real_mpa: mean(group.map((r) => r.processed.properties.maxStress)),
       tensao_max_prevista_curva_mpa: prediction.properties.ultimateStress,
-      tensao_max_prevista_rbf_mpa: directStress,
+      tensao_max_prevista_direta_mpa: directStress,
       tensao_max_prevista_parametros_mpa: paramStress,
       modulo_real_mpa: mean(group.map((r) => r.processed.properties.apparentModulus)),
-      modulo_previsto_rbf_mpa: directModulus,
+      modulo_previsto_direto_mpa: directModulus,
       E_ajustado_mpa: left.E,
       E_previsto_mpa: prediction.rambergOsgood.E,
       sigma0_ajustado_mpa: left.sigma_0,
@@ -448,15 +449,15 @@ async function crossValidation() {
     return Math.abs(mean(others) - Number(row.tensao_max_real_mpa))
   })
   const modulusErrors = rows.map((row) =>
-    Math.abs(Number(row.modulo_previsto_rbf_mpa) - Number(row.modulo_real_mpa))
+    Math.abs(Number(row.modulo_previsto_direto_mpa) - Number(row.modulo_real_mpa))
   )
   return {
     tensao_max_curva: error('tensao_max_prevista_curva_mpa'),
-    tensao_max_rbf: error('tensao_max_prevista_rbf_mpa'),
+    tensao_max_direta: error('tensao_max_prevista_direta_mpa'),
     tensao_max_parametros: error('tensao_max_prevista_parametros_mpa'),
     tensao_max_media_das_outras_mae: mean(naive),
-    modulo_rbf_mae: mean(modulusErrors),
-    modulo_rbf_mae_pct:
+    modulo_direto_mae: mean(modulusErrors),
+    modulo_direto_mae_pct:
       (100 * mean(modulusErrors)) / mean(rows.map((row) => Number(row.modulo_real_mpa))),
     parametros_erro_relativo_pct: {
       E: relative('E_ajustado_mpa', 'E_previsto_mpa'),
@@ -485,7 +486,7 @@ async function responseSurface() {
         temperatura_c: input.temperature,
         velocidade_mm_s: input.speed,
         tensao_max_curva_mpa: prediction.properties.ultimateStress,
-        tensao_max_rbf_mpa: rbfInterpolateScalar(input, coordinates, stressMeans),
+        tensao_max_direta_mpa: predictScalar(input, coordinates, stressMeans),
         E_mpa: prediction.rambergOsgood.E,
         sigma0_mpa: prediction.rambergOsgood.sigma_0,
         n: prediction.rambergOsgood.n,
@@ -506,11 +507,7 @@ async function responseSurface() {
     n: example.rambergOsgood.n,
     deformacao_max: example.curve[example.curve.length - 1].strain,
     tensao_na_deformacao_max_mpa: example.properties.ultimateStress,
-    tensao_max_rbf_direta_mpa: rbfInterpolateScalar(
-      { temperature: 205, speed: 97 },
-      coordinates,
-      stressMeans
-    ),
+    tensao_max_direta_mpa: predictScalar({ temperature: 205, speed: 97 }, coordinates, stressMeans),
   }
 }
 
@@ -562,9 +559,33 @@ function exportCurves() {
   writeCsv(path.join(OUT_DIR, 'curvas', 'ajustes_por_condicao.csv'), trainingCurves)
 }
 
+function metamodelComparison() {
+  const comparison = compareMetamodels(
+    results.map(({ specimen, processed }) => ({
+      code: specimen.code,
+      profile: specimen.profile,
+      temperature: specimen.temperature,
+      speed: specimen.speed,
+      ascending: processed.ascending,
+      maxStress: processed.properties.maxStress,
+      apparentModulus: processed.properties.apparentModulus,
+      toughness: processed.properties.toughness,
+    })),
+    trainingData
+  )
+  writeCsv(path.join(OUT_DIR, 'metamodelos_resumo.csv'), comparison.summaryRows)
+  writeCsv(path.join(OUT_DIR, 'metamodelos_por_condicao.csv'), comparison.foldRows)
+  writeCsv(path.join(OUT_DIR, 'metamodelos_selecao_aninhada.csv'), comparison.nestedRows)
+  writeCsv(path.join(OUT_DIR, 'metamodelos_ensaiadas.csv'), comparison.testedConditionRows)
+  writeCsv(path.join(OUT_DIR, 'falta_de_ajuste.csv'), comparison.lackOfFitRows)
+  writeCsv(path.join(OUT_DIR, 'homogeneidade_variancias.csv'), comparison.varianceRows)
+  return comparison.summary
+}
+
 async function main() {
   exportCurves()
   const cv = await crossValidation()
+  const metamodels = metamodelComparison()
   const example = await responseSurface()
   const all = results.map((r) => r.processed.properties)
   const summary = {
@@ -600,6 +621,7 @@ async function main() {
       max: Math.max(...conditionRows.map((r) => r.ro_r2_medio)),
     },
     validacao_cruzada: cv,
+    metamodelos: metamodels,
     exemplo: example,
   }
   fs.writeFileSync(path.join(OUT_DIR, 'resumo.json'), JSON.stringify(summary, null, 2) + '\n')

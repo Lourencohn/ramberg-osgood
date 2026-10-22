@@ -42,7 +42,7 @@ export default async function DashboardPage() {
     {
       caption: 'Modelo ativo',
       value: 'R.O',
-      hint: 'Ramberg-Osgood com RBF',
+      hint: 'Ramberg-Osgood com regressão linear',
     },
   ]
 

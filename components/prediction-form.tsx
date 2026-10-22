@@ -6,7 +6,12 @@ import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { DEFAULT_LIMITS, type PredictionLimits } from '@/lib/validation'
+import {
+  DEFAULT_LIMITS,
+  testedLimits,
+  validatedLimits,
+  type PredictionLimits,
+} from '@/lib/validation'
 import { predictProperties } from '@/lib/prediction'
 import { useSettings } from '@/components/settings-provider'
 import {
@@ -34,6 +39,9 @@ const speedFormatter = new Intl.NumberFormat('pt-BR', {
   maximumFractionDigits: 1,
 })
 
+const formatRange = (min: number, max: number, unit: string, formatter: Intl.NumberFormat) =>
+  `${formatter.format(min)} a ${formatter.format(max)} ${unit}`
+
 export function PredictionForm({ trainingData, onResult }: PredictionFormProps) {
   const { settings } = useSettings()
   const unitLabels = getUnitLabels(settings.unitSystem)
@@ -41,20 +49,25 @@ export function PredictionForm({ trainingData, onResult }: PredictionFormProps) 
   const [speed, setSpeed] = useState('95')
   const [errors, setErrors] = useState<string[]>([])
   const [isCalculating, setIsCalculating] = useState(false)
-  const limits = useMemo<PredictionLimits>(() => {
-    if (!trainingData.length) return DEFAULT_LIMITS
-    const temps = trainingData
-      .map((point) => point.temperature)
-      .filter((value) => Number.isFinite(value) && value > 0)
-    const speeds = trainingData
-      .map((point) => point.speed)
-      .filter((value) => Number.isFinite(value) && value > 0)
-    if (!temps.length || !speeds.length) return DEFAULT_LIMITS
-    return {
-      temperature: { min: Math.min(...temps), max: Math.max(...temps) },
-      speed: { min: Math.min(...speeds), max: Math.max(...speeds) },
-    }
-  }, [trainingData])
+  const processPoints = useMemo(
+    () =>
+      trainingData.filter(
+        (point) =>
+          Number.isFinite(point.temperature) &&
+          point.temperature > 0 &&
+          Number.isFinite(point.speed) &&
+          point.speed > 0
+      ),
+    [trainingData]
+  )
+  const limits = useMemo<PredictionLimits>(
+    () => (processPoints.length ? validatedLimits(processPoints) : DEFAULT_LIMITS),
+    [processPoints]
+  )
+  const tested = useMemo<PredictionLimits>(
+    () => (processPoints.length ? testedLimits(processPoints) : DEFAULT_LIMITS),
+    [processPoints]
+  )
 
   const displayLimits = useMemo(
     () => ({
@@ -70,6 +83,19 @@ export function PredictionForm({ trainingData, onResult }: PredictionFormProps) 
       },
     }),
     [limits, settings.unitSystem]
+  )
+
+  const testedTemperatureRange = formatRange(
+    convertTemperature(tested.temperature.min, settings.unitSystem) ?? tested.temperature.min,
+    convertTemperature(tested.temperature.max, settings.unitSystem) ?? tested.temperature.max,
+    unitLabels.temperature,
+    tempFormatter
+  )
+  const testedSpeedRange = formatRange(
+    convertSpeed(tested.speed.min, settings.unitSystem) ?? tested.speed.min,
+    convertSpeed(tested.speed.max, settings.unitSystem) ?? tested.speed.max,
+    unitLabels.speed,
+    speedFormatter
   )
 
   const previousUnitSystem = useRef(settings.unitSystem)
@@ -104,9 +130,6 @@ export function PredictionForm({ trainingData, onResult }: PredictionFormProps) 
     previousUnitSystem.current = settings.unitSystem
   }, [settings.unitSystem, speed, temperature])
 
-  const formatRange = (min: number, max: number, unit: string, formatter: Intl.NumberFormat) =>
-    `${formatter.format(min)} a ${formatter.format(max)} ${unit}`
-
   const validateInput = (input: PredictionInput, raw: PredictionInput) => {
     const baseErrors: string[] = []
 
@@ -119,7 +142,7 @@ export function PredictionForm({ trainingData, onResult }: PredictionFormProps) 
       const max = limits.temperature.max
       if (input.temperature < min || input.temperature > max) {
         baseErrors.push(
-          `Temperatura fora da faixa experimental (${formatRange(
+          `Temperatura fora do domínio validado (${formatRange(
             displayLimits.temperature.min,
             displayLimits.temperature.max,
             unitLabels.temperature,
@@ -138,7 +161,7 @@ export function PredictionForm({ trainingData, onResult }: PredictionFormProps) 
       const max = limits.speed.max
       if (input.speed < min || input.speed > max) {
         baseErrors.push(
-          `Velocidade fora da faixa experimental (${formatRange(
+          `Velocidade fora do domínio validado (${formatRange(
             displayLimits.speed.min,
             displayLimits.speed.max,
             unitLabels.speed,
@@ -184,7 +207,7 @@ export function PredictionForm({ trainingData, onResult }: PredictionFormProps) 
       })
       onResult(results)
     } catch (error) {
-      setErrors(['Erro ao calcular propriedades'])
+      setErrors([error instanceof Error ? error.message : 'Erro ao calcular propriedades'])
     } finally {
       setIsCalculating(false)
     }
@@ -288,9 +311,17 @@ export function PredictionForm({ trainingData, onResult }: PredictionFormProps) 
               ? `Baseado em ${trainingData.length} perfis reais com ajuste Ramberg-Osgood.`
               : 'Nenhum perfil com dados suficientes para ajuste foi encontrado.'}
           </p>
+          {processPoints.length > 0 ? (
+            <p className="text-xs text-muted-foreground">
+              A faixa ensaiada vai de {testedTemperatureRange} e de {testedSpeedRange}. Os limites
+              acima acrescentam a distância entre dois níveis ensaiados, margem em que a validação
+              cruzada mediu o erro da extrapolação.
+            </p>
+          ) : null}
           {!settings.autoValidation ? (
             <p className="text-xs text-amber-600">
-              Validação automática desativada. Resultados podem extrapolar a faixa experimental.
+              Validação automática desativada. Fora do domínio validado a extrapolação não tem erro
+              medido.
             </p>
           ) : null}
 

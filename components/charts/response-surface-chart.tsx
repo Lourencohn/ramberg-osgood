@@ -4,7 +4,9 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import type { PredictionResult, RambergOsgoodTrainingPoint, StressStrainPoint } from '@/types'
-import { rbfCurveInterpolation, rbfInterpolation } from '@/lib/metamodel'
+import { predictCurve, predictParameters } from '@/lib/metamodel'
+import { generateStressStrainCurve } from '@/lib/ramberg-osgood'
+import { validatedLimits } from '@/lib/validation'
 import { cn } from '@/lib/utils'
 import { calculatePropertiesFromCurve } from '@/lib/mechanical-properties'
 import { useSettings } from '@/components/settings-provider'
@@ -155,12 +157,11 @@ export function ResponseSurfaceChart({
     )
     if (validTraining.length < 2) return null
 
-    const temperatures = validTraining.map((point) => point.temperature)
-    const speeds = validTraining.map((point) => point.speed)
-    const tempMin = Math.min(...temperatures)
-    const tempMax = Math.max(...temperatures)
-    const speedMin = Math.min(...speeds)
-    const speedMax = Math.max(...speeds)
+    const domain = validatedLimits(validTraining)
+    const tempMin = domain.temperature.min
+    const tempMax = domain.temperature.max
+    const speedMin = domain.speed.min
+    const speedMax = domain.speed.max
     const tempRange = tempMax - tempMin || 1
     const speedRange = speedMax - speedMin || 1
     const maxRange = Math.max(tempRange, speedRange) || 1
@@ -176,10 +177,8 @@ export function ResponseSurfaceChart({
       for (let col = 0; col < cols; col += 1) {
         const temperature = tempMin + (tempRange * col) / (cols - 1)
         const input = { temperature, speed }
-        const { curve } = rbfCurveInterpolation(input, validTraining, curvePoints, {
-          exactMatch: false,
-        })
-        const params = rbfInterpolation(input, validTraining, { exactMatch: false })
+        const { curve } = predictCurve(input, validTraining, curvePoints)
+        const params = predictParameters(input, validTraining)
 
         points.push({
           temperature,
@@ -190,10 +189,10 @@ export function ResponseSurfaceChart({
     }
 
     const trainingPoints: SurfacePoint[] = validTraining.map((point) => {
-      const input = { temperature: point.temperature, speed: point.speed }
-      const { curve } = rbfCurveInterpolation(input, validTraining, curvePoints)
+      const curve = generateStressStrainCurve(point, point.maxStrain, curvePoints)
       return {
-        ...input,
+        temperature: point.temperature,
+        speed: point.speed,
         values: { ...curveMetrics(curve), E: point.E, sigma_0: point.sigma_0, n: point.n },
       }
     })
@@ -460,12 +459,6 @@ export function ResponseSurfaceChart({
   const predictionValue = predictionPoint
     ? metric.formatter(predictionPoint.values[metricKey])
     : null
-  const isTestedCondition =
-    predictionPoint !== null &&
-    gridData.trainingPoints.some(
-      (point) =>
-        point.temperature === predictionPoint.temperature && point.speed === predictionPoint.speed
-    )
   const metricUnitLabel = metric.unit || 'adimensional'
 
   return (
@@ -494,7 +487,7 @@ export function ResponseSurfaceChart({
           E, σ₀ e n são parâmetros de ajuste do Ramberg-Osgood, não propriedades físicas
           independentes. Como o PLA rompe ainda quase em regime linear, combinações muito diferentes
           dos três descrevem a mesma curva. Por isso o ajuste de cada condição e o da previsão podem
-          ficar longe desta superfície, que mostra só a média ponderada dos ajustes.
+          ficar longe desta superfície, que mostra só a regressão linear dos ajustes.
         </p>
       ) : null}
 
@@ -556,18 +549,13 @@ export function ResponseSurfaceChart({
             <p>
               Grade de interpolacao: {gridData.rows} x {gridData.cols} pontos.
             </p>
-            <p>Interpolacao RBF (Gaussiana) com normalizacao min-max.</p>
+            <p>Regressão linear em temperatura e velocidade, a mesma que a previsão usa.</p>
             <p>Marcadores escuros: ensaios reais. Marcador laranja: previsao atual.</p>
             <p>
-              A superfície é a média ponderada dos perfis, a mesma que a previsão usa fora das
-              condições ensaiadas.
+              A distância entre um marcador escuro e a superfície é o resíduo da regressão naquela
+              condição. A grade cobre o domínio validado, que vai uma distância entre níveis além
+              dos ensaios.
             </p>
-            {isTestedCondition ? (
-              <p>
-                Condição ensaiada. A previsão repete o próprio ensaio em vez da média ponderada, por
-                isso o marcador laranja pode ficar fora da superfície.
-              </p>
-            ) : null}
             {gridData.meta.discarded > 0 ? (
               <p>{gridData.meta.discarded} perfis ignorados por dados incompletos.</p>
             ) : null}

@@ -64,7 +64,7 @@ function regularizedBeta(x: number, a: number, b: number): number {
   return 1 - (front * betaContinuedFraction(b, a, 1 - x)) / b
 }
 
-function fSurvival(f: number, d1: number, d2: number): number {
+export function fSurvival(f: number, d1: number, d2: number): number {
   if (f <= 0) return 1
   return regularizedBeta(d2 / (d2 + d1 * f), d2 / 2, d1 / 2)
 }
@@ -78,6 +78,45 @@ function fCritical(alpha: number, d1: number, d2: number): number {
     else hi = mid
   }
   return (lo + hi) / 2
+}
+
+function lowerGammaSeries(a: number, x: number): number {
+  let term = 1 / a
+  let sum = term
+  for (let n = 1; n < 500; n += 1) {
+    term *= x / (a + n)
+    sum += term
+    if (Math.abs(term) < Math.abs(sum) * 3e-14) break
+  }
+  return sum * Math.exp(-x + a * Math.log(x) - gammaLn(a))
+}
+
+function upperGammaContinuedFraction(a: number, x: number): number {
+  const fpmin = 1e-300
+  let b = x + 1 - a
+  let c = 1 / fpmin
+  let d = 1 / b
+  let h = d
+  for (let i = 1; i < 500; i += 1) {
+    const an = -i * (i - a)
+    b += 2
+    d = an * d + b
+    if (Math.abs(d) < fpmin) d = fpmin
+    c = b + an / c
+    if (Math.abs(c) < fpmin) c = fpmin
+    d = 1 / d
+    const delta = d * c
+    h *= delta
+    if (Math.abs(delta - 1) < 3e-14) break
+  }
+  return Math.exp(-x + a * Math.log(x) - gammaLn(a)) * h
+}
+
+export function chiSquareSurvival(x: number, degrees: number): number {
+  if (x <= 0) return 1
+  const a = degrees / 2
+  const half = x / 2
+  return half < a + 1 ? 1 - lowerGammaSeries(a, half) : upperGammaContinuedFraction(a, half)
 }
 
 function solveLeastSquares(X: number[][], y: number[]): number[] {

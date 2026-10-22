@@ -169,7 +169,7 @@ def fig_flow():
         (24, 12, 18, 19, "Processamento\nσ = F/A₀\nε = ΔL/L₀\ncorreção da\nacomodação"),
         (48, 27, 18, 13, "Propriedades\npor ensaio"),
         (48, 4, 18, 15, "Ajuste de\nRamberg-Osgood\npor condição"),
-        (72, 4, 26, 15, "Metamodelo RBF\n(interpolação das\ncurvas por T e v)"),
+        (72, 4, 26, 15, "Metamodelo linear\n(regressão das\ncurvas em T e v)"),
         (72, 27, 26, 13, "Predição, comparação\ne visualização"),
     ]
     for x, y, w, h, text in boxes:

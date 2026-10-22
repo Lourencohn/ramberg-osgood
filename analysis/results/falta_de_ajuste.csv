@@ -1,0 +1,13 @@
+modelo,propriedade,F,gl_falta_de_ajuste,gl_erro_puro,p
+Regressão linear 1 + T + v,tensão máxima,0.34443189,6,36,0.90847327
+Regressão linear 1 + T + v,deformação na tensão máxima,0.83538987,6,36,0.55075172
+Regressão linear 1 + T + v,módulo aparente,4.3464565,6,36,0.0021311955
+Regressão linear 1 + T + v,tenacidade,0.87910888,6,36,0.5199607
+Regressão 1 + T + v + T·v,tensão máxima,0.37284319,5,36,0.86390673
+Regressão 1 + T + v + T·v,deformação na tensão máxima,0.88855176,5,36,0.49891035
+Regressão 1 + T + v + T·v,módulo aparente,4.9344794,5,36,0.0015320919
+Regressão 1 + T + v + T·v,tenacidade,0.55607307,5,36,0.73272362
+Regressão 1 + T + v + v²,tensão máxima,0.39467301,5,36,0.84919688
+Regressão 1 + T + v + v²,deformação na tensão máxima,0.45548998,5,36,0.80649845
+Regressão 1 + T + v + v²,módulo aparente,3.7562923,5,36,0.0077164243
+Regressão 1 + T + v + v²,tenacidade,0.77281801,5,36,0.5756547

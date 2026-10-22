@@ -1,0 +1,25 @@
+esquema,modelo,previsoes,rmse_curva_mpa,mae_tensao_max_mpa,mae_deformacao_pico_pp,hiperparametros
+deixa uma condição de fora,"Ajuste da própria condição (piso, não é previsão)",9,0.967787,0.8429725,0,
+deixa uma condição de fora,Média global (referência ingênua),9,1.6266133,1.7563731,0.30894466,
+deixa uma condição de fora,"Média ponderada gaussiana, ε = 1/distância média",9,1.3376329,1.2871094,0.26831591,
+deixa uma condição de fora,"Média ponderada gaussiana, ε ajustado",9,1.3930311,1.2557446,0.27638395,2.8 / 4 / 2
+deixa uma condição de fora,"RBF gaussiana interpolante + constante, ε ajustado",9,1.7407958,1.691102,0.17168074,2 / 1.4 / 1 / 0.5
+deixa uma condição de fora,Spline de placa fina interpolante + plano,9,1.3287373,1.1471166,0.20559846,
+deixa uma condição de fora,"Spline de placa fina suavizante + plano, λ ajustado",9,1.2461538,0.97644128,0.24251051,0.1 / 1 / 0.3 / 0
+deixa uma condição de fora,Regressão 1 + v,9,1.5647642,1.017569,0.37908231,
+deixa uma condição de fora,Regressão linear 1 + T + v,9,1.1534019,0.92938534,0.24919025,
+deixa uma condição de fora,Regressão 1 + T + v + T·v,9,1.272955,1.3278085,0.26614802,
+deixa uma condição de fora,Regressão 1 + T + v + v²,9,1.2140996,1.3246952,0.18190385,
+deixa uma condição de fora,Regressão quadrática completa,9,1.571382,2.1447711,0.30450697,
+deixa um nível inteiro de fora,"Ajuste da própria condição (piso, não é previsão)",9,0.967787,0.8429725,0,
+deixa um nível inteiro de fora,Média global (referência ingênua),18,1.7750896,1.9944577,0.35202075,
+deixa um nível inteiro de fora,"Média ponderada gaussiana, ε = 1/distância média",18,1.4143665,1.3393023,0.31623117,
+deixa um nível inteiro de fora,"Média ponderada gaussiana, ε ajustado",18,1.3848502,1.3545183,0.31544485,0.5 / 1.4 / 2
+deixa um nível inteiro de fora,"RBF gaussiana interpolante + constante, ε ajustado",18,1.5785207,1.8298729,0.33710302,8 / 1 / 0.7 / 1.4 / 2
+deixa um nível inteiro de fora,Spline de placa fina interpolante + plano,18,1.498354,1.2779175,0.34799267,
+deixa um nível inteiro de fora,"Spline de placa fina suavizante + plano, λ ajustado",18,1.2579016,1.2001113,0.34498212,10000 / 0 / 10 / 0.3
+deixa um nível inteiro de fora,Regressão 1 + v,18,1.5814958,1.1988407,0.47720067,
+deixa um nível inteiro de fora,Regressão linear 1 + T + v,18,1.2509373,1.2712671,0.3449488,
+deixa um nível inteiro de fora,Regressão 1 + T + v + T·v,18,1.4522718,1.641014,0.43065767,
+deixa um nível inteiro de fora,Regressão 1 + T + v + v²,9,1.244594,1.1215321,0.15872771,
+deixa um nível inteiro de fora,Regressão quadrática completa,0,,,,

@@ -19,6 +19,7 @@ import { ResponseSurfaceChart } from '@/components/charts/response-surface-chart
 import { useSettings } from '@/components/settings-provider'
 import type { Estimate, PredictionResult, RambergOsgoodTrainingPoint } from '@/types'
 import type { ExportFormat } from '@/lib/settings'
+import { testedLimits, validatedLimits, type PredictionLimits } from '@/lib/validation'
 import {
   buildHtmlTable,
   downloadContent,
@@ -77,10 +78,6 @@ const strainFormatter = new Intl.NumberFormat('pt-BR', {
 })
 
 const modulusFormatter = new Intl.NumberFormat('pt-BR', {
-  maximumFractionDigits: 0,
-})
-
-const percentFormatter = new Intl.NumberFormat('pt-BR', {
   maximumFractionDigits: 0,
 })
 
@@ -167,25 +164,25 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
   const diagnostics = useMemo(() => {
     if (!result || !validTraining.length) return null
 
-    const temperatures = validTraining.map((point) => point.temperature)
-    const speeds = validTraining.map((point) => point.speed)
-    const tempMin = Math.min(...temperatures)
-    const tempMax = Math.max(...temperatures)
-    const speedMin = Math.min(...speeds)
-    const speedMax = Math.max(...speeds)
+    const tested = testedLimits(validTraining)
+    const tempMin = tested.temperature.min
+    const tempMax = tested.temperature.max
+    const speedMin = tested.speed.min
+    const speedMax = tested.speed.max
     const nearestProfile = validationProfile?.profile ?? validTraining[0]
     const tempRange = tempMax - tempMin || 1
     const speedRange = speedMax - speedMin || 1
     const dx = (result.input.temperature - nearestProfile.temperature) / tempRange
     const dy = (result.input.speed - nearestProfile.speed) / speedRange
     const normalizedDistance = Math.min(Math.sqrt(dx * dx + dy * dy) / Math.sqrt(2), 1)
-    const confidence =
-      normalizedDistance < 0.2 ? 'Alta' : normalizedDistance < 0.45 ? 'Moderada' : 'Baixa'
-    const withinBounds =
-      result.input.temperature >= tempMin &&
-      result.input.temperature <= tempMax &&
-      result.input.speed >= speedMin &&
-      result.input.speed <= speedMax
+    const isInside = (limits: PredictionLimits) =>
+      result.input.temperature >= limits.temperature.min &&
+      result.input.temperature <= limits.temperature.max &&
+      result.input.speed >= limits.speed.min &&
+      result.input.speed <= limits.speed.max
+    const withinBounds = isInside(tested)
+    const withinValidated = isInside(validatedLimits(validTraining))
+    const confidence = withinBounds ? 'Alta' : withinValidated ? 'Moderada' : 'Baixa'
 
     return {
       tempMin,
@@ -195,6 +192,7 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
       normalizedDistance,
       confidence,
       withinBounds,
+      withinValidated,
       nearestProfile,
     }
   }, [result, validTraining, validationProfile])
@@ -291,7 +289,7 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
     {
       code: 'limite',
       label: 'Deformação na tensão máxima',
-      description: 'Média ponderada dos perfis usados na interpolação.',
+      description: 'Previsão da regressão linear em temperatura e velocidade.',
       value: maxStrain !== null ? maxStrain * 100 : null,
       unit: '%',
       formatter: numberFormatter,
@@ -348,17 +346,7 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
     : 'Ensaios reais'
 
   const sourcesSummary = experimental
-    ? experimental.sources[0]?.weight === 1
-      ? `Condição já ensaiada: média dos ${referenceRuns.length} corpos de prova dessa condição.`
-      : `Média ponderada dos ensaios vizinhos, com maior peso para ${experimental.sources
-          .slice(0, 3)
-          .map(
-            (source) =>
-              `${formatTemperatureValue(source.temperature)} e ${formatSpeedValue(source.speed)} (${percentFormatter.format(
-                source.weight * 100
-              )}%)`
-          )
-          .join(', ')}.`
+    ? `Regressão linear sobre as ${experimental.sources.length} condições ensaiadas. O valor após ± é o desvio esperado para um novo corpo de prova nessa condição.`
     : null
 
   const glossary = [
@@ -383,8 +371,9 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
       description: 'Faixa de temperatura e velocidade coberta pelos ensaios reais.',
     },
     {
-      term: 'Interpolacao RBF',
-      description: 'Metodo de base radial com normalizacao min-max.',
+      term: 'Regressão linear',
+      description:
+        'Plano em temperatura e velocidade ajustado por mínimos quadrados às condições ensaiadas.',
     },
   ]
 
@@ -514,7 +503,7 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
         temperature: convertTemperature(result.input.temperature, settings.unitSystem),
         speed: convertSpeed(result.input.speed, settings.unitSystem),
       },
-      interpolationMethod: 'rbf',
+      interpolationMethod: 'regressao-linear',
       rambergOsgood: {
         E: convertStress(params?.E, settings.unitSystem),
         sigma_0: convertStress(params?.sigma_0, settings.unitSystem),
@@ -620,7 +609,7 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <Badge variant="outline">Modelo Ramberg-Osgood</Badge>
-            <Badge variant="secondary">RBF Gaussiana</Badge>
+            <Badge variant="secondary">Regressão linear</Badge>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm" className="gap-2" disabled={!result}>
@@ -698,7 +687,9 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
                   {diagnostics
                     ? diagnostics.withinBounds
                       ? 'Entrada dentro do envelope experimental.'
-                      : 'Entrada fora da faixa observada; resultados representam extrapolacao.'
+                      : diagnostics.withinValidated
+                        ? 'Entrada na margem validada. O resultado é uma extrapolação de até um nível.'
+                        : 'Entrada fora do domínio validado. A extrapolação não tem erro medido.'
                     : 'Sem dados suficientes para avaliar o envelope experimental.'}
                 </div>
               </div>
@@ -831,7 +822,7 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
                   <div>
                     <h3 className="font-semibold text-foreground">Parametros do modelo</h3>
                     <p className="text-xs text-muted-foreground">
-                      Ajuste Ramberg-Osgood com offset de 0,2% e interpolacao por base radial.
+                      Ajuste Ramberg-Osgood com offset de 0,2% e regressão linear em T e v.
                     </p>
                   </div>
                 </div>
@@ -864,8 +855,8 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
                   <div>
                     <h3 className="font-semibold text-foreground">Propriedades previstas</h3>
                     <p className="text-xs text-muted-foreground">
-                      Modelo Ramberg-Osgood ao lado da média ponderada dos ensaios reais, com ± 1
-                      desvio-padrão.
+                      Modelo Ramberg-Osgood ao lado da regressão linear dos ensaios reais, com o
+                      desvio esperado para um novo corpo de prova.
                     </p>
                   </div>
                 </div>
@@ -933,7 +924,7 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
                   <div className="flex items-center justify-between gap-3">
                     <span className="text-muted-foreground">Interpolação aplicada</span>
                     <span className="font-mono font-semibold">
-                      {result ? 'RBF Gaussiana' : '--'}
+                      {result ? 'Regressão linear' : '--'}
                     </span>
                   </div>
                   <div className="flex items-center justify-between gap-3">

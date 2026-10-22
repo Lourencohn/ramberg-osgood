@@ -1,0 +1,10 @@
+condicao,modelo_escolhido,curveRmse,stressError,strainError
+T190_V90,Regressão linear 1 + T + v,1.3048845,1.582259,0.001843471
+T190_V95,Regressão linear 1 + T + v,0.85197491,0.31000233,0.0015674352
+T190_V100,Regressão linear 1 + T + v,0.56913003,0.19929802,-0.0042071634
+T210_V90,"Média ponderada gaussiana, ε ajustado",2.2574364,1.5885741,-0.0041998444
+T210_V95,Regressão linear 1 + T + v,1.8198893,-0.20053049,0.0029918855
+T210_V100,Regressão linear 1 + T + v,0.56556553,0.8398412,0.0011349135
+T220_V90,Regressão 1 + T + v + v²,2.0560126,-2.6103196,0.00014750738
+T220_V95,Regressão 1 + T + v + v²,1.0616352,0.87401452,0.00027642155
+T220_V100,Regressão linear 1 + T + v,1.5280299,-0.53913165,-0.0025322206

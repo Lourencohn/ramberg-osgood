@@ -174,15 +174,15 @@ export default function DocsPage() {
 
             <Section chapter="Interpolação" title="Metamodelagem">
               <p className="text-sm leading-relaxed text-muted-foreground">
-                As propriedades de cada combinação de temperatura e velocidade saem de funções de
-                interpolação treinadas com os ensaios já cadastrados. O sistema tenta dois caminhos
-                e escolhe o que melhor se aproxima dos dados.
+                A curva de cada combinação de temperatura e velocidade sai de uma regressão linear
+                ajustada às condições ensaiadas. O modelo foi escolhido entre dez candidatos por
+                validação cruzada com os ensaios reais cadastrados.
               </p>
               <ul className="space-y-2">
                 {[
-                  'Interpolação polinomial de segunda ordem',
-                  'Função de base radial gaussiana (RBF)',
-                  'Validação cruzada com os ensaios reais cadastrados',
+                  'Regressão linear em temperatura e velocidade, por mínimos quadrados',
+                  'Comparada com RBF, spline de placa fina e polinômios de segunda ordem',
+                  'Falta de ajuste testada com as cinco réplicas de cada condição',
                 ].map((item) => (
                   <li key={item} className="flex items-center gap-2 text-sm">
                     <CheckCircle2 className="size-4 shrink-0 text-brand-deep" />
@@ -196,25 +196,26 @@ export default function DocsPage() {
           <TabsContent value="parameters">
             <Section chapter="Faixas de validade" title="Parâmetros de entrada">
               <p className="text-sm leading-relaxed text-muted-foreground">
-                Os limites abaixo refletem as faixas em que os ensaios atuais foram realizados. Fora
-                delas a confiança da predição cai.
+                Os limites abaixo somam à faixa ensaiada a distância entre dois níveis ensaiados.
+                Nessa margem a validação cruzada mediu o erro da extrapolação. Além dela o erro não
+                foi medido.
               </p>
 
               <div className="grid gap-3 md:grid-cols-2">
                 <ParamCard
                   icon={Thermometer}
                   title="Temperatura de extrusão"
-                  hint="Faixas típicas para PLA padrão."
-                  min="190°C"
+                  hint="Ensaios de 190 a 220 °C, com margem de 10 °C."
+                  min="180°C"
                   max="230°C"
                 />
 
                 <ParamCard
                   icon={Gauge}
                   title="Velocidade de impressão"
-                  hint="Velocidades recomendadas para qualidade estrutural."
-                  min="20 mm/s"
-                  max="100 mm/s"
+                  hint="Ensaios de 90 a 100 mm/s, com margem de 5 mm/s."
+                  min="85 mm/s"
+                  max="105 mm/s"
                 />
               </div>
             </Section>
