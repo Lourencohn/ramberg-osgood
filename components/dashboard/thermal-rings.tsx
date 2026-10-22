@@ -81,7 +81,7 @@ function ThermalSvg({ data, totalRuns }: { data: TemperatureUsage[]; totalRuns: 
   const SIZE = 180
   const CENTER = SIZE / 2
   const MAX_R = 78
-  const MIN_R = 18
+  const MIN_R = 36
 
   if (!data.length) return null
 
