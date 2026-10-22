@@ -43,7 +43,7 @@ type AxisBounds = {
 function mapColor(t: number) {
   const clamped = Math.max(0, Math.min(1, t))
   const color = new THREE.Color()
-  color.setHSL(0.6 - 0.55 * clamped, 0.6, 0.5)
+  color.setHSL(0.6 - 0.55 * clamped, 0.7, 0.42)
   return color
 }
 
@@ -138,7 +138,7 @@ export function ParameterSpaceChart({ points, highlightId, axis }: ParameterSpac
     const pointsGeometry = new THREE.BufferGeometry()
     pointsGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
     pointsGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3))
-    const pointsMaterial = new THREE.PointsMaterial({ size: 0.035, vertexColors: true })
+    const pointsMaterial = new THREE.PointsMaterial({ size: 0.07, vertexColors: true })
     const pointsMesh = new THREE.Points(pointsGeometry, pointsMaterial)
     scene.add(pointsMesh)
 
