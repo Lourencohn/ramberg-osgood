@@ -4,9 +4,10 @@
   "private": true,
   "scripts": {
     "build": "next build",
-    "db:import": "tsx scripts/import-data.ts",
+    "db:import": "tsx --env-file-if-exists=.env scripts/import-data.ts",
     "db:import:manual": "node scripts/import-manual.js",
-    "db:schema": "psql $DATABASE_URL -f db/schema.sql",
+    "db:schema": "tsx --env-file-if-exists=.env scripts/apply-schema.ts",
+    "db:setup": "npm run db:schema && npm run db:import",
     "dev": "next dev",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

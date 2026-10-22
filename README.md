@@ -4,7 +4,7 @@ Aplicação web para previsão de curvas tensão‑deformação do PLA usando o 
 
 ## Requisitos
 
-- Node.js 18+
+- Node.js 22.9+
 - PostgreSQL 13+
 
 ## Configuração do banco
@@ -26,14 +26,13 @@ Aplicação web para previsão de curvas tensão‑deformação do PLA usando o 
    ```bash
    createdb ramberg_osgood
    ```
-4. Aplique o schema:
+4. Aplique o schema e importe os dados da pasta `data/`:
    ```bash
-   DATABASE_URL="postgresql://seu_usuario@localhost:5432/ramberg_osgood" npm run db:schema
+   npm run db:setup
    ```
-5. Importe os dados da pasta `data/`:
-   ```bash
-   DATABASE_URL="postgresql://seu_usuario@localhost:5432/ramberg_osgood" npm run db:import
-   ```
+   Os scripts de banco leem o `DATABASE_URL` do `.env`; uma variável definida no terminal tem
+   prioridade sobre o arquivo. O comando pode ser repetido sem duplicar dados: o schema só cria o que
+   falta e a importação substitui os ensaios já gravados.
    Para validar sem gravar nada (processa os 45 ensaios e mostra o resumo):
    ```bash
    npm run db:import -- --dry-run
@@ -80,6 +79,20 @@ npm run dev
 ```
 
 O app estará em `http://localhost:3000`.
+
+## Deploy
+
+A aplicação roda na Vercel com banco PostgreSQL no Neon, no domínio `resistencia3d.com.br`.
+
+1. Na Vercel, o projeto fica ligado a este repositório; todo push em `main` gera um deploy de
+   produção. As funções rodam em São Paulo (`gru1`, definido em `vercel.json`).
+2. Na aba Storage do projeto, o banco Neon conectado cria a variável `DATABASE_URL` (conexão com
+   pooling), que é a lida pela aplicação.
+3. Para criar ou atualizar as tabelas e os ensaios do banco de produção, coloque no `.env` local a
+   conexão direta (`DATABASE_URL_UNPOOLED` no painel do banco) como `DATABASE_URL` e rode
+   `npm run db:setup`.
+4. O domínio é configurado em Settings > Domains na Vercel, com as entradas A e CNAME indicadas
+   lá criadas na zona DNS do Registro.br.
 
 ## Acessar o banco pelo terminal (psql)
 
@@ -159,6 +172,7 @@ Veja [`analysis/README.md`](analysis/README.md) para as etapas e a descrição d
 
 ## Scripts úteis
 
+- `npm run db:setup` aplica o schema e importa os ensaios (os dois comandos abaixo, em sequência).
 - `npm run db:schema` aplica o schema do PostgreSQL.
 - `npm run db:import` importa os ensaios em `data/` (a partir dos arquivos brutos).
 - `npm run analysis` e `npm run analysis:figures` reproduzem os resultados e as figuras do TCC.
