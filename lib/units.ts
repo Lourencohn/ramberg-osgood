@@ -3,7 +3,7 @@ import type { UnitSystem } from '@/lib/settings'
 const MPa_TO_PSI = 145.0377377
 const MM_TO_IN = 0.0393700787
 
-export type UnitLabels = {
+type UnitLabels = {
   temperature: string
   speed: string
   stress: string

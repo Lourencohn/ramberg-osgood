@@ -1,7 +1,7 @@
 import type { RambergOsgoodParams, StressStrainPoint } from '@/types'
 import { calculateStrain, generateStressStrainCurve } from './ramberg-osgood'
 
-export interface RambergOsgoodFitOptions {
+interface RambergOsgoodFitOptions {
   iterations?: number
   restarts?: number
   seed?: number
@@ -15,7 +15,7 @@ export interface RambergOsgoodFitOptions {
   }
 }
 
-export interface RambergOsgoodFitResult {
+interface RambergOsgoodFitResult {
   params: RambergOsgoodParams
   /** raiz do erro quadrático médio no espaço das deformações (mm/mm) */
   rmse: number

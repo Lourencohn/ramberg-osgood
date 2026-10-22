@@ -2,7 +2,7 @@
 
 import type { PredictionResult } from '@/types'
 
-export type SavedPrediction = {
+type SavedPrediction = {
   id: string
   createdAt: string
   result: PredictionResult
@@ -28,7 +28,7 @@ const safeParse = (raw: string | null) => {
   }
 }
 
-export const loadSavedPredictions = () => {
+const loadSavedPredictions = () => {
   if (typeof window === 'undefined') return []
   return safeParse(window.localStorage.getItem(STORAGE_KEY))
 }

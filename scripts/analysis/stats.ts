@@ -62,7 +62,7 @@ function betaContinuedFraction(a: number, b: number, x: number): number {
 }
 
 /** Função beta incompleta regularizada I_x(a, b). */
-export function regularizedBeta(x: number, a: number, b: number): number {
+function regularizedBeta(x: number, a: number, b: number): number {
   if (x <= 0) return 0
   if (x >= 1) return 1
   const front = Math.exp(
@@ -73,13 +73,13 @@ export function regularizedBeta(x: number, a: number, b: number): number {
 }
 
 /** P(F > f) para F ~ F(d1, d2). */
-export function fSurvival(f: number, d1: number, d2: number): number {
+function fSurvival(f: number, d1: number, d2: number): number {
   if (f <= 0) return 1
   return regularizedBeta(d2 / (d2 + d1 * f), d2 / 2, d1 / 2)
 }
 
 /** Valor crítico da distribuição F ao nível alpha (bissecção). */
-export function fCritical(alpha: number, d1: number, d2: number): number {
+function fCritical(alpha: number, d1: number, d2: number): number {
   let lo = 0
   let hi = 1000
   for (let i = 0; i < 200; i += 1) {
@@ -132,7 +132,7 @@ function effectCodes(level: number, levels: number): number[] {
   )
 }
 
-export interface AnovaRow {
+interface AnovaRow {
   source: string
   ss: number
   df: number

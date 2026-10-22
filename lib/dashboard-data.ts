@@ -42,7 +42,7 @@ export type RunMetrics = {
   pointCount: number
 }
 
-export type StressPoint = {
+type StressPoint = {
   strain: number
   stress: number
 }
@@ -62,17 +62,17 @@ export type TemperatureUsage = {
   tests: number
 }
 
-export type StressHistogramBin = {
+type StressHistogramBin = {
   range: string
   count: number
 }
 
-export type SpeedPerformance = {
+type SpeedPerformance = {
   series: number[]
   data: Array<{ speed: number } & Record<string, number | null>>
 }
 
-export type DashboardStats = {
+type DashboardStats = {
   totalTests: number
   totalProfiles: number
   totalMeasurements: number
@@ -101,7 +101,7 @@ export type ProfileDetail = {
   tests: TestDetail[]
 }
 
-export type DashboardData = {
+type DashboardData = {
   stats: DashboardStats
   profileAverages: ProfileAverages[]
   temperatureUsage: TemperatureUsage[]

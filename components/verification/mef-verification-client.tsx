@@ -57,13 +57,6 @@ type BarResponse = {
   minStress: number
 }
 
-type ConvergencePoint = {
-  elements: number
-  displacement: number
-  error: number
-  elementLength: number
-}
-
 const stressFormatter = new Intl.NumberFormat('pt-BR', {
   minimumFractionDigits: 1,
   maximumFractionDigits: 1,
@@ -212,7 +205,7 @@ function MeshScene({ elements }: { elements: ElementState[] }) {
     const meshes: THREE.Mesh[] = []
     const edges: THREE.LineSegments[] = []
 
-    elements.forEach((element) => {
+    elements.forEach(() => {
       const material = new THREE.MeshStandardMaterial({
         color: 0x94a3b8,
         roughness: 0.35,

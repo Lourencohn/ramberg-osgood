@@ -1,4 +1,4 @@
-export type CsvValue = string | number | null | undefined
+type CsvValue = string | number | null | undefined
 
 const escapeCsvValue = (value: CsvValue) => {
   if (value === null || value === undefined) return ''
@@ -30,7 +30,7 @@ export const downloadHtmlAsExcel = (filename: string, html: string) => {
   downloadContent(filename, html, 'application/vnd.ms-excel')
 }
 
-export const escapeHtml = (value: string) => {
+const escapeHtml = (value: string) => {
   return value
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')

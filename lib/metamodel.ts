@@ -9,7 +9,7 @@ import { calculateStress } from '@/lib/ramberg-osgood'
 type InterpolationResult = RambergOsgoodParams & { maxStrain: number }
 
 /** Coordenadas de processo de um ponto de treinamento. */
-export interface ProcessCoordinates {
+interface ProcessCoordinates {
   temperature: number
   speed: number
 }
@@ -124,14 +124,6 @@ export function rbfInterpolateScalar(
   if (!weightSum) return clamp(values[0], min, max)
   const value = values.reduce((sum, v, index) => sum + v * weights[index], 0) / weightSum
   return clamp(value, min, max)
-}
-
-/** Mantido por compatibilidade: a versão atual usa a mesma interpolação RBF. */
-export function polynomialInterpolation(
-  input: PredictionInput,
-  data: RambergOsgoodTrainingPoint[]
-): InterpolationResult {
-  return rbfInterpolation(input, data)
 }
 
 export function rbfInterpolation(

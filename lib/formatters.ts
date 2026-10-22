@@ -11,11 +11,6 @@ export function formatDataSource(source?: string | null) {
   return source
 }
 
-export function formatTestCode(testCode?: string | null) {
-  if (!testCode) return null
-  return testCode.replace(/test_/gi, 'ensaio_')
-}
-
 const KNOWN_MATERIALS = ['PLA', 'ABS', 'PETG', 'TPU', 'PA', 'PC']
 
 // Normalize material names from the database. The database has entries like
@@ -34,7 +29,7 @@ export function normalizeMaterial(raw?: string | null): string {
 
 // Extract a friendly variant suffix from a verbose material name like
 // "03 ABS BLACK" → "BLACK". Returns null when no variant info is present.
-export function extractMaterialVariant(raw?: string | null): string | null {
+function extractMaterialVariant(raw?: string | null): string | null {
   if (!raw) return null
   const cleaned = raw.replace(/[_\-]/g, ' ').trim()
   if (!cleaned) return null
@@ -97,17 +92,6 @@ export function formatProfileTokens(options: ProfileNameOptions): {
     speed: hasV ? `${options.speed} mm/s` : null,
     layer: hasL ? `${options.layerHeight} mm` : null,
   }
-}
-
-// Compact mono code, e.g. "T190·V90" — keeps the legacy short identity but
-// rendered with a typographic separator instead of an underscore.
-export function formatProfileCode(temperature: number | null | undefined, speed: number | null | undefined) {
-  const hasT = Number.isFinite(temperature) && (temperature as number) > 0
-  const hasV = Number.isFinite(speed) && (speed as number) > 0
-  if (!hasT && !hasV) return '—'
-  const t = hasT ? `T${temperature}` : ''
-  const v = hasV ? `V${speed}` : ''
-  return [t, v].filter(Boolean).join('·')
 }
 
 // Preserved for backward compatibility with screens that still call the

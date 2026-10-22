@@ -15,7 +15,7 @@ type UserRow = {
   password_hash: string
 }
 
-export type AuthUser = {
+type AuthUser = {
   id: number
   name: string
   email: string

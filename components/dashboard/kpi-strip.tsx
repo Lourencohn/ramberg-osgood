@@ -1,5 +1,3 @@
-import type React from 'react'
-
 type Kpi = {
   caption: string
   value: string

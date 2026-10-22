@@ -42,8 +42,3 @@ export interface PredictionResult {
   curve: StressStrainPoint[]
   interpolationMethod: 'polynomial' | 'rbf'
 }
-
-export interface ValidationResult {
-  valid: boolean
-  errors: string[]
-}

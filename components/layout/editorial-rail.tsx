@@ -8,7 +8,6 @@ import {
   Activity,
   BarChart3,
   BookOpen,
-  FileText,
   GitCompare,
   History,
   Home,
@@ -22,13 +21,13 @@ import {
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { NavUser } from '@/components/nav-user'
 
-export type RailItem = {
+type RailItem = {
   href: string
   label: string
   icon: React.ComponentType<{ className?: string }>
 }
 
-export type RailSection = {
+type RailSection = {
   label: string
   items: RailItem[]
 }

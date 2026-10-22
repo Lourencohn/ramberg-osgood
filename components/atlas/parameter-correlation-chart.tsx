@@ -10,7 +10,7 @@ import {
   YAxis,
 } from 'recharts'
 
-export type CorrelationPoint = {
+type CorrelationPoint = {
   x: number
   y: number
   label: string

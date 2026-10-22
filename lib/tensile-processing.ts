@@ -21,7 +21,7 @@ import type { StressStrainPoint } from '@/types'
  *    do modelo de Ramberg-Osgood.
  */
 
-export interface MachineRecord {
+interface MachineRecord {
   time: number
   displacement: number
   force: number
@@ -82,14 +82,14 @@ export interface ProcessedTensileTest {
   properties: TensileProperties
 }
 
-export interface ToeCompensationOptions {
+interface ToeCompensationOptions {
   lowerFraction?: number
   upperFraction?: number
   windowFraction?: number
   minWindowPoints?: number
 }
 
-export const DEFAULT_TOE_OPTIONS: Required<ToeCompensationOptions> = {
+const DEFAULT_TOE_OPTIONS: Required<ToeCompensationOptions> = {
   lowerFraction: 0.02,
   upperFraction: 0.65,
   windowFraction: 0.2,
@@ -97,9 +97,9 @@ export const DEFAULT_TOE_OPTIONS: Required<ToeCompensationOptions> = {
 }
 
 /** Tolerância (fração da tensão máxima) para estender o trecho linear para trás a partir da janela. */
-export const LINEAR_TOLERANCE_FRACTION = 0.02
-export const RUPTURE_STRESS_FRACTION = 0.5
-export const YIELD_OFFSET_STRAIN = 0.002
+const LINEAR_TOLERANCE_FRACTION = 0.02
+const RUPTURE_STRESS_FRACTION = 0.5
+const YIELD_OFFSET_STRAIN = 0.002
 
 /** Lê o .txt exportado pelo software da máquina (colunas: tempo, deslocamento, força). */
 export function parseMachineFile(content: string): MachineRecord[] {
@@ -115,7 +115,7 @@ export function parseMachineFile(content: string): MachineRecord[] {
   return records
 }
 
-export function toEngineeringCurve(
+function toEngineeringCurve(
   records: MachineRecord[],
   geometry: SpecimenGeometry
 ): EngineeringPoint[] {
@@ -158,7 +158,7 @@ function linearRegression(points: StressStrainPoint[]) {
 }
 
 /** Localiza o trecho linear de maior inclinação da curva ascendente (janelas deslizantes). */
-export function findLinearRegion(
+function findLinearRegion(
   ascending: StressStrainPoint[],
   options: ToeCompensationOptions = {}
 ): LinearRegion {
