@@ -12,6 +12,7 @@ import {
   History,
   Home,
   Layers,
+  Settings,
   ShieldCheck,
   Sparkles,
   Target,
@@ -19,7 +20,6 @@ import {
 } from 'lucide-react'
 
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { NavUser } from '@/components/nav-user'
 
 type RailItem = {
   href: string
@@ -65,13 +65,13 @@ export const RAIL_SECTIONS: RailSection[] = [
     label: 'Referência',
     items: [{ href: '/docs', label: 'Documentação', icon: BookOpen }],
   },
+  {
+    label: 'Sistema',
+    items: [{ href: '/settings', label: 'Configurações', icon: Settings }],
+  },
 ]
 
-type EditorialRailProps = {
-  user: { name: string; email: string; avatar?: string | null }
-}
-
-export function EditorialRail({ user }: EditorialRailProps) {
+export function EditorialRail() {
   const pathname = usePathname()
 
   return (
@@ -129,10 +129,6 @@ export function EditorialRail({ user }: EditorialRailProps) {
             ))}
           </ul>
         </nav>
-
-        <div className="flex flex-col items-center gap-2 border-t border-foreground/10 p-2">
-          <NavUser user={user} compact />
-        </div>
       </aside>
     </TooltipProvider>
   )

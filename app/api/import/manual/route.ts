@@ -1,5 +1,4 @@
 import type { PoolClient } from 'pg'
-import { getCurrentUser } from '@/lib/auth'
 import { getPool } from '@/lib/db'
 import manualParser from '@/lib/import/manual-parser'
 
@@ -203,10 +202,6 @@ async function insertMeasurements(
 }
 
 export async function POST(request: Request) {
-  if (!(await getCurrentUser())) {
-    return Response.json({ error: 'Faça login para continuar.' }, { status: 401 })
-  }
-
   try {
     const formData = await request.formData()
     const files = formData

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Settings, LogOut, ChevronRight, FileSpreadsheet, Loader2, Search } from 'lucide-react'
+import { Settings, ChevronRight, FileSpreadsheet, Loader2, Search } from 'lucide-react'
 
 import {
   CommandDialog,
@@ -17,7 +17,6 @@ import {
 import { useSettings } from '@/components/settings-provider'
 import { formatDataSource, formatProfileTokens } from '@/lib/formatters'
 import { convertSpeed, convertTemperature, getUnitLabels } from '@/lib/units'
-import { logoutAction } from '@/lib/auth-actions'
 import { RAIL_SECTIONS } from '@/components/layout/editorial-rail'
 
 type SearchResult = {
@@ -98,12 +97,6 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
     onOpenChange(false)
     router.push(`/history?query=${encodeURIComponent(trimmed)}`)
   }, [onOpenChange, query, router])
-
-  const handleLogout = useCallback(async () => {
-    onOpenChange(false)
-    const formData = new FormData()
-    await logoutAction(formData)
-  }, [onOpenChange])
 
   const ensaiosLabel = useMemo(() => {
     if (query.trim().length < 2) return 'Ensaios'
@@ -213,14 +206,10 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
         ) : null}
 
         <CommandSeparator />
-        <CommandGroup heading="Conta">
+        <CommandGroup heading="Sistema">
           <CommandItem value="configuracoes" onSelect={() => handleSelect('/settings')}>
             <Settings className="text-foreground/60" />
             Configurações
-          </CommandItem>
-          <CommandItem value="sair" onSelect={handleLogout}>
-            <LogOut className="text-foreground/60" />
-            Sair da conta
           </CommandItem>
         </CommandGroup>
       </CommandList>

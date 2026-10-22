@@ -8,7 +8,6 @@
     "db:import:manual": "node scripts/import-manual.js",
     "db:schema": "tsx --env-file-if-exists=.env scripts/apply-schema.ts",
     "db:setup": "npm run db:schema && npm run db:import",
-    "user:reset-password": "tsx --env-file-if-exists=.env scripts/reset-password.ts",
     "dev": "next dev",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
@@ -17,13 +16,11 @@
     "analysis:figures": "python3 scripts/analysis/figures.py"
   },
   "dependencies": {
-    "@radix-ui/react-avatar": "1.1.2",
     "@radix-ui/react-collapsible": "1.1.2",
     "@radix-ui/react-dialog": "1.1.4",
     "@radix-ui/react-dropdown-menu": "2.1.4",
     "@radix-ui/react-label": "2.1.1",
     "@radix-ui/react-select": "2.1.4",
-    "@radix-ui/react-separator": "1.1.1",
     "@radix-ui/react-slot": "1.1.1",
     "@radix-ui/react-switch": "1.1.2",
     "@radix-ui/react-tabs": "1.1.2",
