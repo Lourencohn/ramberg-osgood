@@ -17,7 +17,10 @@ export interface RambergOsgoodFitOptions {
 
 export interface RambergOsgoodFitResult {
   params: RambergOsgoodParams
+  /** raiz do erro quadrático médio no espaço das deformações (mm/mm) */
   rmse: number
+  /** coeficiente de determinação no espaço das deformações */
+  r2: number
   iterations: number
   pointsUsed: number
   curve: StressStrainPoint[]
@@ -25,10 +28,21 @@ export interface RambergOsgoodFitResult {
 }
 
 const DEFAULT_BOUNDS = {
-  E: [500, 10000],
+  // limite inferior abaixo dos módulos aparentes medidos pelo travessão (~480 MPa)
+  E: [100, 10000],
   sigma_0: [5, 200],
   n: [1, 30],
 } satisfies Required<NonNullable<RambergOsgoodFitOptions['bounds']>>
+
+/** Semente determinística a partir de um texto (ex.: código do perfil ou do corpo de prova). */
+export function seedFromString(value: string): number {
+  let hash = 0
+  for (let i = 0; i < value.length; i += 1) {
+    hash = (hash << 5) - hash + value.charCodeAt(i)
+    hash |= 0
+  }
+  return Math.abs(hash)
+}
 
 function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max)
@@ -138,6 +152,7 @@ export function fitRambergOsgoodCurve(
     return {
       params: { E: 3000, sigma_0: 50, n: 8 },
       rmse: 0,
+      r2: 0,
       iterations: 0,
       pointsUsed: 0,
       curve: [],
@@ -202,6 +217,9 @@ export function fitRambergOsgoodCurve(
   }
 
   const rmse = bestResult.count ? Math.sqrt(bestResult.error / bestResult.count) : 0
+  const meanStrain = sample.reduce((sum, point) => sum + point.strain, 0) / sample.length
+  const totalVariance = sample.reduce((sum, point) => sum + (point.strain - meanStrain) ** 2, 0)
+  const r2 = totalVariance > 0 ? 1 - bestResult.error / totalVariance : 0
   const maxStrain = options.maxStrain ?? Math.max(...sanitized.map((point) => point.strain))
   const curvePoints = options.curvePoints ?? 120
   const curve = generateStressStrainCurve(bestParams, maxStrain, curvePoints)
@@ -213,6 +231,7 @@ export function fitRambergOsgoodCurve(
   return {
     params: bestParams,
     rmse,
+    r2,
     iterations: iterationsPerRun * restarts,
     pointsUsed: sample.length,
     curve,

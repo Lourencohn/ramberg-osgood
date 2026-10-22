@@ -1,8 +1,17 @@
 import type { PredictionInput, PredictionResult, RambergOsgoodTrainingPoint } from '@/types'
-import { polynomialInterpolation, rbfInterpolation } from './metamodel'
-import { generateStressStrainCurve } from './ramberg-osgood'
-import { calculateMechanicalProperties } from './mechanical-properties'
+import { rbfCurveInterpolation } from './metamodel'
+import { fitRambergOsgoodCurve, seedFromString } from './ramberg-osgood-fit'
+import { calculatePropertiesFromCurve } from './mechanical-properties'
 
+/**
+ * Predição para uma combinação de temperatura e velocidade.
+ *
+ * 1. a curva prevista é interpolada no espaço das curvas (lib/metamodel.ts,
+ *    rbfCurveInterpolation): média ponderada, com pesos RBF gaussianos, das curvas ajustadas de
+ *    cada condição de treinamento, na deformação normalizada ε/ε_max;
+ * 2. o modelo de Ramberg-Osgood é ajustado à curva prevista, para expor E, σ₀ e n;
+ * 3. as propriedades são calculadas sobre a curva prevista.
+ */
 export async function predictProperties(
   input: PredictionInput,
   trainingData: RambergOsgoodTrainingPoint[],
@@ -13,24 +22,17 @@ export async function predictProperties(
 ): Promise<PredictionResult> {
   const method = options.method ?? 'rbf'
   const curvePoints = options.curvePoints ?? 180
-  const interpolation =
-    method === 'polynomial'
-      ? polynomialInterpolation(input, trainingData)
-      : rbfInterpolation(input, trainingData)
-  const rambergOsgood = {
-    E: interpolation.E,
-    sigma_0: interpolation.sigma_0,
-    n: interpolation.n,
-  }
+  const { curve } = rbfCurveInterpolation(input, trainingData, curvePoints)
 
-  const maxStrain = interpolation.maxStrain > 0 ? interpolation.maxStrain : 0.08
-  const curve = generateStressStrainCurve(rambergOsgood, maxStrain, curvePoints)
-
-  const properties = calculateMechanicalProperties(rambergOsgood, maxStrain)
+  const fit = fitRambergOsgoodCurve(curve, {
+    seed: seedFromString(`${input.temperature}-${input.speed}`),
+    sampleSize: Math.min(400, curve.length),
+  })
+  const { modulus: _modulus, ...properties } = calculatePropertiesFromCurve(curve)
 
   return {
     input,
-    rambergOsgood,
+    rambergOsgood: fit.params,
     properties,
     curve,
     interpolationMethod: method,

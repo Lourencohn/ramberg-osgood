@@ -34,10 +34,14 @@ Aplicação web para previsão de curvas tensão‑deformação do PLA usando o 
    ```bash
    DATABASE_URL="postgresql://seu_usuario@localhost:5432/ramberg_osgood" npm run db:import
    ```
-   Para validar sem gravar nada:
+   Para validar sem gravar nada (processa os 45 ensaios e mostra o resumo):
    ```bash
-   DATABASE_URL="postgresql://seu_usuario@localhost:5432/ramberg_osgood" node scripts/import-data.js --dry-run
+   npm run db:import -- --dry-run
    ```
+   A importação lê os arquivos brutos da máquina (`data/T*/test_*/raw.txt`) e as dimensões medidas
+   (`data/specimens.csv`), aplica o mesmo processamento da análise do TCC (`lib/tensile-processing.ts`)
+   e grava a curva corrigida, as propriedades e o ajuste de Ramberg-Osgood de cada ensaio.
+   Detalhes sobre a origem e os problemas corrigidos nos dados estão em [`data/README.md`](data/README.md).
 
 ## Importacao manual (CSV/TXT)
 
@@ -142,10 +146,22 @@ Instale a extensão **Prettier - Code formatter** e adicione ao seu `settings.js
 }
 ```
 
+## Análise dos dados (TCC)
+
+Os resultados, tabelas e figuras do TCC são gerados a partir dos dados brutos com:
+
+```bash
+npm run analysis           # resultados em analysis/results/ e analysis/results-sem-A00-3/
+npm run analysis:figures   # figuras em analysis/figures/ (Python 3 com numpy, pandas e matplotlib)
+```
+
+Veja [`analysis/README.md`](analysis/README.md) para as etapas e a descrição de cada arquivo.
+
 ## Scripts úteis
 
 - `npm run db:schema` aplica o schema do PostgreSQL.
-- `npm run db:import` importa os ensaios em `data/`.
+- `npm run db:import` importa os ensaios em `data/` (a partir dos arquivos brutos).
+- `npm run analysis` e `npm run analysis:figures` reproduzem os resultados e as figuras do TCC.
 - `npm run db:import:manual` importa arquivos CSV/TXT individuais.
 - `npm run dev` inicia o Next.js em modo desenvolvimento.
 - `npm run format` formata o código com Prettier.

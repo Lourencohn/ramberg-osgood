@@ -1,6 +1,18 @@
-import type { PredictionInput, RambergOsgoodParams, RambergOsgoodTrainingPoint } from '@/types'
+import type {
+  PredictionInput,
+  RambergOsgoodParams,
+  RambergOsgoodTrainingPoint,
+  StressStrainPoint,
+} from '@/types'
+import { calculateStress } from '@/lib/ramberg-osgood'
 
 type InterpolationResult = RambergOsgoodParams & { maxStrain: number }
+
+/** Coordenadas de processo de um ponto de treinamento. */
+export interface ProcessCoordinates {
+  temperature: number
+  speed: number
+}
 
 function normalize(value: number, min: number, max: number) {
   if (max === min) return 0
@@ -11,7 +23,7 @@ function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max)
 }
 
-function computeRanges(points: RambergOsgoodTrainingPoint[]) {
+function computeRanges(points: ProcessCoordinates[]) {
   const temperatures = points.map((point) => point.temperature)
   const speeds = points.map((point) => point.speed)
   return {
@@ -38,10 +50,7 @@ function computeBounds(points: RambergOsgoodTrainingPoint[]) {
   }
 }
 
-function computeEpsilon(
-  points: RambergOsgoodTrainingPoint[],
-  ranges: ReturnType<typeof computeRanges>
-) {
+function computeEpsilon(points: ProcessCoordinates[], ranges: ReturnType<typeof computeRanges>) {
   if (points.length < 2) return 1
   let sum = 0
   let count = 0
@@ -61,7 +70,7 @@ function computeEpsilon(
   return meanDist > 0 ? 1 / meanDist : 1
 }
 
-function rbfWeights(input: PredictionInput, points: RambergOsgoodTrainingPoint[]) {
+function rbfWeights(input: PredictionInput, points: ProcessCoordinates[]) {
   if (!points.length) return []
   const ranges = computeRanges(points)
   const inputTemp = normalize(input.temperature, ranges.tempMin, ranges.tempMax)
@@ -91,6 +100,33 @@ function interpolateValue(
   return clamp(value, min, max)
 }
 
+/**
+ * Interpolação RBF gaussiana (médias ponderadas normalizadas) de uma grandeza escalar sobre o
+ * plano temperatura × velocidade, com os mesmos pesos usados para os parâmetros constitutivos.
+ * O resultado é limitado ao intervalo dos valores de treinamento.
+ */
+export function rbfInterpolateScalar(
+  input: PredictionInput,
+  points: ProcessCoordinates[],
+  values: number[]
+): number {
+  if (!points.length || points.length !== values.length) {
+    throw new Error('Pontos e valores de treinamento incompatíveis')
+  }
+  const exactIndex = points.findIndex(
+    (point) => point.temperature === input.temperature && point.speed === input.speed
+  )
+  if (exactIndex >= 0) return values[exactIndex]
+  const weights = rbfWeights(input, points)
+  const weightSum = weights.reduce((sum, weight) => sum + weight, 0)
+  const min = Math.min(...values)
+  const max = Math.max(...values)
+  if (!weightSum) return clamp(values[0], min, max)
+  const value = values.reduce((sum, v, index) => sum + v * weights[index], 0) / weightSum
+  return clamp(value, min, max)
+}
+
+/** Mantido por compatibilidade: a versão atual usa a mesma interpolação RBF. */
 export function polynomialInterpolation(
   input: PredictionInput,
   data: RambergOsgoodTrainingPoint[]
@@ -155,4 +191,50 @@ export function rbfInterpolation(
       bounds.maxStrain[1]
     ),
   }
+}
+
+/**
+ * Interpolação no espaço das curvas: a curva prevista é a média ponderada (pesos RBF gaussianos)
+ * das curvas ajustadas de cada condição de treinamento, tomadas na deformação normalizada
+ * u = ε / ε_max (0 ≤ u ≤ 1). A deformação máxima prevista é a média ponderada das deformações
+ * máximas. Como os parâmetros σ₀ e n são pouco identificáveis, interpolar as curvas, e não os
+ * parâmetros isoladamente, preserva a forma e o ponto final de cada curva de treinamento.
+ */
+export function rbfCurveInterpolation(
+  input: PredictionInput,
+  data: RambergOsgoodTrainingPoint[],
+  points = 180
+): { curve: StressStrainPoint[]; maxStrain: number } {
+  const validData = data.filter(
+    (point) =>
+      Number.isFinite(point.temperature) &&
+      Number.isFinite(point.speed) &&
+      point.E > 0 &&
+      point.sigma_0 > 0 &&
+      point.n > 0 &&
+      point.maxStrain > 0
+  )
+  if (!validData.length) return { curve: [], maxStrain: 0 }
+
+  const exact = validData.find(
+    (point) => point.temperature === input.temperature && point.speed === input.speed
+  )
+  const weights = exact
+    ? validData.map((point) => (point === exact ? 1 : 0))
+    : rbfWeights(input, validData)
+  const weightSum = weights.reduce((sum, weight) => sum + weight, 0) || 1
+  const maxStrain =
+    validData.reduce((sum, point, index) => sum + point.maxStrain * weights[index], 0) / weightSum
+
+  const curve: StressStrainPoint[] = []
+  for (let i = 0; i <= points; i += 1) {
+    const u = i / points
+    const stress =
+      validData.reduce(
+        (sum, point, index) => sum + calculateStress(u * point.maxStrain, point) * weights[index],
+        0
+      ) / weightSum
+    curve.push({ strain: u * maxStrain, stress })
+  }
+  return { curve, maxStrain }
 }

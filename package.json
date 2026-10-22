@@ -4,14 +4,16 @@
   "private": true,
   "scripts": {
     "build": "next build",
-    "db:import": "node scripts/import-data.js",
+    "db:import": "tsx scripts/import-data.ts",
     "db:import:manual": "node scripts/import-manual.js",
     "db:schema": "psql $DATABASE_URL -f db/schema.sql",
     "dev": "next dev",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint .",
-    "start": "next start"
+    "start": "next start",
+    "analysis": "tsx scripts/analysis/analyze-dataset.ts && tsx scripts/analysis/analyze-dataset.ts --exclude A00-3 --out analysis/results-sem-A00-3",
+    "analysis:figures": "python3 scripts/analysis/figures.py"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
@@ -76,6 +78,7 @@
     "postcss": "^8.5",
     "prettier": "^3.7.4",
     "tailwindcss": "^4.1.9",
+    "tsx": "^4.23.15",
     "tw-animate-css": "1.3.3",
     "typescript": "^5.9.3"
   }
