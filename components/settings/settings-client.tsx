@@ -158,27 +158,6 @@ export function SettingsClient() {
           icon={Calculator}
         >
           <div className="space-y-2">
-            <Label htmlFor="interpolation-method" className="label-caps">
-              Método de interpolação
-            </Label>
-            <Select
-              value={draft.interpolationMethod}
-              onValueChange={(value) =>
-                updateField('interpolationMethod', value as AppSettings['interpolationMethod'])
-              }
-            >
-              <SelectTrigger id="interpolation-method" className="h-10 border-foreground/15">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="polynomial">Polinomial de segunda ordem</SelectItem>
-                <SelectItem value="rbf">RBF gaussiano</SelectItem>
-                <SelectItem value="auto">Automático</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
             <Label htmlFor="stress-points" className="label-caps">
               Pontos na curva σ por ε
             </Label>

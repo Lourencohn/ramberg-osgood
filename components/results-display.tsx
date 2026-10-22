@@ -179,11 +179,6 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
     }
   }, [result, validTraining, validationProfile])
   const maxStrain = result?.curve?.length ? result.curve[result.curve.length - 1].strain : null
-  const methodLabel = result
-    ? result.interpolationMethod === 'rbf'
-      ? 'RBF Gaussiana'
-      : 'Polinomial'
-    : '--'
   const confidenceClass = diagnostics
     ? diagnostics.confidence === 'Alta'
       ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
@@ -421,7 +416,7 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
         temperature: convertTemperature(result.input.temperature, settings.unitSystem),
         speed: convertSpeed(result.input.speed, settings.unitSystem),
       },
-      interpolationMethod: result.interpolationMethod,
+      interpolationMethod: 'rbf',
       rambergOsgood: {
         E: convertStress(params?.E, settings.unitSystem),
         sigma_0: convertStress(params?.sigma_0, settings.unitSystem),
@@ -503,7 +498,7 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <Badge variant="outline">Modelo Ramberg-Osgood</Badge>
-            <Badge variant="secondary">{methodLabel}</Badge>
+            <Badge variant="secondary">RBF Gaussiana</Badge>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm" className="gap-2" disabled={!result}>
@@ -812,7 +807,7 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
                   <div className="flex items-center justify-between gap-3">
                     <span className="text-muted-foreground">Interpolação aplicada</span>
                     <span className="font-mono font-semibold">
-                      {result?.interpolationMethod ?? '--'}
+                      {result ? 'RBF Gaussiana' : '--'}
                     </span>
                   </div>
                   <div className="flex items-center justify-between gap-3">

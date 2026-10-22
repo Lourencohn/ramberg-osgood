@@ -40,5 +40,4 @@ export interface PredictionResult {
   rambergOsgood: RambergOsgoodParams
   properties: MechanicalProperties
   curve: StressStrainPoint[]
-  interpolationMethod: 'polynomial' | 'rbf'
 }

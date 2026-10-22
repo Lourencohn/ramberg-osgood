@@ -104,11 +104,6 @@ export function PredictionForm({ trainingData, onResult }: PredictionFormProps) 
     previousUnitSystem.current = settings.unitSystem
   }, [settings.unitSystem, speed, temperature])
 
-  const resolveMethod = () => {
-    if (settings.interpolationMethod !== 'auto') return settings.interpolationMethod
-    return trainingData.length > 12 ? 'rbf' : 'polynomial'
-  }
-
   const formatRange = (min: number, max: number, unit: string, formatter: Intl.NumberFormat) =>
     `${formatter.format(min)} a ${formatter.format(max)} ${unit}`
 
@@ -185,7 +180,6 @@ export function PredictionForm({ trainingData, onResult }: PredictionFormProps) 
 
     try {
       const results = await predictProperties(input, trainingData, {
-        method: resolveMethod(),
         curvePoints: settings.stressCurvePoints,
       })
       onResult(results)

@@ -1,9 +1,7 @@
 export type ExportFormat = 'csv' | 'json' | 'xlsx' | 'pdf'
-export type InterpolationMethod = 'polynomial' | 'rbf' | 'auto'
 export type UnitSystem = 'si' | 'imperial'
 
 export type AppSettings = {
-  interpolationMethod: InterpolationMethod
   stressCurvePoints: number
   autoValidation: boolean
   theme: 'light' | 'dark' | 'system'
@@ -19,7 +17,6 @@ export type AppSettings = {
 export const SETTINGS_STORAGE_KEY = 'resistencia-settings'
 
 export const DEFAULT_SETTINGS: AppSettings = {
-  interpolationMethod: 'rbf',
   stressCurvePoints: 100,
   autoValidation: true,
   theme: 'system',
@@ -33,7 +30,6 @@ export const DEFAULT_SETTINGS: AppSettings = {
 }
 
 const EXPORT_FORMATS = new Set<ExportFormat>(['csv', 'json', 'xlsx', 'pdf'])
-const INTERPOLATION_METHODS = new Set<InterpolationMethod>(['polynomial', 'rbf', 'auto'])
 const UNIT_SYSTEMS = new Set<UnitSystem>(['si', 'imperial'])
 const THEMES = new Set<AppSettings['theme']>(['light', 'dark', 'system'])
 
@@ -46,11 +42,6 @@ export const normalizeSettings = (input?: Partial<AppSettings> | null): AppSetti
   const resolved = input ?? {}
 
   return {
-    interpolationMethod: INTERPOLATION_METHODS.has(
-      resolved.interpolationMethod as InterpolationMethod
-    )
-      ? (resolved.interpolationMethod as InterpolationMethod)
-      : DEFAULT_SETTINGS.interpolationMethod,
     stressCurvePoints: clampNumber(
       resolved.stressCurvePoints,
       DEFAULT_SETTINGS.stressCurvePoints,

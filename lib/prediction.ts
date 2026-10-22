@@ -16,11 +16,9 @@ export async function predictProperties(
   input: PredictionInput,
   trainingData: RambergOsgoodTrainingPoint[],
   options: {
-    method?: 'polynomial' | 'rbf'
     curvePoints?: number
   } = {}
 ): Promise<PredictionResult> {
-  const method = options.method ?? 'rbf'
   const curvePoints = options.curvePoints ?? 180
   const { curve } = rbfCurveInterpolation(input, trainingData, curvePoints)
 
@@ -35,6 +33,5 @@ export async function predictProperties(
     rambergOsgood: fit.params,
     properties,
     curve,
-    interpolationMethod: method,
   }
 }
