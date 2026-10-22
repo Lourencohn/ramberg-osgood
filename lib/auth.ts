@@ -1,11 +1,10 @@
 import { cookies } from 'next/headers'
-import { createHash, randomBytes, scryptSync, timingSafeEqual } from 'crypto'
+import { createHash, randomBytes, timingSafeEqual } from 'crypto'
+import { createPasswordHash, hashPassword, normalizeEmail } from '@/lib/credentials'
 import { query } from '@/lib/db'
 
 const SESSION_COOKIE_NAME = 'ro_session'
 const SESSION_MAX_AGE = 60 * 60 * 24 * 7
-const PASSWORD_SALT_BYTES = 16
-const PASSWORD_KEY_LEN = 64
 
 type UserRow = {
   id: number
@@ -19,14 +18,6 @@ type AuthUser = {
   id: number
   name: string
   email: string
-}
-
-function normalizeEmail(email: string) {
-  return email.trim().toLowerCase()
-}
-
-function hashPassword(password: string, salt: string) {
-  return scryptSync(password, salt, PASSWORD_KEY_LEN).toString('hex')
 }
 
 function hashToken(token: string) {
@@ -68,8 +59,7 @@ export async function createUser({
   password: string
 }): Promise<AuthUser> {
   const normalizedEmail = normalizeEmail(email)
-  const salt = randomBytes(PASSWORD_SALT_BYTES).toString('hex')
-  const passwordHash = hashPassword(password, salt)
+  const { salt, hash: passwordHash } = createPasswordHash(password)
 
   const result = await query<AuthUser>(
     'INSERT INTO users (name, email, password_salt, password_hash) VALUES ($1, $2, $3, $4) RETURNING id, name, email',

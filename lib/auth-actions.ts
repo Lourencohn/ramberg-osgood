@@ -2,6 +2,7 @@
 
 import { redirect } from 'next/navigation'
 import { clearSession, createSession, createUser, verifyUser } from '@/lib/auth'
+import { MIN_PASSWORD_LENGTH } from '@/lib/credentials'
 
 export async function loginAction(formData: FormData) {
   const email = String(formData.get('email') ?? '').trim()
@@ -30,7 +31,7 @@ export async function signupAction(formData: FormData) {
     redirect('/signup?error=missing-fields')
   }
 
-  if (password.length < 8) {
+  if (password.length < MIN_PASSWORD_LENGTH) {
     redirect('/signup?error=weak-password')
   }
 

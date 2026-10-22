@@ -180,6 +180,8 @@ Veja [`analysis/README.md`](analysis/README.md) para as etapas e a descrição d
 - `npm run db:import` importa os ensaios em `data/` (a partir dos arquivos brutos).
 - `npm run analysis` e `npm run analysis:figures` reproduzem os resultados e as figuras do TCC.
 - `npm run db:import:manual` importa arquivos CSV/TXT individuais.
+- `npm run user:reset-password -- email@exemplo.com` redefine a senha de um usuário no banco do `.env`;
+  a nova senha é digitada no terminal, sem aparecer na tela, e as sessões abertas são encerradas.
 - `npm run dev` inicia o Next.js em modo desenvolvimento.
 - `npm run format` formata o código com Prettier.
 - `npm run format:check` verifica formatação sem alterar.

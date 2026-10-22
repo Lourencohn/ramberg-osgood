@@ -8,6 +8,7 @@
     "db:import:manual": "node scripts/import-manual.js",
     "db:schema": "tsx --env-file-if-exists=.env scripts/apply-schema.ts",
     "db:setup": "npm run db:schema && npm run db:import",
+    "user:reset-password": "tsx --env-file-if-exists=.env scripts/reset-password.ts",
     "dev": "next dev",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
