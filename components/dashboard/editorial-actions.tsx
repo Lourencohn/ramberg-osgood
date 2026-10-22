@@ -33,7 +33,7 @@ export function EditorialActions() {
   return (
     <nav aria-label="Ações" className="rounded-md border border-foreground/15 bg-card p-4">
       <div className="flex items-center justify-between border-b border-foreground/10 pb-3">
-        <span className="label-caps-copper">Coluna II</span>
+        <span className="label-caps-brand">Coluna II</span>
         <span className="label-caps">Atalhos</span>
       </div>
       <ul className="mt-1 divide-y divide-foreground/10">
@@ -41,14 +41,14 @@ export function EditorialActions() {
           <li key={action.href}>
             <Link
               href={action.href}
-              className="group flex items-center gap-3 py-3 transition-colors hover:text-copper-deep"
+              className="group flex items-center gap-3 py-3 transition-colors hover:text-brand-deep"
             >
               <span
                 className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-md border ${
                   action.accent
-                    ? 'border-copper bg-copper-soft text-copper-deep'
+                    ? 'border-brand bg-brand-soft text-brand-deep'
                     : 'border-foreground/15 bg-background text-foreground'
-                } transition-all group-hover:border-copper group-hover:bg-copper-soft group-hover:text-copper-deep`}
+                } transition-all group-hover:border-brand group-hover:bg-brand-soft group-hover:text-brand-deep`}
               >
                 <action.icon className="h-4 w-4" />
               </span>

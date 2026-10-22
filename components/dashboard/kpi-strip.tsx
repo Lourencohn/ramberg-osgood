@@ -28,11 +28,11 @@ function KpiCell({ item, index }: { item: Kpi; index: number }) {
       </span>
 
       <div className="space-y-2">
-        <span className={item.accent ? 'label-caps-copper' : 'label-caps'}>{item.caption}</span>
+        <span className={item.accent ? 'label-caps-brand' : 'label-caps'}>{item.caption}</span>
         <div className="flex items-baseline gap-1.5">
           <span
             className={`font-display text-[44px] leading-none tracking-tight md:text-[52px] ${
-              item.accent ? 'text-copper-deep' : 'text-foreground'
+              item.accent ? 'text-brand-deep' : 'text-foreground'
             }`}
           >
             {item.value}
@@ -49,7 +49,7 @@ function KpiCell({ item, index }: { item: Kpi; index: number }) {
       </div>
 
       <span
-        className="absolute bottom-0 left-0 h-px w-0 bg-copper transition-all duration-500 group-hover:w-full"
+        className="absolute bottom-0 left-0 h-px w-0 bg-brand transition-all duration-500 group-hover:w-full"
         aria-hidden="true"
       />
     </div>

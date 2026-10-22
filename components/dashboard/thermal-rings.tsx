@@ -24,7 +24,7 @@ export function ThermalRings({ data, totalRuns }: ThermalRingsProps) {
   return (
     <article className="corner-brackets relative flex h-full flex-col rounded-md border border-foreground/15 bg-card p-5">
       <div className="flex items-center justify-between border-b border-foreground/10 pb-3">
-        <span className="label-caps-copper">Figura 02</span>
+        <span className="label-caps-brand">Figura 02</span>
         <span className="label-caps">Espectro térmico</span>
       </div>
 
@@ -93,8 +93,8 @@ function ThermalSvg({ data, totalRuns }: { data: TemperatureUsage[]; totalRuns: 
     <svg viewBox={`0 0 ${SIZE} ${SIZE}`} width={SIZE} height={SIZE} role="img" aria-label="Anéis térmicos">
       <defs>
         <radialGradient id="thermal-center" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="var(--copper-soft)" stopOpacity="0.4" />
-          <stop offset="100%" stopColor="var(--copper-soft)" stopOpacity="0" />
+          <stop offset="0%" stopColor="var(--brand-soft)" stopOpacity="0.4" />
+          <stop offset="100%" stopColor="var(--brand-soft)" stopOpacity="0" />
         </radialGradient>
       </defs>
 

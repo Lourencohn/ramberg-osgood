@@ -117,7 +117,7 @@ export function CurveOverlayCard({ profiles }: CurveOverlayCardProps) {
     return (
       <article className="relative flex h-full flex-col rounded-md border border-foreground/15 bg-card p-6">
         <div className="flex items-center justify-between border-b border-foreground/10 pb-3">
-          <span className="label-caps-copper">Figura 01</span>
+          <span className="label-caps-brand">Figura 01</span>
           <span className="label-caps">Curva σ x ε</span>
         </div>
         <div className="flex flex-1 items-center justify-center py-12">
@@ -133,13 +133,13 @@ export function CurveOverlayCard({ profiles }: CurveOverlayCardProps) {
     <article className="corner-brackets relative flex h-full flex-col rounded-md border border-foreground/15 bg-card p-5">
       <div className="flex items-start justify-between gap-3 border-b border-foreground/10 pb-4">
         <div>
-          <span className="label-caps-copper">Figura 01</span>
+          <span className="label-caps-brand">Figura 01</span>
           <h2 className="mt-1 font-display text-3xl leading-tight tracking-tight">
             Curva <span className="italic">tensão por deformação</span>
           </h2>
           <p className="mt-1 max-w-md text-xs text-muted-foreground">
             Sobreposição do ensaio de maior σ por perfil de impressão. As cores acompanham a
-            temperatura, do azul mais frio ao cobre mais quente.
+            temperatura, do azul na mais fria aos tons quentes nas mais altas.
           </p>
         </div>
         {summary ? (
@@ -196,7 +196,7 @@ export function CurveOverlayCard({ profiles }: CurveOverlayCardProps) {
                 width={32}
               />
               <ChartTooltip
-                cursor={{ stroke: 'var(--copper)', strokeWidth: 1, strokeDasharray: '3 3' }}
+                cursor={{ stroke: 'var(--brand)', strokeWidth: 1, strokeDasharray: '3 3' }}
                 content={<ChartTooltipContent indicator="line" />}
               />
               {series.map((item) => (

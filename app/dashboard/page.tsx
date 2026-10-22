@@ -42,8 +42,8 @@ export default async function DashboardPage() {
 
   return (
     <DashboardLayout>
-      <div className="relative mx-auto w-full max-w-[1320px] space-y-8 pb-12">
-        <div className="pointer-events-none absolute inset-0 -z-10 grain opacity-60" aria-hidden="true" />
+      <div className="relative isolate mx-auto w-full max-w-[1320px] space-y-8 pb-12">
+        <div className="pointer-events-none absolute inset-0 -z-10 graph-paper opacity-60" aria-hidden="true" />
 
         <EditorialHeader totalTests={stats.totalTests} lastTestAt={stats.lastTest?.createdAt} />
 

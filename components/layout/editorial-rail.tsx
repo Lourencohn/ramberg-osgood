@@ -80,7 +80,7 @@ export function EditorialRail() {
         <div className="flex h-16 items-center justify-center border-b border-foreground/10">
           <Link
             href="/dashboard"
-            className="flex size-9 items-center justify-center rounded-md border border-foreground/10 bg-background transition-colors hover:border-copper"
+            className="flex size-9 items-center justify-center rounded-md border border-foreground/10 bg-background transition-colors hover:border-brand"
           >
             <Image src="/logo.png" alt="ResistencIA" width={26} height={26} />
             <span className="sr-only">ResistencIA</span>
@@ -104,14 +104,14 @@ export function EditorialRail() {
                           href={item.href}
                           className={`group relative flex size-10 items-center justify-center rounded-md transition-colors ${
                             isActive
-                              ? 'bg-copper-soft text-copper-deep'
+                              ? 'bg-brand-soft text-brand-deep'
                               : 'text-foreground/65 hover:bg-muted hover:text-foreground'
                           }`}
                           aria-current={isActive ? 'page' : undefined}
                         >
                           {isActive ? (
                             <span
-                              className="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-full bg-copper"
+                              className="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-full bg-brand"
                               aria-hidden="true"
                             />
                           ) : null}

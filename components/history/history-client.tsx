@@ -489,7 +489,7 @@ export function HistoryClient({
               placeholder="Buscar por ensaio, material, temperatura, velocidade ou perfil"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              className="h-10 border-foreground/15 bg-card pl-10 focus-visible:ring-copper"
+              className="h-10 border-foreground/15 bg-card pl-10 focus-visible:ring-brand"
             />
             {query ? (
               <button
@@ -609,7 +609,7 @@ export function HistoryClient({
             <Button
               variant="ghost"
               size="sm"
-              className="text-copper-deep hover:bg-copper-soft"
+              className="text-brand-deep hover:bg-brand-soft"
               onClick={() =>
                 setFilters({
                   source: 'all',
@@ -787,7 +787,7 @@ export function HistoryClient({
       >
         <SheetContent side="right" className="w-full sm:max-w-xl">
           <SheetHeader className="space-y-1 border-b border-foreground/10 pb-4">
-            <span className="label-caps-copper">Folha de leitura</span>
+            <span className="label-caps-brand">Folha de leitura</span>
             <SheetTitle className="font-display text-3xl italic">
               {detail ? `Ensaio ${String(detail.testNumber).padStart(2, '0')}` : detailId ? `Ensaio ${String(detailId).padStart(2, '0')}` : 'Ensaio'}
             </SheetTitle>
@@ -927,10 +927,10 @@ function KpiCell({
   return (
     <div className="group relative px-5 py-5">
       <div className="space-y-2">
-        <span className={accent ? 'label-caps-copper' : 'label-caps'}>{caption}</span>
+        <span className={accent ? 'label-caps-brand' : 'label-caps'}>{caption}</span>
         <p
           className={`font-display text-[32px] leading-none tracking-tight md:text-[40px] ${
-            accent ? 'text-copper-deep' : 'text-foreground'
+            accent ? 'text-brand-deep' : 'text-foreground'
           }`}
         >
           {value}
@@ -972,7 +972,7 @@ function ActionButton({
     <button
       type="button"
       {...props}
-      className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-transparent text-foreground/60 transition-all hover:border-foreground/15 hover:bg-background hover:text-copper-deep"
+      className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-transparent text-foreground/60 transition-all hover:border-foreground/15 hover:bg-background hover:text-brand-deep"
     >
       {icon}
     </button>

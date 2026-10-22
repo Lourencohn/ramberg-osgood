@@ -16,7 +16,7 @@ export function EditorialHeader({ totalTests, lastTestAt }: EditorialHeaderProps
   return (
     <header className="relative">
       <div className="flex items-center gap-3 pb-3 border-b border-foreground/15">
-        <span className="label-caps-copper">N.º 001</span>
+        <span className="label-caps-brand">N.º 001</span>
         <span className="h-px flex-1 bg-foreground/10" />
         <span className="label-caps tabular-nums">{dateLabel}</span>
         <span className="h-px w-8 bg-foreground/10" />
@@ -27,7 +27,7 @@ export function EditorialHeader({ totalTests, lastTestAt }: EditorialHeaderProps
         <div className="space-y-2">
           <h1 className="font-display text-[44px] leading-[1] tracking-tight md:text-[58px] md:leading-[0.95]">
             <span className="italic">Panorama</span>{' '}
-            <span className="italic text-copper-deep">experimental</span>
+            <span className="italic text-brand-deep">experimental</span>
           </h1>
           <p className="max-w-xl text-sm text-muted-foreground leading-relaxed">
             Comportamento mecânico de peças impressas em FDM, modelado por{' '}

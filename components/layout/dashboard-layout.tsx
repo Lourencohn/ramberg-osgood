@@ -102,7 +102,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                       href={item.href}
                       className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors ${
                         isActive
-                          ? 'bg-copper-soft text-copper-deep'
+                          ? 'bg-brand-soft text-brand-deep'
                           : 'text-foreground hover:bg-muted'
                       }`}
                     >
@@ -140,7 +140,7 @@ function TopBar({ currentLabel, onOpenPalette, onOpenMobileNav }: TopBarProps) {
       </Button>
 
       <div className="flex min-w-0 items-center gap-2">
-        <span className="label-caps-copper hidden sm:inline">ResistencIA</span>
+        <span className="label-caps-brand hidden sm:inline">ResistencIA</span>
         <span className="hidden h-3 w-px bg-foreground/20 sm:inline-block" />
         <span className="font-display truncate text-lg italic">{currentLabel}</span>
       </div>

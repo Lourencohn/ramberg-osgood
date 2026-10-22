@@ -14,12 +14,12 @@ export type AppSettings = {
   debugMode: boolean
 }
 
-export const SETTINGS_STORAGE_KEY = 'resistencia-settings'
+export const SETTINGS_STORAGE_KEY = 'resistencia-settings-v2'
 
 export const DEFAULT_SETTINGS: AppSettings = {
   stressCurvePoints: 100,
   autoValidation: true,
-  theme: 'system',
+  theme: 'light',
   unitSystem: 'si',
   interactiveCharts: true,
   exportFormat: 'csv',

@@ -1,29 +1,26 @@
 import type React from 'react'
 import type { Metadata } from 'next'
-import { Geist, Geist_Mono, Instrument_Serif, JetBrains_Mono } from 'next/font/google'
+import { IBM_Plex_Mono, IBM_Plex_Sans, IBM_Plex_Serif } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { ThemeProvider } from '@/components/theme-provider'
 import { SettingsProvider } from '@/components/settings-provider'
 import './globals.css'
 
-const geist = Geist({
+const plexSans = IBM_Plex_Sans({
+  weight: ['400', '500', '600', '700'],
   subsets: ['latin'],
   variable: '--font-sans-app',
 })
 
-const _geistMono = Geist_Mono({
-  subsets: ['latin'],
-  variable: '--font-geist-mono',
-})
-
-const instrumentSerif = Instrument_Serif({
-  weight: '400',
+const plexSerif = IBM_Plex_Serif({
+  weight: ['400', '500', '600'],
   style: ['normal', 'italic'],
   subsets: ['latin'],
   variable: '--font-display',
 })
 
-const jetbrainsMono = JetBrains_Mono({
+const plexMono = IBM_Plex_Mono({
+  weight: ['400', '500'],
   subsets: ['latin'],
   variable: '--font-mono-app',
 })
@@ -47,9 +44,9 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" suppressHydrationWarning>
       <body
-        className={`${geist.variable} ${instrumentSerif.variable} ${jetbrainsMono.variable} ${_geistMono.variable} font-sans antialiased`}
+        className={`${plexSans.variable} ${plexSerif.variable} ${plexMono.variable} font-sans antialiased`}
       >
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
           <SettingsProvider>{children}</SettingsProvider>
         </ThemeProvider>
         <Analytics />

@@ -52,7 +52,7 @@ function Section({ chapter, title, hint, icon: Icon, children }: SectionProps) {
     <section className="rounded-md border border-foreground/15 bg-card">
       <div className="flex items-center justify-between border-b border-foreground/10 px-5 py-4">
         <div className="flex items-center gap-3">
-          <span className="flex size-9 items-center justify-center rounded-md border border-foreground/15 bg-background text-copper-deep">
+          <span className="flex size-9 items-center justify-center rounded-md border border-foreground/15 bg-background text-brand-deep">
             <Icon className="size-4" />
           </span>
           <div>
@@ -366,7 +366,7 @@ export function SettingsClient() {
       </div>
 
       {status ? (
-        <div className="rounded-md border border-copper/30 bg-copper-soft/40 px-4 py-3 text-sm text-copper-deep">
+        <div className="rounded-md border border-brand/30 bg-brand-soft/40 px-4 py-3 text-sm text-brand-deep">
           {status}
         </div>
       ) : null}

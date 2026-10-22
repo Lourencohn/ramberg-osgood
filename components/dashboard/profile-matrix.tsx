@@ -112,7 +112,7 @@ export function ProfileMatrix({ profiles }: ProfileMatrixProps) {
     <article className="rounded-md border border-foreground/15 bg-card">
       <div className="flex flex-col gap-2 border-b border-foreground/10 px-5 py-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <span className="label-caps-copper">Tábua I</span>
+          <span className="label-caps-brand">Tábua I</span>
           <h2 className="mt-1 font-display text-2xl leading-tight tracking-tight">
             Matriz de <span className="italic">perfis</span>
           </h2>
@@ -123,7 +123,7 @@ export function ProfileMatrix({ profiles }: ProfileMatrixProps) {
         </div>
         <p className="font-mono-data text-[10px] uppercase tracking-widest text-muted-foreground">
           ordenado por{' '}
-          <span className="text-copper-deep">
+          <span className="text-brand-deep">
             {sortKey === 'temperature'
               ? 'temperatura'
               : sortKey === 'speed'
@@ -263,7 +263,7 @@ export function ProfileMatrix({ profiles }: ProfileMatrixProps) {
                       <span className="label-caps">Ensaios deste perfil</span>
                       <Link
                         href={`/history?query=${encodeURIComponent(row.profile.profile)}`}
-                        className="text-[11px] font-medium uppercase tracking-wider text-copper-deep underline-offset-4 hover:underline"
+                        className="text-[11px] font-medium uppercase tracking-wider text-brand-deep underline-offset-4 hover:underline"
                       >
                         ver no histórico →
                       </Link>
@@ -342,7 +342,7 @@ function SortHeader({
         onClick()
       }}
       className={`flex items-center gap-1 text-left transition-colors ${
-        active ? 'text-copper-deep' : 'text-muted-foreground hover:text-foreground'
+        active ? 'text-brand-deep' : 'text-muted-foreground hover:text-foreground'
       }`}
     >
       <span className="label-caps">{label}</span>

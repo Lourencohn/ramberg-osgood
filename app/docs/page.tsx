@@ -81,7 +81,7 @@ export default function DocsPage() {
                     key={item.text}
                     className="flex items-center gap-3 rounded-md border border-foreground/10 bg-background px-3 py-2.5"
                   >
-                    <item.icon className="size-4 shrink-0 text-copper-deep" />
+                    <item.icon className="size-4 shrink-0 text-brand-deep" />
                     <span className="text-sm">{item.text}</span>
                   </div>
                 ))}
@@ -114,13 +114,13 @@ export default function DocsPage() {
                   },
                 ].map((step, index) => (
                   <li key={step.href} className="flex items-start gap-3">
-                    <span className="flex size-7 shrink-0 items-center justify-center rounded-full border border-copper bg-copper-soft font-mono-data text-xs text-copper-deep">
+                    <span className="flex size-7 shrink-0 items-center justify-center rounded-full border border-brand bg-brand-soft font-mono-data text-xs text-brand-deep">
                       {String(index + 1).padStart(2, '0')}
                     </span>
                     <div className="space-y-0.5">
                       <Link
                         href={step.href}
-                        className="font-display text-lg italic text-foreground hover:text-copper-deep"
+                        className="font-display text-lg italic text-foreground hover:text-brand-deep"
                       >
                         {step.label}
                       </Link>
@@ -161,7 +161,7 @@ export default function DocsPage() {
                     key={item.symbol}
                     className="flex items-center gap-3 rounded-md border border-foreground/10 bg-background px-3 py-2.5"
                   >
-                    <span className="flex size-9 items-center justify-center rounded-md border border-copper bg-copper-soft font-display text-xl italic text-copper-deep">
+                    <span className="flex size-9 items-center justify-center rounded-md border border-brand bg-brand-soft font-display text-xl italic text-brand-deep">
                       {item.symbol}
                     </span>
                     <span className="text-sm">{item.name}</span>
@@ -183,7 +183,7 @@ export default function DocsPage() {
                   'Validação cruzada com os ensaios reais cadastrados',
                 ].map((item) => (
                   <li key={item} className="flex items-center gap-2 text-sm">
-                    <CheckCircle2 className="size-4 shrink-0 text-copper-deep" />
+                    <CheckCircle2 className="size-4 shrink-0 text-brand-deep" />
                     <span>{item}</span>
                   </li>
                 ))}
@@ -246,16 +246,16 @@ export default function DocsPage() {
               body={
                 <ul className="mt-1 space-y-1.5">
                   <li className="flex items-start gap-2">
-                    <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-copper" />
+                    <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-brand" />
                     Temperaturas mais baixas costumam aumentar a resistência, mas reduzem a adesão
                     entre camadas.
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-copper" />
+                    <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-brand" />
                     Velocidades mais baixas permitem melhor fusão entre filamentos.
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-copper" />
+                    <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-brand" />
                     Existe sempre um ponto ótimo entre temperatura e velocidade para cada peça.
                   </li>
                 </ul>
@@ -295,7 +295,7 @@ function Section({
   return (
     <section className="rounded-md border border-foreground/15 bg-card">
       <div className="border-b border-foreground/10 px-5 py-4">
-        <span className="label-caps-copper">{chapter}</span>
+        <span className="label-caps-brand">{chapter}</span>
         <h2 className="mt-1 font-display text-2xl italic leading-tight">{title}</h2>
       </div>
       <div className="space-y-4 px-5 py-5">{children}</div>
@@ -313,8 +313,8 @@ function InfoCallout({
   body: React.ReactNode
 }) {
   return (
-    <div className="flex items-start gap-3 rounded-md border border-copper/40 bg-copper-soft/40 p-4">
-      <Icon className="mt-0.5 size-4 shrink-0 text-copper-deep" />
+    <div className="flex items-start gap-3 rounded-md border border-brand/40 bg-brand-soft/40 p-4">
+      <Icon className="mt-0.5 size-4 shrink-0 text-brand-deep" />
       <div className="space-y-1 text-sm">
         <p className="font-display text-base italic text-foreground">{title}</p>
         <div className="text-muted-foreground">{body}</div>
@@ -339,7 +339,7 @@ function ParamCard({
   return (
     <div className="rounded-md border border-foreground/10 bg-background p-5">
       <div className="mb-3 flex items-center gap-3">
-        <span className="flex size-9 items-center justify-center rounded-md border border-foreground/15 text-copper-deep">
+        <span className="flex size-9 items-center justify-center rounded-md border border-foreground/15 text-brand-deep">
           <Icon className="size-4" />
         </span>
         <h4 className="font-display text-lg italic">{title}</h4>
@@ -367,7 +367,7 @@ function ResultCard({ title, range, body }: { title: string; range: string; body
     <div className="rounded-md border border-foreground/10 bg-background p-4">
       <div className="flex items-start justify-between gap-3">
         <h4 className="font-display text-lg italic">{title}</h4>
-        <span className="shrink-0 rounded-full border border-copper bg-copper-soft px-2.5 py-0.5 font-mono-data text-[11px] tabular-nums text-copper-deep">
+        <span className="shrink-0 rounded-full border border-brand bg-brand-soft px-2.5 py-0.5 font-mono-data text-[11px] tabular-nums text-brand-deep">
           {range}
         </span>
       </div>
@@ -390,9 +390,9 @@ function ShortcutLink({
   return (
     <Link
       href={href}
-      className="group flex items-center gap-3 rounded-md border border-foreground/15 bg-card p-4 transition-colors hover:border-copper hover:bg-copper-soft/30"
+      className="group flex items-center gap-3 rounded-md border border-foreground/15 bg-card p-4 transition-colors hover:border-brand hover:bg-brand-soft/30"
     >
-      <span className="flex size-10 items-center justify-center rounded-md border border-foreground/15 bg-background text-copper-deep transition-colors group-hover:border-copper">
+      <span className="flex size-10 items-center justify-center rounded-md border border-foreground/15 bg-background text-brand-deep transition-colors group-hover:border-brand">
         <Icon className="size-4" />
       </span>
       <div className="flex-1">

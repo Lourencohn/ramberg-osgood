@@ -25,7 +25,7 @@ export default function ImportPage() {
         }
       >
         <div className="flex items-start gap-3 rounded-md border border-foreground/15 bg-card p-4">
-          <Info className="mt-0.5 size-4 shrink-0 text-copper-deep" />
+          <Info className="mt-0.5 size-4 shrink-0 text-brand-deep" />
           <div className="space-y-1 text-sm">
             <p className="font-medium">Formatos aceitos</p>
             <p className="text-muted-foreground">

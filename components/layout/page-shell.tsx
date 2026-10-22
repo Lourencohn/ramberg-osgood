@@ -34,16 +34,16 @@ export function PageShell({
   return (
     <div
       className={cn(
-        'relative flex min-h-0 flex-1 flex-col gap-8 pb-12',
+        'relative isolate flex min-h-0 flex-1 flex-col gap-8 pb-12',
         !fullBleed && 'mx-auto w-full max-w-[1320px]',
         className
       )}
     >
-      <div className="pointer-events-none absolute inset-0 -z-10 grain opacity-60" aria-hidden="true" />
+      <div className="pointer-events-none absolute inset-0 -z-10 graph-paper opacity-60" aria-hidden="true" />
 
       <header>
         <div className="flex items-center gap-3 border-b border-foreground/15 pb-3">
-          {chapter ? <span className="label-caps-copper">{chapter}</span> : null}
+          {chapter ? <span className="label-caps-brand">{chapter}</span> : null}
           <span className="h-px flex-1 bg-foreground/10" />
           <span className="label-caps tabular-nums">{today}</span>
           {rubric ? (
@@ -58,7 +58,7 @@ export function PageShell({
           <div className="space-y-2">
             <h1 className="font-display text-[40px] leading-[1] tracking-tight md:text-[52px] md:leading-[0.95]">
               <span className="italic">{title}</span>
-              {accent ? <span className="italic text-copper-deep">{` ${accent}`}</span> : null}
+              {accent ? <span className="italic text-brand-deep">{` ${accent}`}</span> : null}
             </h1>
             {description ? (
               <p className="max-w-xl text-sm leading-relaxed text-muted-foreground">{description}</p>
