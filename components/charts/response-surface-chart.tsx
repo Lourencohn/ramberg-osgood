@@ -431,7 +431,8 @@ export function ResponseSurfaceChart({
 
     let predictionGeometry: THREE.SphereGeometry | null = null
     let predictionMaterial: THREE.MeshStandardMaterial | null = null
-    if (predictionPoint) {
+    const predictionValue = predictionPoint?.values[metricKey]
+    if (predictionPoint && typeof predictionValue === 'number') {
       predictionGeometry = new THREE.SphereGeometry(0.045, 18, 18)
       predictionMaterial = new THREE.MeshStandardMaterial({
         color: 0xf97316,
@@ -442,7 +443,7 @@ export function ResponseSurfaceChart({
       predictionMesh.position.set(
         mapX(predictionPoint.temperature),
         mapY(predictionPoint.speed),
-        mapZ(predictionPoint.values[metricKey])
+        mapZ(predictionValue)
       )
       scene.add(predictionMesh)
     }
@@ -507,8 +508,11 @@ export function ResponseSurfaceChart({
   const surfaceMin = metric.formatter(surface.zMin)
   const surfaceMax = metric.formatter(surface.zMax)
   const surfaceSpan = metric.formatter(zRange)
+  const currentValue = predictionPoint?.values[metricKey]
   const predictionValue = predictionPoint
-    ? metric.formatter(predictionPoint.values[metricKey])
+    ? typeof currentValue === 'number'
+      ? metric.formatter(currentValue)
+      : 'não atingido'
     : null
   const metricUnitLabel = metric.unit || 'adimensional'
 

@@ -50,6 +50,15 @@ export function StressStrainValidationChart({
       })),
     [points, unitSystem]
   )
+  const maxStrain = useMemo(
+    () =>
+      Math.max(
+        0,
+        ...displayCurve.map((point) => point.strain),
+        ...displayPoints.map((point) => point.strain)
+      ),
+    [displayCurve, displayPoints]
+  )
 
   if (!displayPoints.length || !displayCurve.length) {
     return (
@@ -82,7 +91,9 @@ export function StressStrainValidationChart({
         <LineChart data={displayCurve}>
           <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
           <XAxis
+            type="number"
             dataKey="strain"
+            domain={[0, maxStrain]}
             tickFormatter={(value) => strainFormatter.format(value)}
             className="text-xs"
             name={`Deformacao (${unitLabels.strain})`}

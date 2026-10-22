@@ -20,6 +20,15 @@ export interface RambergOsgoodTrainingPoint {
   rmse: number
   pointsUsed: number
   validationPoints?: StressStrainPoint[]
+  runs?: ExperimentalRun[]
+}
+
+export interface ExperimentalRun {
+  specimen: string
+  peakStrain: number
+  modulus: number | null
+  normalizedStress: number[]
+  points: StressStrainPoint[]
 }
 
 export interface MechanicalProperties {
@@ -35,9 +44,37 @@ export interface StressStrainPoint {
   stress: number
 }
 
+export interface ExpectedCurvePoint extends StressStrainPoint {
+  deviation: number
+}
+
+export interface CurveProperties {
+  yieldStress: number | null
+  ultimateStress: number
+  ductility: number
+  resilience: number | null
+  toughness: number
+  modulus: number
+}
+
+export interface Estimate {
+  mean: number
+  deviation: number
+}
+
+export interface ExperimentalPrediction {
+  curve: ExpectedCurvePoint[]
+  ultimateStress: Estimate
+  peakStrain: Estimate
+  modulus: Estimate | null
+  toughness: number
+  sources: Array<{ profile: string; temperature: number; speed: number; weight: number }>
+}
+
 export interface PredictionResult {
   input: PredictionInput
   rambergOsgood: RambergOsgoodParams
-  properties: MechanicalProperties
+  properties: CurveProperties
   curve: StressStrainPoint[]
+  experimental: ExperimentalPrediction | null
 }

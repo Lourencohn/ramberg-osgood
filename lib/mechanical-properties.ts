@@ -1,4 +1,9 @@
-import type { RambergOsgoodParams, MechanicalProperties, StressStrainPoint } from '@/types'
+import type {
+  CurveProperties,
+  MechanicalProperties,
+  RambergOsgoodParams,
+  StressStrainPoint,
+} from '@/types'
 import { calculateStress } from '@/lib/ramberg-osgood'
 
 export function calculateMechanicalProperties(
@@ -48,18 +53,16 @@ function calculateEnergy(params: RambergOsgoodParams, stressLimit: number) {
   return elasticTerm + plasticTerm
 }
 
-export function calculatePropertiesFromCurve(curve: StressStrainPoint[]): MechanicalProperties & {
-  modulus: number
-} {
+export function calculatePropertiesFromCurve(curve: StressStrainPoint[]): CurveProperties {
   const points = curve.filter(
     (point) => Number.isFinite(point.strain) && Number.isFinite(point.stress)
   )
   if (points.length < 3) {
     return {
-      yieldStress: 0,
+      yieldStress: null,
       ultimateStress: 0,
       ductility: 0,
-      resilience: 0,
+      resilience: null,
       toughness: 0,
       modulus: 0,
     }
@@ -72,7 +75,7 @@ export function calculatePropertiesFromCurve(curve: StressStrainPoint[]): Mechan
   for (const point of points) ultimateStress = Math.max(ultimateStress, point.stress)
   const ductility = points[points.length - 1].strain * 100
 
-  let yieldStress = ultimateStress
+  let yieldStress: number | null = null
   const gap = (point: StressStrainPoint) => point.stress - modulus * (point.strain - 0.002)
   for (let i = 1; i < points.length; i += 1) {
     if (gap(points[i]) <= 0 && gap(points[i - 1]) > 0) {
@@ -90,7 +93,7 @@ export function calculatePropertiesFromCurve(curve: StressStrainPoint[]): Mechan
     yieldStress,
     ultimateStress,
     ductility,
-    resilience: (yieldStress * yieldStress) / (2 * modulus),
+    resilience: yieldStress === null ? null : (yieldStress * yieldStress) / (2 * modulus),
     toughness,
     modulus,
   }

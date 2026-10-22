@@ -6,7 +6,7 @@ import { getRambergOsgoodTrainingData } from '@/lib/prediction-data'
 export const dynamic = 'force-dynamic'
 
 export default async function PredictPage() {
-  const trainingData = await getRambergOsgoodTrainingData()
+  const trainingData = await getRambergOsgoodTrainingData({ withRuns: true })
 
   return (
     <DashboardLayout>

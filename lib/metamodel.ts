@@ -84,6 +84,14 @@ function rbfWeights(input: PredictionInput, points: ProcessCoordinates[]) {
   })
 }
 
+export function profileWeights(input: PredictionInput, points: ProcessCoordinates[]): number[] {
+  const exactIndex = points.findIndex(
+    (point) => point.temperature === input.temperature && point.speed === input.speed
+  )
+  if (exactIndex >= 0) return points.map((_, index) => (index === exactIndex ? 1 : 0))
+  return rbfWeights(input, points)
+}
+
 function interpolateValue(
   points: RambergOsgoodTrainingPoint[],
   weights: number[],
@@ -195,12 +203,7 @@ export function rbfCurveInterpolation(
   )
   if (!validData.length) return { curve: [], maxStrain: 0 }
 
-  const exact = validData.find(
-    (point) => point.temperature === input.temperature && point.speed === input.speed
-  )
-  const weights = exact
-    ? validData.map((point) => (point === exact ? 1 : 0))
-    : rbfWeights(input, validData)
+  const weights = profileWeights(input, validData)
   const weightSum = weights.reduce((sum, weight) => sum + weight, 0) || 1
   const maxStrain =
     validData.reduce((sum, point, index) => sum + point.maxStrain * weights[index], 0) / weightSum

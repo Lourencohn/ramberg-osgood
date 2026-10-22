@@ -2,6 +2,7 @@ import type { PredictionInput, PredictionResult, RambergOsgoodTrainingPoint } fr
 import { rbfCurveInterpolation } from './metamodel'
 import { fitRambergOsgoodCurve, seedFromString } from './ramberg-osgood-fit'
 import { calculatePropertiesFromCurve } from './mechanical-properties'
+import { predictExperimentalCurve } from './experimental-curve'
 
 export async function predictProperties(
   input: PredictionInput,
@@ -17,12 +18,12 @@ export async function predictProperties(
     seed: seedFromString(`${input.temperature}-${input.speed}`),
     sampleSize: Math.min(400, curve.length),
   })
-  const { modulus: _modulus, ...properties } = calculatePropertiesFromCurve(curve)
 
   return {
     input,
     rambergOsgood: fit.params,
-    properties,
+    properties: calculatePropertiesFromCurve(curve),
     curve,
+    experimental: predictExperimentalCurve(input, trainingData),
   }
 }

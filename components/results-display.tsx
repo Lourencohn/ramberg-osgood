@@ -12,12 +12,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { StressStrainChart } from '@/components/charts/stress-strain-chart'
+import { PredictionCurvesChart } from '@/components/charts/prediction-curves-chart'
 import { StressStrainValidationChart } from '@/components/charts/stress-strain-validation-chart'
 import { RambergOsgoodLinearizationChart } from '@/components/charts/ramberg-osgood-linearization-chart'
 import { ResponseSurfaceChart } from '@/components/charts/response-surface-chart'
 import { useSettings } from '@/components/settings-provider'
-import type { PredictionResult, RambergOsgoodTrainingPoint } from '@/types'
+import type { Estimate, PredictionResult, RambergOsgoodTrainingPoint } from '@/types'
 import type { ExportFormat } from '@/lib/settings'
 import {
   buildHtmlTable,
@@ -39,8 +39,6 @@ import {
   Box,
   Zap,
   Target,
-  Percent,
-  Battery,
   Shield,
   CheckCircle2,
   Thermometer,
@@ -78,6 +76,14 @@ const strainFormatter = new Intl.NumberFormat('pt-BR', {
   maximumFractionDigits: 4,
 })
 
+const modulusFormatter = new Intl.NumberFormat('pt-BR', {
+  maximumFractionDigits: 0,
+})
+
+const percentFormatter = new Intl.NumberFormat('pt-BR', {
+  maximumFractionDigits: 0,
+})
+
 const clamp = (value: number, min = 0, max = 1) => Math.min(Math.max(value, min), max)
 
 const formatWithUnit = (
@@ -92,12 +98,25 @@ const formatWithUnit = (
   return unit ? `${formatted} ${unit}` : formatted
 }
 
+const formatEstimate = (
+  estimate: Estimate | null | undefined,
+  convert: (value: number) => number | null,
+  formatter: Intl.NumberFormat,
+  unit: string
+) => {
+  const mean = estimate ? convert(estimate.mean) : null
+  const deviation = estimate ? convert(estimate.deviation) : null
+  if (mean === null || deviation === null) return `-- ${unit}`
+  return `${formatter.format(mean)} ± ${formatter.format(deviation)} ${unit}`
+}
+
 export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
   const { settings } = useSettings()
   const [activeTab, setActiveTab] = useState('properties')
   const unitLabels = getUnitLabels(settings.unitSystem)
   const params = result?.rambergOsgood
   const properties = result?.properties
+  const experimental = result?.experimental ?? null
   const validTraining = useMemo(
     () =>
       trainingData.filter(
@@ -144,6 +163,7 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
     return { profile: closest, isExact: false }
   }, [result, validTraining])
   const validationPoints = validationProfile?.profile.validationPoints ?? []
+  const referenceRuns = validationProfile?.profile.runs ?? []
   const diagnostics = useMemo(() => {
     if (!result || !validTraining.length) return null
 
@@ -252,7 +272,10 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
     {
       code: 'σ₀',
       label: 'Tensao de referencia',
-      description: 'Marco de escoamento com offset de 0,2%.',
+      description:
+        params && properties && params.sigma_0 > properties.ultimateStress
+          ? 'Acima da tensão máxima: a curva rompe antes de chegar a esse escoamento.'
+          : 'Marco de escoamento com offset de 0,2%.',
       value: convertStress(params?.sigma_0, settings.unitSystem),
       unit: unitLabels.stress,
       formatter: stressFormatter,
@@ -267,51 +290,76 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
     },
     {
       code: 'limite',
-      label: 'Deformacao limite',
-      description: 'Maior deformacao observada nos ensaios.',
+      label: 'Deformação na tensão máxima',
+      description: 'Média ponderada dos perfis usados na interpolação.',
       value: maxStrain !== null ? maxStrain * 100 : null,
       unit: '%',
       formatter: numberFormatter,
     },
   ]
 
-  const mechanicalProperties = [
+  const toStress = (value: number | null | undefined) => convertStress(value, settings.unitSystem)
+  const toEnergy = (value: number | null | undefined) =>
+    convertEnergyDensity(value, settings.unitSystem)
+
+  const propertyComparison = [
     {
-      label: 'Tensao de escoamento (0,2%)',
-      value: convertStress(properties?.yieldStress, settings.unitSystem),
-      unit: unitLabels.stress,
-      formatter: stressFormatter,
-      icon: Shield,
+      label: 'Tensão máxima',
+      model: formatWithUnit(toStress(properties?.ultimateStress), stressFormatter, unitLabels.stress),
+      expected: formatEstimate(experimental?.ultimateStress, toStress, stressFormatter, unitLabels.stress),
     },
     {
-      label: 'Tensao maxima',
-      value: convertStress(properties?.ultimateStress, settings.unitSystem),
-      unit: unitLabels.stress,
-      formatter: stressFormatter,
-      icon: Zap,
+      label: 'Deformação na tensão máxima',
+      model: formatWithUnit(properties?.ductility, numberFormatter, '%'),
+      expected: formatEstimate(experimental?.peakStrain, (value) => value * 100, numberFormatter, '%'),
     },
     {
-      label: 'Ductilidade',
-      value: properties?.ductility,
-      unit: '%',
-      formatter: numberFormatter,
-      icon: Percent,
+      label: 'Módulo aparente',
+      model: formatWithUnit(toStress(properties?.modulus), modulusFormatter, unitLabels.stress),
+      expected: formatEstimate(experimental?.modulus, toStress, modulusFormatter, unitLabels.stress),
+    },
+    {
+      label: 'Tenacidade até a tensão máxima',
+      model: formatWithUnit(toEnergy(properties?.toughness), numberFormatter, unitLabels.energy),
+      expected: formatWithUnit(toEnergy(experimental?.toughness), numberFormatter, unitLabels.energy),
+    },
+    {
+      label: 'Escoamento convencional (0,2%)',
+      model:
+        properties && properties.yieldStress === null
+          ? 'não atingido'
+          : formatWithUnit(toStress(properties?.yieldStress), stressFormatter, unitLabels.stress),
+      expected: '--',
     },
     {
       label: 'Resiliência',
-      value: convertEnergyDensity(properties?.resilience, settings.unitSystem),
-      unit: unitLabels.energy,
-      formatter: numberFormatter,
-      icon: Battery,
-    },
-    {
-      label: 'Tenacidade',
-      value: convertEnergyDensity(properties?.toughness, settings.unitSystem),
-      unit: unitLabels.energy,
-      formatter: numberFormatter,
-      icon: Target,
+      model:
+        properties && properties.resilience === null
+          ? '--'
+          : formatWithUnit(toEnergy(properties?.resilience), numberFormatter, unitLabels.energy),
+      expected: '--',
     },
   ]
+
+  const referenceLabel = validationProfile
+    ? `Ensaios reais em ${formatTemperatureValue(validationProfile.profile.temperature)} e ${formatSpeedValue(
+        validationProfile.profile.speed
+      )} (${referenceRuns.length} CPs)`
+    : 'Ensaios reais'
+
+  const sourcesSummary = experimental
+    ? experimental.sources[0]?.weight === 1
+      ? `Condição já ensaiada: média dos ${referenceRuns.length} corpos de prova dessa condição.`
+      : `Média ponderada dos ensaios vizinhos, com maior peso para ${experimental.sources
+          .slice(0, 3)
+          .map(
+            (source) =>
+              `${formatTemperatureValue(source.temperature)} e ${formatSpeedValue(source.speed)} (${percentFormatter.format(
+                source.weight * 100
+              )}%)`
+          )
+          .join(', ')}.`
+    : null
 
   const glossary = [
     {
@@ -382,6 +430,39 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
         convertEnergyDensity(properties?.toughness, settings.unitSystem),
         unitLabels.energy,
       ],
+      ['properties', 'modulus', toStress(properties?.modulus), unitLabels.stress],
+      [
+        'experimental',
+        'ultimate_stress',
+        toStress(experimental?.ultimateStress.mean),
+        unitLabels.stress,
+      ],
+      [
+        'experimental',
+        'ultimate_stress_sd',
+        toStress(experimental?.ultimateStress.deviation),
+        unitLabels.stress,
+      ],
+      [
+        'experimental',
+        'peak_strain',
+        experimental ? experimental.peakStrain.mean * 100 : null,
+        '%',
+      ],
+      [
+        'experimental',
+        'peak_strain_sd',
+        experimental ? experimental.peakStrain.deviation * 100 : null,
+        '%',
+      ],
+      ['experimental', 'modulus', toStress(experimental?.modulus?.mean), unitLabels.stress],
+      [
+        'experimental',
+        'modulus_sd',
+        toStress(experimental?.modulus?.deviation),
+        unitLabels.stress,
+      ],
+      ['experimental', 'toughness', toEnergy(experimental?.toughness), unitLabels.energy],
     ]
   }
 
@@ -392,6 +473,21 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
       convertStress(point.stress, settings.unitSystem) ?? point.stress,
     ])
   }
+
+  const buildExpectedCurveRows = () => {
+    if (!experimental?.curve.length) return [] as Array<Array<string | number | null>>
+    return experimental.curve.map((point) => [
+      point.strain,
+      toStress(point.stress) ?? point.stress,
+      toStress(point.deviation) ?? point.deviation,
+    ])
+  }
+
+  const expectedCurveHeader = [
+    `strain (${unitLabels.strain})`,
+    `expected_stress (${unitLabels.stress})`,
+    `stress_deviation (${unitLabels.stress})`,
+  ]
 
   const buildCsvExport = () => {
     const summaryRows = buildExportSummaryRows()
@@ -404,7 +500,9 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
     if (!curveRows.length) return summaryCsv
     const curveHeader = [`strain (${unitLabels.strain})`, `stress (${unitLabels.stress})`]
     const curveCsv = toCsv([curveHeader, ...curveRows])
-    return `${summaryCsv}\n\n${curveCsv}`
+    const expectedRows = buildExpectedCurveRows()
+    const expectedCsv = expectedRows.length ? `\n\n${toCsv([expectedCurveHeader, ...expectedRows])}` : ''
+    return `${summaryCsv}\n\n${curveCsv}${expectedCsv}`
   }
 
   const buildJsonExport = () => {
@@ -423,6 +521,18 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
         n: params?.n ?? null,
         maxStrain: maxStrain,
       },
+      experimental: experimental
+        ? {
+            ultimateStress: toStress(experimental.ultimateStress.mean),
+            ultimateStressDeviation: toStress(experimental.ultimateStress.deviation),
+            peakStrain: experimental.peakStrain.mean,
+            peakStrainDeviation: experimental.peakStrain.deviation,
+            modulus: toStress(experimental.modulus?.mean),
+            modulusDeviation: toStress(experimental.modulus?.deviation),
+            toughness: toEnergy(experimental.toughness),
+            sources: experimental.sources,
+          }
+        : null,
       properties: {
         yieldStress: convertStress(properties?.yieldStress, settings.unitSystem),
         ultimateStress: convertStress(properties?.ultimateStress, settings.unitSystem),
@@ -436,6 +546,11 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
       payload.curve = buildCurveRows().map(([strain, stress]) => ({
         strain,
         stress,
+      }))
+      payload.expectedCurve = buildExpectedCurveRows().map(([strain, stress, deviation]) => ({
+        strain,
+        stress,
+        deviation,
       }))
     }
 
@@ -455,10 +570,17 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
           )
         : ''
 
+    const expectedRows = buildExpectedCurveRows()
+    const expectedTable =
+      settings.exportIncludeCharts && expectedRows.length
+        ? buildHtmlTable(expectedCurveHeader, expectedRows)
+        : ''
+
     return `
       <h1>Resultados da Previsao</h1>
       ${summaryTable}
       ${curveTable ? `<h2>Curva tensao x deformacao</h2>${curveTable}` : ''}
+      ${expectedTable ? `<h2>Curva experimental esperada</h2>${expectedTable}` : ''}
     `
   }
 
@@ -740,34 +862,38 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
                     <Target className="size-4 text-foreground" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-foreground">Propriedades mecanicas</h3>
+                    <h3 className="font-semibold text-foreground">Propriedades previstas</h3>
                     <p className="text-xs text-muted-foreground">
-                      Indicadores calculados diretamente a partir do modelo ajustado.
+                      Modelo Ramberg-Osgood ao lado da média ponderada dos ensaios reais, com ± 1
+                      desvio-padrão.
                     </p>
                   </div>
                 </div>
-                <div className="grid gap-2 sm:grid-cols-2 @5xl:grid-cols-3">
-                  {mechanicalProperties.map((property) => {
-                    const Icon = property.icon
-                    return (
-                      <div
-                        key={property.label}
-                        className="flex items-center gap-3 rounded-lg border border-border bg-white dark:bg-black dark:text-white px-3 py-2"
-                      >
-                        <Icon className="size-4 text-foreground" />
-                        <div className="flex-1">
-                          <p className="text-xs text-muted-foreground">{property.label}</p>
-                          <p className="font-mono font-semibold">
-                            {formatWithUnit(property.value, property.formatter, property.unit)}
-                          </p>
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
+                <table className="w-full text-xs">
+                  <thead>
+                    <tr className="border-b border-border text-left text-muted-foreground">
+                      <th className="py-1.5 pr-3 font-medium">Propriedade</th>
+                      <th className="py-1.5 pr-3 text-right font-medium">Ramberg-Osgood</th>
+                      <th className="py-1.5 text-right font-medium">Experimental esperada</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border/60">
+                    {propertyComparison.map((row) => (
+                      <tr key={row.label}>
+                        <td className="py-1.5 pr-3 text-muted-foreground">{row.label}</td>
+                        <td className="py-1.5 pr-3 text-right font-mono font-semibold text-foreground">
+                          {row.model}
+                        </td>
+                        <td className="py-1.5 text-right font-mono font-semibold text-foreground">
+                          {row.expected}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
                 <p className="mt-2 text-xs text-muted-foreground">
-                  Resiliência considera energia até o escoamento. Tenacidade considera a energia
-                  total.
+                  Escoamento e resiliência dependem do offset de 0,2%, que não se sustenta numa
+                  curva quase linear até a ruptura; por isso aparecem só no modelo.
                 </p>
               </div>
             </div>
@@ -829,13 +955,31 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
             ) : null}
           </TabsContent>
 
-          <TabsContent value="curve" className="relative mt-1 min-h-[360px]">
-            <div className="absolute inset-0 rounded-xl border border-border p-4">
-              <StressStrainChart
-                curve={result?.curve ?? []}
+          <TabsContent value="curve" className="mt-1 flex min-h-[440px] flex-col gap-2">
+            {experimental ? (
+              <div className="shrink-0 rounded-lg border border-border bg-white dark:bg-black dark:text-white px-3 py-2 text-xs text-muted-foreground">
+                <p>
+                  Ruptura esperada em{' '}
+                  <span className="font-mono font-semibold text-foreground">
+                    {formatEstimate(experimental.peakStrain, (value) => value * 100, numberFormatter, '%')}
+                  </span>{' '}
+                  de deformação, com{' '}
+                  <span className="font-mono font-semibold text-foreground">
+                    {formatEstimate(experimental.ultimateStress, toStress, stressFormatter, unitLabels.stress)}
+                  </span>
+                  . {sourcesSummary}
+                </p>
+              </div>
+            ) : null}
+            <div className="flex min-h-0 flex-1 flex-col rounded-xl border border-border p-3">
+              <PredictionCurvesChart
+                modelCurve={result?.curve ?? []}
+                experimental={experimental}
+                runs={referenceRuns}
+                runsLabel={referenceLabel}
                 unitSystem={settings.unitSystem}
                 interactive={settings.interactiveCharts}
-                className="h-full"
+                className="min-h-[340px] flex-1"
               />
             </div>
           </TabsContent>

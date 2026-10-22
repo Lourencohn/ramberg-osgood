@@ -124,7 +124,7 @@ function linearRegression(points: StressStrainPoint[]) {
   return { slope, intercept, r2 }
 }
 
-function findLinearRegion(
+export function findLinearRegion(
   ascending: StressStrainPoint[],
   options: ToeCompensationOptions = {}
 ): LinearRegion {
