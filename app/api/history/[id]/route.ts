@@ -1,3 +1,4 @@
+import { getCurrentUser } from '@/lib/auth'
 import { getRunDetail } from '@/lib/history-data'
 
 export const runtime = 'nodejs'
@@ -10,6 +11,10 @@ type RouteContext = {
 }
 
 export async function GET(_request: Request, { params }: RouteContext) {
+  if (!(await getCurrentUser())) {
+    return Response.json({ error: 'Faça login para continuar.' }, { status: 401 })
+  }
+
   const runId = Number(params.id)
   if (!Number.isFinite(runId)) {
     return Response.json({ error: 'Identificador inválido.' }, { status: 400 })

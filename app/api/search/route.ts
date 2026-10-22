@@ -1,3 +1,4 @@
+import { getCurrentUser } from '@/lib/auth'
 import { query } from '@/lib/db'
 
 export const runtime = 'nodejs'
@@ -15,6 +16,10 @@ type SearchRow = {
 }
 
 export async function GET(request: Request) {
+  if (!(await getCurrentUser())) {
+    return Response.json({ error: 'Faça login para continuar.' }, { status: 401 })
+  }
+
   const { searchParams } = new URL(request.url)
   const queryParam = searchParams.get('query')?.trim() ?? ''
   if (!queryParam) {
