@@ -1,0 +1,74 @@
+{
+  "gerado_em": "2026-10-09T14:59:36.126Z",
+  "excluidos": [
+    "A00-3"
+  ],
+  "corpos_de_prova": 44,
+  "pontos_arquivos_brutos": {
+    "min": 474,
+    "max": 1010
+  },
+  "forca_max_n": {
+    "min": 1575.6,
+    "max": 2196.3
+  },
+  "tensao_max_condicao_mpa": {
+    "min": 41.167411423862326,
+    "max": 46.947691444383835
+  },
+  "deformacao_ruptura_condicao_pct": {
+    "min": 7.240710814680991,
+    "max": 8.767009415578448
+  },
+  "deslocamento_acomodacao": {
+    "min": 0.00009866238031966927,
+    "max": 0.10666406664960251
+  },
+  "ro_r2_ensaio": {
+    "min": 0.9982808600085289,
+    "max": 0.9993381508434812
+  },
+  "ro_r2_condicao": {
+    "min": 0.9988166491265373,
+    "max": 0.9992361371009902
+  },
+  "validacao_cruzada": {
+    "tensao_max_curva": {
+      "mae": 1.287109385442275,
+      "rmse": 1.5506826892742456,
+      "maePct": 2.9292085409542126
+    },
+    "tensao_max_rbf": {
+      "mae": 1.2813109855929588,
+      "rmse": 1.5465289285943145,
+      "maePct": 2.9160125200451983
+    },
+    "tensao_max_parametros": {
+      "mae": 4.864337015639334,
+      "rmse": 5.228220597688634,
+      "maePct": 11.070277082467513
+    },
+    "tensao_max_media_das_outras_mae": 1.7100631732496447,
+    "modulo_rbf_mae": 24.20498492361546,
+    "modulo_rbf_mae_pct": 4.196253807349761,
+    "parametros_erro_relativo_pct": {
+      "E": 10.784129139667996,
+      "sigma0": 212.3888665429715,
+      "n": 59.110287119898295
+    },
+    "rmse_curva_prevista_medio_mpa": 1.2643286928408484,
+    "rmse_curva_ajustada_medio_mpa": 0.8270968545368396
+  },
+  "exemplo": {
+    "entrada": {
+      "temperatura_c": 205,
+      "velocidade_mm_s": 97
+    },
+    "E_mpa": 663.2581522621148,
+    "sigma0_mpa": 10.403274295376185,
+    "n": 1.1179481331118335,
+    "deformacao_max": 0.07674938836737787,
+    "tensao_na_deformacao_max_mpa": 44.24500040031956,
+    "tensao_max_rbf_direta_mpa": 44.273685846723055
+  }
+}
