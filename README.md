@@ -40,6 +40,9 @@ Aplicação web para previsão de curvas tensão‑deformação do PLA usando o 
    A importação lê os arquivos brutos da máquina (`data/T*/test_*/raw.txt`) e as dimensões medidas
    (`data/specimens.csv`), aplica o mesmo processamento da análise do TCC (`lib/tensile-processing.ts`)
    e grava a curva corrigida, as propriedades e o ajuste de Ramberg-Osgood de cada ensaio.
+   Em `test_measurements` fica só a curva corrigida (origem e pontos do início do trecho linear
+   até a ruptura); os registros brutos completos continuam em `data/`, referenciados em
+   `test_runs.raw_file_path`.
    Detalhes sobre a origem e os problemas corrigidos nos dados estão em [`data/README.md`](data/README.md).
 
 ## Importacao manual (CSV/TXT)

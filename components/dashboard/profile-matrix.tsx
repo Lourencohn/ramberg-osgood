@@ -110,7 +110,6 @@ export function ProfileMatrix({ profiles }: ProfileMatrixProps) {
 
   return (
     <article className="rounded-md border border-foreground/15 bg-card">
-      {/* Editorial header strip */}
       <div className="flex flex-col gap-2 border-b border-foreground/10 px-5 py-4 md:flex-row md:items-end md:justify-between">
         <div>
           <span className="label-caps-copper">Tábua I</span>
@@ -139,7 +138,6 @@ export function ProfileMatrix({ profiles }: ProfileMatrixProps) {
         </p>
       </div>
 
-      {/* Header row */}
       <div className="hidden grid-cols-[1.7fr_0.9fr_0.9fr_0.7fr_0.9fr_0.9fr_1.1fr_36px] items-center gap-3 border-b border-foreground/10 bg-muted/40 px-5 py-2.5 lg:grid">
         <span className="label-caps">Perfil</span>
         <SortHeader label="Temp." active={sortKey === 'temperature'} dir={sortDir} onClick={() => toggleSort('temperature')} />
@@ -151,7 +149,6 @@ export function ProfileMatrix({ profiles }: ProfileMatrixProps) {
         <span aria-hidden="true" />
       </div>
 
-      {/* Rows */}
       {rows.length === 0 ? (
         <div className="flex items-center justify-center px-5 py-12 text-sm italic text-muted-foreground">
           Nenhum perfil cadastrado ainda.
@@ -174,9 +171,7 @@ export function ProfileMatrix({ profiles }: ProfileMatrixProps) {
                   onClick={() => setExpandedKey((current) => (current === row.profile.profile ? null : row.profile.profile))}
                   className="group grid w-full grid-cols-[1fr_36px] items-center gap-3 px-5 py-3 text-left transition-colors hover:bg-muted/40 lg:grid-cols-[1.7fr_0.9fr_0.9fr_0.7fr_0.9fr_0.9fr_1.1fr_36px]"
                 >
-                  {/* Profile cell */}
                   <div className="flex items-center gap-3">
-                    {/* Temperature color indicator */}
                     <span
                       className="h-9 w-1 rounded-full"
                       style={{ backgroundColor: accentColor }}
@@ -195,7 +190,6 @@ export function ProfileMatrix({ profiles }: ProfileMatrixProps) {
                     </div>
                   </div>
 
-                  {/* Mobile readout: pills */}
                   <div className="contents lg:hidden">
                     <div className="col-span-2 mt-2 flex flex-wrap items-center gap-2">
                       <Pill>{tokens.temperature ?? 'sem dados'}</Pill>
@@ -214,7 +208,6 @@ export function ProfileMatrix({ profiles }: ProfileMatrixProps) {
                     </div>
                   </div>
 
-                  {/* Desktop columns */}
                   <span className="hidden font-mono-data text-sm tabular-nums lg:inline">
                     {tokens.temperature ?? 'sem dados'}
                   </span>
@@ -238,7 +231,6 @@ export function ProfileMatrix({ profiles }: ProfileMatrixProps) {
                     {row.avgStrain !== null ? strainFormatter.format(row.avgStrain) : 'sem dados'}
                   </span>
 
-                  {/* Sparkline */}
                   <div className="hidden h-9 w-full lg:block">
                     {row.bestPoints.length > 0 ? (
                       <ResponsiveContainer width="100%" height="100%">
@@ -258,7 +250,6 @@ export function ProfileMatrix({ profiles }: ProfileMatrixProps) {
                     )}
                   </div>
 
-                  {/* Chevron */}
                   <span className="flex h-8 w-8 items-center justify-center rounded-full border border-transparent text-foreground/40 transition-all group-hover:border-foreground/15 group-hover:text-foreground">
                     <ChevronRight
                       className={`h-4 w-4 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
@@ -266,7 +257,6 @@ export function ProfileMatrix({ profiles }: ProfileMatrixProps) {
                   </span>
                 </button>
 
-                {/* Expanded panel */}
                 {isExpanded ? (
                   <div className="border-t border-foreground/10 bg-muted/30 px-5 py-4">
                     <div className="mb-3 flex items-center justify-between">

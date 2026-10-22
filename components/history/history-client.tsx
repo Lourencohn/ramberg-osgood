@@ -462,7 +462,6 @@ export function HistoryClient({
 
   return (
     <div className="space-y-6">
-      {/* Editorial KPI strip */}
       <section className="grid grid-cols-2 divide-y divide-foreground/10 border-y border-foreground/15 md:grid-cols-3 md:divide-x md:divide-y-0">
         <KpiCell
           caption="Ensaios no acervo"
@@ -482,7 +481,6 @@ export function HistoryClient({
         />
       </section>
 
-      {/* Toolbar: search + filters + export */}
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div className="flex flex-1 items-center gap-2">
           <div className="relative flex-1">
@@ -634,7 +632,6 @@ export function HistoryClient({
         </div>
       ) : null}
 
-      {/* Dense list */}
       {filteredRuns.length === 0 ? (
         <div className="flex items-center justify-center rounded-md border border-dashed border-foreground/20 bg-card p-10 text-center">
           <div>
@@ -646,7 +643,6 @@ export function HistoryClient({
         </div>
       ) : (
         <article className="overflow-hidden rounded-md border border-foreground/15 bg-card">
-          {/* Header row (lg+) */}
           <div className="hidden grid-cols-[1.6fr_1.1fr_0.8fr_0.8fr_0.9fr_0.9fr_0.7fr_88px] items-center gap-3 border-b border-foreground/10 bg-muted/40 px-5 py-2.5 lg:grid">
             <span className="label-caps">Ensaio</span>
             <span className="label-caps">Perfil</span>
@@ -674,7 +670,6 @@ export function HistoryClient({
               return (
                 <li key={run.id} className="group">
                   <div className="grid grid-cols-1 gap-3 px-5 py-3.5 transition-colors hover:bg-muted/40 lg:grid-cols-[1.6fr_1.1fr_0.8fr_0.8fr_0.9fr_0.9fr_0.7fr_88px] lg:items-center">
-                    {/* Ensaio col */}
                     <div className="flex items-center gap-3">
                       <span
                         className="h-9 w-1 rounded-full"
@@ -699,7 +694,6 @@ export function HistoryClient({
                       </div>
                     </div>
 
-                    {/* Perfil col */}
                     <div className="hidden flex-col lg:flex">
                       <span className="font-display italic">{tokens.material}</span>
                       <span className="font-mono-data text-[11px] text-muted-foreground">
@@ -707,7 +701,6 @@ export function HistoryClient({
                       </span>
                     </div>
 
-                    {/* Mobile pills row */}
                     <div className="flex flex-wrap items-center gap-2 lg:hidden">
                       <Pill>{tokens.material}</Pill>
                       <Pill>{tokens.temperature ?? 'sem temp.'}</Pill>
@@ -715,7 +708,6 @@ export function HistoryClient({
                       <Pill mono>{countFormatter.format(run.pointCount)} pts</Pill>
                     </div>
 
-                    {/* Temp/Speed/Stress/Strain/Points (desktop) */}
                     <span className="hidden font-mono-data text-sm tabular-nums lg:inline">
                       {formatWithUnit(tempValue, tempFormatter, unitLabels.temperature)}
                     </span>
@@ -741,7 +733,6 @@ export function HistoryClient({
                       {countFormatter.format(run.pointCount)}
                     </span>
 
-                    {/* Mobile stress row */}
                     <div className="flex items-center justify-between gap-3 lg:hidden">
                       <div className="flex items-baseline gap-1">
                         <span className="font-display text-2xl leading-none">
@@ -763,7 +754,6 @@ export function HistoryClient({
                       </div>
                     </div>
 
-                    {/* Actions (desktop) */}
                     <div className="hidden items-center justify-end gap-1 lg:flex">
                       <ActionButton
                         aria-label="Visualizar"
@@ -784,7 +774,6 @@ export function HistoryClient({
         </article>
       )}
 
-      {/* Detail drawer */}
       <Sheet
         open={detailOpen}
         onOpenChange={(open) => {

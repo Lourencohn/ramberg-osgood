@@ -17,9 +17,7 @@ interface RambergOsgoodFitOptions {
 
 interface RambergOsgoodFitResult {
   params: RambergOsgoodParams
-  /** raiz do erro quadrático médio no espaço das deformações (mm/mm) */
   rmse: number
-  /** coeficiente de determinação no espaço das deformações */
   r2: number
   iterations: number
   pointsUsed: number
@@ -28,13 +26,11 @@ interface RambergOsgoodFitResult {
 }
 
 const DEFAULT_BOUNDS = {
-  // limite inferior abaixo dos módulos aparentes medidos pelo travessão (~480 MPa)
   E: [100, 10000],
   sigma_0: [5, 200],
   n: [1, 30],
 } satisfies Required<NonNullable<RambergOsgoodFitOptions['bounds']>>
 
-/** Semente determinística a partir de um texto (ex.: código do perfil ou do corpo de prova). */
 export function seedFromString(value: string): number {
   let hash = 0
   for (let i = 0; i < value.length; i += 1) {

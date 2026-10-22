@@ -1,26 +1,5 @@
 import type { StressStrainPoint } from '@/types'
 
-/**
- * Processamento de ensaios de tração (ASTM D638) a partir do arquivo bruto da máquina.
- *
- * Etapas (as mesmas descritas no TCC, Seção 7.5):
- * 1. conversão para grandezas de engenharia: tensão = força / área medida do corpo de prova;
- *    deformação = deslocamento do travessão / comprimento de referência;
- * 2. sanitização: descarta pontos não numéricos, força negativa e deslocamento negativo;
- * 3. correção da região de acomodação (toe compensation, ASTM D638 Anexo A1): o trecho de
- *    maior inclinação da curva ascendente é localizado por regressão linear em janelas
- *    deslizantes (20% dos pontos entre 2% e 65% da tensão máxima); a reta é prolongada até
- *    tensão zero e esse ponto vira o novo zero de deformação; os pontos anteriores ao início do
- *    trecho linear (desvio da reta maior que 2% da tensão máxima) formam a região de acomodação
- *    e são substituídos pela reta a partir da origem;
- * 4. extração de propriedades: módulo aparente (inclinação da janela), tensão máxima,
- *    deformação na tensão máxima, deformação na ruptura (última deformação com tensão de pelo
- *    menos 50% da máxima), escoamento por offset de 0,2%, resiliência e tenacidade (regra dos
- *    trapézios até a ruptura);
- * 5. recorte do trecho ascendente (início do carregamento até a tensão máxima), usado no ajuste
- *    do modelo de Ramberg-Osgood.
- */
-
 interface MachineRecord {
   time: number
   displacement: number
@@ -39,7 +18,6 @@ export interface EngineeringPoint extends StressStrainPoint {
 }
 
 export interface CorrectedPoint extends EngineeringPoint {
-  /** deformação de engenharia sem correção (deslocamento / L0) */
   rawStrain: number
 }
 
@@ -52,32 +30,23 @@ export interface LinearRegion {
 }
 
 export interface TensileProperties {
-  /** módulo de elasticidade aparente (MPa), medido pelo deslocamento do travessão */
   apparentModulus: number
   maxStress: number
   strainAtMaxStress: number
   ruptureStrain: number
-  /** escoamento convencional por offset de 0,2% (MPa); null se a curva não cruza a reta */
   offsetYieldStress: number | null
-  /** σy² / 2E (MJ/m³) */
   resilience: number | null
-  /** área sob a curva corrigida até a ruptura (MJ/m³) */
   toughness: number
   maxForce: number
 }
 
 export interface ProcessedTensileTest {
   geometry: SpecimenGeometry
-  /** curva de engenharia completa, sem correção */
   engineering: EngineeringPoint[]
-  /** curva corrigida da origem até a ruptura (o primeiro ponto é a origem) */
   corrected: CorrectedPoint[]
-  /** trecho ascendente da curva corrigida, da origem até a tensão máxima */
   ascending: CorrectedPoint[]
   linearRegion: LinearRegion
-  /** índice (na curva de engenharia) do primeiro ponto mantido após a acomodação */
   linearStartIndex: number
-  /** deformação subtraída na correção de acomodação */
   toeOffset: number
   properties: TensileProperties
 }
@@ -96,12 +65,10 @@ const DEFAULT_TOE_OPTIONS: Required<ToeCompensationOptions> = {
   minWindowPoints: 5,
 }
 
-/** Tolerância (fração da tensão máxima) para estender o trecho linear para trás a partir da janela. */
 const LINEAR_TOLERANCE_FRACTION = 0.02
 const RUPTURE_STRESS_FRACTION = 0.5
 const YIELD_OFFSET_STRAIN = 0.002
 
-/** Lê o .txt exportado pelo software da máquina (colunas: tempo, deslocamento, força). */
 export function parseMachineFile(content: string): MachineRecord[] {
   const lines = content.replace(/\u0000/g, '').split(/\r?\n/)
   const records: MachineRecord[] = []
@@ -157,7 +124,6 @@ function linearRegression(points: StressStrainPoint[]) {
   return { slope, intercept, r2 }
 }
 
-/** Localiza o trecho linear de maior inclinação da curva ascendente (janelas deslizantes). */
 function findLinearRegion(
   ascending: StressStrainPoint[],
   options: ToeCompensationOptions = {}
@@ -247,8 +213,6 @@ export function processTensileTest(
   const linearRegion = findLinearRegion(engineering.slice(0, maxIndex + 1), options)
   const toeOffset = -linearRegion.intercept / linearRegion.slope
 
-  // Início do trecho linear: a partir da janela, recua enquanto os pontos permanecem sobre a reta
-  // (desvio de até 2% da tensão máxima). Só o que vem antes disso é tratado como acomodação.
   const tolerance = LINEAR_TOLERANCE_FRACTION * maxStress
   let linearStart = linearRegion.startIndex
   for (let i = linearRegion.startIndex - 1; i >= 0; i -= 1) {

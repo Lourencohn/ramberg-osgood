@@ -1,6 +1,3 @@
--- PostgreSQL schema for PLA tensile test data and derived results.
--- Apply with: psql -d <db_name> -f db/schema.sql
-
 CREATE TABLE IF NOT EXISTS materials (
   id bigserial PRIMARY KEY,
   name text NOT NULL UNIQUE,

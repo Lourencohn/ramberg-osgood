@@ -1,13 +1,6 @@
 import type { RambergOsgoodTrainingPoint, StressStrainPoint } from '@/types'
 import { fitRambergOsgoodCurve, seedFromString } from '@/lib/ramberg-osgood-fit'
 
-/**
- * Montagem de um ponto de treinamento do metamodelo a partir dos ensaios de um perfil.
- *
- * Usada tanto pela plataforma (dados do banco) quanto pelo script de análise do TCC
- * (dados de data/), para que os dois caminhos produzam exatamente os mesmos parâmetros.
- */
-
 const MAX_POINTS_PER_TEST = 600
 const FIT_SAMPLE_SIZE = 400
 const VALIDATION_POINTS = 400
@@ -16,7 +9,6 @@ export interface ProfileTests {
   profile: string
   temperature: number
   speed: number
-  /** trecho ascendente de cada ensaio (origem até a tensão máxima), já corrigido */
   tests: StressStrainPoint[][]
 }
 
@@ -26,7 +18,6 @@ export function downsample<T>(points: T[], maxPoints: number): T[] {
   return points.filter((_, index) => index % step === 0)
 }
 
-/** Recorta o trecho ascendente (do início até o ponto de tensão máxima). */
 export function ascendingBranch(points: StressStrainPoint[]): StressStrainPoint[] {
   if (!points.length) return points
   let maxIndex = 0

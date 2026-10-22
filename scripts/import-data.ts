@@ -1,21 +1,3 @@
-/**
- * Importa os ensaios da série A para o banco a partir dos dados reais:
- *   - data/<perfil>/test_<n>/raw.txt  arquivo exportado pela máquina EMIC (tempo, deslocamento, força)
- *   - data/specimens.csv               dimensões medidas de cada corpo de prova
- *
- * Cada ensaio passa pelo mesmo processamento do script de análise do TCC
- * (lib/tensile-processing.ts): tensão pela área medida, deformação pelo comprimento de referência,
- * correção da região de acomodação e extração de propriedades. Em test_measurements fica a curva
- * corrigida; em mechanical_properties e ramberg_osgood_fits, as propriedades e o ajuste de cada
- * ensaio.
- *
- * Os arquivos processed.csv antigos (derivados das planilhas) não são mais usados: 12 abas
- * calculavam a tensão com área fixa de 31,37 mm² e A00-1/A00-2 não tinham aba (ver data/README.md).
- *
- * Uso:
- *   DATABASE_URL=... npm run db:import
- *   npm run db:import -- --dry-run        (processa e mostra o resumo, sem gravar)
- */
 import fs from 'node:fs'
 import path from 'node:path'
 import { Client } from 'pg'
@@ -100,12 +82,6 @@ function finite(value: number | null | undefined): number | null {
   return value === null || value === undefined || !Number.isFinite(value) ? null : value
 }
 
-/**
- * Grava em test_measurements a curva corrigida do ensaio (origem + pontos do início do trecho
- * linear até a ruptura). Os registros brutos completos continuam em data/.../raw.txt, referenciado
- * em test_runs.raw_file_path. Gravar só a curva corrigida evita misturar, nos gráficos que usam
- * COALESCE(deformacao_mm_mm, alongamento_mm_mm), pontos corrigidos com pontos da acomodação.
- */
 async function insertMeasurements(
   client: Client,
   testRunId: number,

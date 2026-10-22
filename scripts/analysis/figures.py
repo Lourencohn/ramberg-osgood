@@ -1,10 +1,3 @@
-"""Figuras do TCC geradas a partir dos resultados de scripts/analysis/analyze-dataset.ts.
-
-Uso (na raiz do repositório, depois de `npm run analysis`):
-    python3 scripts/analysis/figures.py
-
-Requer numpy, pandas e matplotlib. As figuras vão para analysis/figures/.
-"""
 from __future__ import annotations
 
 import json
@@ -13,18 +6,17 @@ from pathlib import Path
 import matplotlib
 
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt  # noqa: E402
-import numpy as np  # noqa: E402
-import pandas as pd  # noqa: E402
-from matplotlib import ticker  # noqa: E402
-from matplotlib.patches import FancyBboxPatch  # noqa: E402
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+from matplotlib import ticker
+from matplotlib.patches import FancyBboxPatch
 
 ROOT = Path(__file__).resolve().parents[2]
 RESULTS = ROOT / "analysis" / "results"
 OUT = ROOT / "analysis" / "figures"
 OUT.mkdir(parents=True, exist_ok=True)
 
-# Paleta categórica validada (dataviz/palette.md), na ordem fixa dos slots.
 SERIES = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4"]
 INK = "#1f1f1e"
 INK_2 = "#52514e"
@@ -60,7 +52,7 @@ plt.rcParams.update(
     }
 )
 
-WIDTH = 6.3  # polegadas (~16 cm, largura útil de página A4 com margens ABNT)
+WIDTH = 6.3
 CONDITIONS = ["A00", "A01", "A02", "A10", "A11", "A12", "A20", "A21", "A22"]
 TEMPS = {"0": 190, "1": 210, "2": 220}
 SPEEDS = {"0": 90, "1": 95, "2": 100}
@@ -116,7 +108,6 @@ def ascending(df: pd.DataFrame) -> pd.DataFrame:
     return df.iloc[: i + 1]
 
 
-# ------------------------------------------------------------------ curva típica anotada
 def fig_typical(code="A12-4"):
     t = tests.set_index("codigo").loc[code]
     c = corrected[corrected.codigo == code]
@@ -146,7 +137,6 @@ def fig_typical(code="A12-4"):
     save(fig, "curva_tipica_anotada.png")
 
 
-# ------------------------------------------------------------------ efeito do expoente n (modelo)
 def ro_strain(stress, E, s0, n):
     return stress / E + 0.002 * (stress / s0) ** n
 
@@ -168,7 +158,6 @@ def fig_n_effect():
     save(fig, "modelo_efeito_n.png")
 
 
-# ------------------------------------------------------------------ fluxo de dados
 def fig_flow():
     fig, ax = plt.subplots(figsize=(WIDTH, 2.9))
     ax.set_axis_off()
@@ -196,7 +185,6 @@ def fig_flow():
     save(fig, "fluxo_plataforma.png")
 
 
-# ------------------------------------------------------------------ brutas x corrigidas
 def fig_raw_vs_corrected(cond="A12"):
     fig, axes = plt.subplots(1, 2, figsize=(WIDTH, 2.9), sharey=True)
     codes = sorted(tests[tests.condicao == cond].codigo)
@@ -216,7 +204,6 @@ def fig_raw_vs_corrected(cond="A12"):
     save(fig, f"curvas_brutas_corrigidas_{cond}.png")
 
 
-# ------------------------------------------------------------------ 3 x 3 condições
 def fig_grid():
     fig, axes = plt.subplots(3, 3, figsize=(WIDTH, 6.2), sharex=True, sharey=True)
     for cond in CONDITIONS:
@@ -247,7 +234,6 @@ def fig_grid():
     save(fig, "curvas_por_condicao.png")
 
 
-# ------------------------------------------------------------------ comparação com os relatórios EMIC
 def fig_emic():
     fig, ax = plt.subplots(figsize=(WIDTH, 2.9))
     x = np.arange(len(CONDITIONS))
@@ -266,7 +252,6 @@ def fig_emic():
     save(fig, "comparacao_emic.png")
 
 
-# ------------------------------------------------------------------ gráfico de interação
 def fig_interaction():
     fig, axes = plt.subplots(1, 3, figsize=(WIDTH, 2.7))
     props = [("tensao_max_mpa", "Tensão máxima (MPa)"), ("modulo_aparente_mpa", "Módulo aparente (MPa)"),
@@ -288,7 +273,6 @@ def fig_interaction():
     save(fig, "interacao_temperatura_velocidade.png")
 
 
-# ------------------------------------------------------------------ ajuste de Ramberg-Osgood
 def fig_fit(cond="A12"):
     fig, ax = plt.subplots(figsize=(WIDTH, 3.0))
     codes = sorted(tests[tests.condicao == cond].codigo)
@@ -311,7 +295,6 @@ def fig_fit(cond="A12"):
     save(fig, f"ajuste_ramberg_osgood_{cond}.png")
 
 
-# ------------------------------------------------------------------ superfície de resposta
 def fig_surface():
     pivot = surface.pivot(index="velocidade_mm_s", columns="temperatura_c", values="tensao_max_curva_mpa")
     T, V = np.meshgrid(pivot.columns.values, pivot.index.values)
@@ -340,7 +323,6 @@ def fig_surface():
     save(fig, "superficie_tensao_maxima.png")
 
 
-# ------------------------------------------------------------------ validação cruzada: curvas
 def fig_cv_curves(conds=("A00", "A12", "A22")):
     fig, axes = plt.subplots(1, len(conds), figsize=(WIDTH, 2.7), sharey=True)
     for ax, cond in zip(axes, conds):
@@ -364,7 +346,6 @@ def fig_cv_curves(conds=("A00", "A12", "A22")):
     save(fig, "validacao_cruzada_curvas.png")
 
 
-# ------------------------------------------------------------------ validação cruzada: dispersão
 def fig_cv_scatter():
     fig, ax = plt.subplots(figsize=(4.2, 3.6))
     real = cv.tensao_max_real_mpa
@@ -374,7 +355,6 @@ def fig_cv_scatter():
     ax.plot([lo, hi], [lo, hi], color=INK_2, lw=0.8, ls="--", label="predição perfeita")
     ax.errorbar(real, pred, xerr=sd, fmt="o", color=SERIES[0], ms=5, capsize=2, lw=1,
                 label="condição (barra: desvio padrão dos ensaios)")
-    # posição dos rótulos escolhida à mão para evitar sobreposição (acima/abaixo, esquerda/direita)
     placement = {"A00": (-5, 4, "right"), "A01": (-5, -10, "right"), "A02": (3, 5, "left"), "A10": (4, -11, "left"),
                  "A11": (-5, 5, "right"), "A12": (4, 5, "left"), "A20": (4, -11, "left"), "A21": (-5, 5, "right"),
                  "A22": (4, -11, "left")}
@@ -395,7 +375,6 @@ def fig_cv_scatter():
     save(fig, "validacao_cruzada_dispersao.png")
 
 
-# ------------------------------------------------------------------ exemplo 205 °C / 97 mm/s
 def fig_example():
     fig, ax = plt.subplots(figsize=(WIDTH, 3.0))
     for i, cond in enumerate(["A01", "A02", "A11", "A12"]):

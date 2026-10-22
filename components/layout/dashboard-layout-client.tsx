@@ -52,12 +52,10 @@ export function DashboardLayoutClient({ children, user }: DashboardLayoutClientP
   const currentLabel = useCurrentLabel()
   const pathname = usePathname()
 
-  // Close mobile nav on route change
   useEffect(() => {
     setMobileNavOpen(false)
   }, [pathname])
 
-  // ⌘K / Ctrl+K opens the palette
   useEffect(() => {
     const handler = (event: KeyboardEvent) => {
       if (event.key === 'k' && (event.metaKey || event.ctrlKey)) {
@@ -88,7 +86,6 @@ export function DashboardLayoutClient({ children, user }: DashboardLayoutClientP
 
       <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} />
 
-      {/* Mobile drawer */}
       <Sheet open={mobileNavOpen} onOpenChange={setMobileNavOpen}>
         <SheetContent side="left" className="w-72 p-0">
           <SheetHeader className="flex flex-row items-center justify-between border-b border-foreground/10 px-5 py-4">

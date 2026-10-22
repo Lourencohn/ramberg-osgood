@@ -11,14 +11,6 @@ type TestPointRow = {
   stress: number | null
 }
 
-/**
- * Pontos de treinamento do metamodelo a partir do banco.
- *
- * A importação (scripts/import-data.ts) grava em test_measurements a curva já corrigida
- * (tensão pela área medida e deformação com correção de acomodação). Aqui cada ensaio é
- * recortado no trecho ascendente e os ensaios de um mesmo perfil são ajustados em conjunto
- * (lib/training-data.ts), como no script de análise do TCC.
- */
 export async function getRambergOsgoodTrainingData(): Promise<RambergOsgoodTrainingPoint[]> {
   const { rows } = await query<TestPointRow>(
     `

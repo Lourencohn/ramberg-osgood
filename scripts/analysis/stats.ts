@@ -1,14 +1,7 @@
-/**
- * Estatística usada no script de análise do TCC: descritivas (desvio padrão amostral, n − 1),
- * ANOVA de dois fatores com interação (somas de quadrados do tipo III, válidas também para
- * delineamentos desbalanceados) e distribuição F de Fisher.
- */
-
 export function mean(values: number[]): number {
   return values.reduce((sum, value) => sum + value, 0) / values.length
 }
 
-/** Desvio padrão amostral (divisor n − 1), como nos relatórios da máquina e na ASTM D638. */
 export function sampleStd(values: number[]): number {
   if (values.length < 2) return 0
   const m = mean(values)
@@ -61,7 +54,6 @@ function betaContinuedFraction(a: number, b: number, x: number): number {
   return h
 }
 
-/** Função beta incompleta regularizada I_x(a, b). */
 function regularizedBeta(x: number, a: number, b: number): number {
   if (x <= 0) return 0
   if (x >= 1) return 1
@@ -72,13 +64,11 @@ function regularizedBeta(x: number, a: number, b: number): number {
   return 1 - (front * betaContinuedFraction(b, a, 1 - x)) / b
 }
 
-/** P(F > f) para F ~ F(d1, d2). */
 function fSurvival(f: number, d1: number, d2: number): number {
   if (f <= 0) return 1
   return regularizedBeta(d2 / (d2 + d1 * f), d2 / 2, d1 / 2)
 }
 
-/** Valor crítico da distribuição F ao nível alpha (bissecção). */
 function fCritical(alpha: number, d1: number, d2: number): number {
   let lo = 0
   let hi = 1000
@@ -126,7 +116,6 @@ function residualSumOfSquares(X: number[][], y: number[]): number {
 }
 
 function effectCodes(level: number, levels: number): number[] {
-  // codificação por efeitos (soma zero): o último nível recebe -1 em todas as colunas
   return Array.from({ length: levels - 1 }, (_, j) =>
     level === levels - 1 ? -1 : level === j ? 1 : 0
   )
@@ -142,10 +131,6 @@ interface AnovaRow {
   p: number | null
 }
 
-/**
- * ANOVA de dois fatores com interação, somas de quadrados do tipo III.
- * `a` e `b` são os índices de nível (0..levels-1) de cada observação.
- */
 export function twoWayAnova(
   y: number[],
   a: number[],

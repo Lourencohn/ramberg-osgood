@@ -16,8 +16,6 @@ export default async function DashboardPage() {
 
   const avgPoints = stats.totalTests ? Math.round(stats.totalMeasurements / stats.totalTests) : 0
 
-  // KPI values pre-formatted for editorial display: the big number is the
-  // "headline", the unit/hint sit beneath for context.
   const kpis = [
     {
       caption: 'Ensaios catalogados',
@@ -45,14 +43,12 @@ export default async function DashboardPage() {
   return (
     <DashboardLayout>
       <div className="relative mx-auto w-full max-w-[1320px] space-y-8 pb-12">
-        {/* Paper-grain backdrop */}
         <div className="pointer-events-none absolute inset-0 -z-10 grain opacity-60" aria-hidden="true" />
 
         <EditorialHeader totalTests={stats.totalTests} lastTestAt={stats.lastTest?.createdAt} />
 
         <KpiStrip items={kpis} />
 
-        {/* Hero band: curve overlay (large), thermal rings and shortcuts on the right */}
         <section className="grid gap-5 lg:grid-cols-[1.7fr_1fr]">
           <CurveOverlayCard profiles={profileDetails} />
 
@@ -62,10 +58,8 @@ export default async function DashboardPage() {
           </div>
         </section>
 
-        {/* Dense profile matrix, replaces the long scrolling ProfileTests */}
         <ProfileMatrix profiles={profileDetails} />
 
-        {/* Editorial colophon */}
         <footer className="flex items-center justify-between border-t border-foreground/15 pt-4 text-[10px] uppercase tracking-[0.18em] text-foreground/40">
           <span>ResistencIA · vol. 01 · ed. {new Date().getFullYear()}</span>
           <span>Dados experimentais reais · sem síntese</span>

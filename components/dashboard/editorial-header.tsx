@@ -15,7 +15,6 @@ export function EditorialHeader({ totalTests, lastTestAt }: EditorialHeaderProps
 
   return (
     <header className="relative">
-      {/* Editorial top rule */}
       <div className="flex items-center gap-3 pb-3 border-b border-foreground/15">
         <span className="label-caps-copper">N.º 001</span>
         <span className="h-px flex-1 bg-foreground/10" />

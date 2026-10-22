@@ -77,7 +77,6 @@ export function EditorialRail({ user }: EditorialRailProps) {
   return (
     <TooltipProvider delayDuration={200}>
       <aside className="sticky top-0 z-30 hidden h-svh w-16 shrink-0 flex-col border-r border-foreground/15 bg-sidebar md:flex">
-        {/* Logo */}
         <div className="flex h-16 items-center justify-center border-b border-foreground/10">
           <Link
             href="/dashboard"
@@ -88,7 +87,6 @@ export function EditorialRail({ user }: EditorialRailProps) {
           </Link>
         </div>
 
-        {/* Nav, scrolls internally only if needed */}
         <nav className="flex-1 overflow-y-auto py-3">
           <ul className="flex flex-col items-center gap-1">
             {RAIL_SECTIONS.map((section, index) => (
@@ -132,7 +130,6 @@ export function EditorialRail({ user }: EditorialRailProps) {
           </ul>
         </nav>
 
-        {/* Footer: user avatar */}
         <div className="flex flex-col items-center gap-2 border-t border-foreground/10 p-2">
           <NavUser user={user} compact />
         </div>

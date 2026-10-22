@@ -48,11 +48,6 @@ function calculateEnergy(params: RambergOsgoodParams, stressLimit: number) {
   return elasticTerm + plasticTerm
 }
 
-/**
- * Propriedades obtidas diretamente de uma curva tensão-deformação (prevista ou experimental):
- * tensão máxima, deformação final, módulo pela inclinação inicial, escoamento por offset de 0,2%,
- * resiliência (σy²/2E) e tenacidade (regra dos trapézios).
- */
 export function calculatePropertiesFromCurve(curve: StressStrainPoint[]): MechanicalProperties & {
   modulus: number
 } {

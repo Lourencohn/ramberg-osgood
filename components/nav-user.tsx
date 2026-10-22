@@ -20,7 +20,6 @@ type NavUserProps = {
     email: string
     avatar?: string | null
   }
-  // Compact = only avatar, used inside the rail.
   compact?: boolean
 }
 

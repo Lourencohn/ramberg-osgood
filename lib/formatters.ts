@@ -13,8 +13,6 @@ export function formatDataSource(source?: string | null) {
 
 const KNOWN_MATERIALS = ['PLA', 'ABS', 'PETG', 'TPU', 'PA', 'PC']
 
-// Normalize material names from the database. The database has entries like
-// "PLA", "ABS", "03 ABS BLACK" — we extract the canonical family token.
 export function normalizeMaterial(raw?: string | null): string {
   if (!raw) return 'PLA'
   const cleaned = raw.replace(/[_\-]/g, ' ').trim()
@@ -27,8 +25,6 @@ export function normalizeMaterial(raw?: string | null): string {
   return upper.split(/\s+/)[0]
 }
 
-// Extract a friendly variant suffix from a verbose material name like
-// "03 ABS BLACK" → "BLACK". Returns null when no variant info is present.
 function extractMaterialVariant(raw?: string | null): string | null {
   if (!raw) return null
   const cleaned = raw.replace(/[_\-]/g, ' ').trim()
@@ -52,8 +48,6 @@ type ProfileNameOptions = {
   layerHeight?: number | null
 }
 
-// Humanized one-line profile name, e.g. "PLA · 190°C · 90 mm/s".
-// Falls back gracefully when a value is missing.
 export function formatProfileName({ material, temperature, speed }: ProfileNameOptions): string {
   const parts: string[] = []
   const variant = extractMaterialVariant(material)
@@ -71,7 +65,6 @@ export function formatProfileName({ material, temperature, speed }: ProfileNameO
   return parts.join(' · ')
 }
 
-// Structured tokens, useful when each piece needs its own styling (chips, mono).
 export function formatProfileTokens(options: ProfileNameOptions): {
   material: string
   variant: string | null
@@ -94,8 +87,6 @@ export function formatProfileTokens(options: ProfileNameOptions): {
   }
 }
 
-// Preserved for backward compatibility with screens that still call the
-// older "Temperatura X · Velocidade Y" sentence.
 export function formatProfileLabel(temperature: number, speed: number) {
   const hasTemperature = Number.isFinite(temperature) && temperature > 0
   const hasSpeed = Number.isFinite(speed) && speed > 0

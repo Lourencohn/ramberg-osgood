@@ -8,7 +8,6 @@ import { calculateStress } from '@/lib/ramberg-osgood'
 
 type InterpolationResult = RambergOsgoodParams & { maxStrain: number }
 
-/** Coordenadas de processo de um ponto de treinamento. */
 interface ProcessCoordinates {
   temperature: number
   speed: number
@@ -100,11 +99,6 @@ function interpolateValue(
   return clamp(value, min, max)
 }
 
-/**
- * Interpolação RBF gaussiana (médias ponderadas normalizadas) de uma grandeza escalar sobre o
- * plano temperatura × velocidade, com os mesmos pesos usados para os parâmetros constitutivos.
- * O resultado é limitado ao intervalo dos valores de treinamento.
- */
 export function rbfInterpolateScalar(
   input: PredictionInput,
   points: ProcessCoordinates[],
@@ -185,13 +179,6 @@ export function rbfInterpolation(
   }
 }
 
-/**
- * Interpolação no espaço das curvas: a curva prevista é a média ponderada (pesos RBF gaussianos)
- * das curvas ajustadas de cada condição de treinamento, tomadas na deformação normalizada
- * u = ε / ε_max (0 ≤ u ≤ 1). A deformação máxima prevista é a média ponderada das deformações
- * máximas. Como os parâmetros σ₀ e n são pouco identificáveis, interpolar as curvas, e não os
- * parâmetros isoladamente, preserva a forma e o ponto final de cada curva de treinamento.
- */
 export function rbfCurveInterpolation(
   input: PredictionInput,
   data: RambergOsgoodTrainingPoint[],

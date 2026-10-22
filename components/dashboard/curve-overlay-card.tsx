@@ -131,7 +131,6 @@ export function CurveOverlayCard({ profiles }: CurveOverlayCardProps) {
 
   return (
     <article className="corner-brackets relative flex h-full flex-col rounded-md border border-foreground/15 bg-card p-5">
-      {/* Editorial chart header */}
       <div className="flex items-start justify-between gap-3 border-b border-foreground/10 pb-4">
         <div>
           <span className="label-caps-copper">Figura 01</span>
@@ -155,9 +154,7 @@ export function CurveOverlayCard({ profiles }: CurveOverlayCardProps) {
         ) : null}
       </div>
 
-      {/* The chart */}
       <div className="relative mt-4 flex-1">
-        {/* Axis micro-labels editorial style */}
         <span className="label-caps absolute -left-1 top-0 -rotate-90 origin-top-left translate-y-6 text-foreground/50">
           σ (MPa) →
         </span>
@@ -224,7 +221,6 @@ export function CurveOverlayCard({ profiles }: CurveOverlayCardProps) {
         </span>
       </div>
 
-      {/* Legend as filter toggles, click to isolate */}
       <div className="mt-4 grid grid-cols-2 gap-x-3 gap-y-1.5 border-t border-foreground/10 pt-3 sm:grid-cols-3 lg:grid-cols-4">
         {series.map((item) => {
           const isHidden = hidden.has(item.key)

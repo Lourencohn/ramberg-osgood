@@ -44,7 +44,6 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
   const [results, setResults] = useState<SearchResult[]>([])
   const [loading, setLoading] = useState(false)
 
-  // Reset on close
   useEffect(() => {
     if (!open) {
       setQuery('')
@@ -53,7 +52,6 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
     }
   }, [open])
 
-  // Debounced server search for ensaios
   useEffect(() => {
     if (!open) return
     const trimmed = query.trim()

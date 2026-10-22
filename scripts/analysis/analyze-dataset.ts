@@ -1,15 +1,3 @@
-/**
- * Análise completa do dataset de ensaios de tração (série A) usada no TCC.
- *
- * Lê os arquivos brutos da máquina (data/<perfil>/test_<n>/raw.txt) e as dimensões medidas
- * (data/specimens.csv), aplica o processamento de lib/tensile-processing.ts, ajusta o modelo de
- * Ramberg-Osgood com lib/ramberg-osgood-fit.ts, monta os pontos de treinamento com
- * lib/training-data.ts e avalia o metamodelo de lib/metamodel.ts por validação cruzada.
- *
- * Uso:
- *   npx tsx scripts/analysis/analyze-dataset.ts
- *   npx tsx scripts/analysis/analyze-dataset.ts --exclude A00-3 --out analysis/results-sem-A00-3
- */
 import fs from 'node:fs'
 import path from 'node:path'
 import {
@@ -36,7 +24,6 @@ function argValue(name: string): string | undefined {
 const EXCLUDE = new Set((argValue('--exclude') ?? '').split(',').filter(Boolean))
 const OUT_DIR = path.resolve(ROOT, argValue('--out') ?? 'analysis/results')
 
-// ---------------------------------------------------------------- CSV
 function parseCsv(content: string): Record<string, string>[] {
   const rows: string[][] = []
   let field = ''
@@ -89,7 +76,6 @@ function writeCsv(file: string, rows: Record<string, unknown>[]) {
   fs.writeFileSync(file, lines.join('\n') + '\n')
 }
 
-// ---------------------------------------------------------------- dados
 interface Specimen {
   code: string
   condition: string
@@ -152,7 +138,6 @@ const results: TestResult[] = specimens.map((specimen) => {
   return { specimen, processed, fit, rawPoints: records.length }
 })
 
-// ---------------------------------------------------------------- por corpo de prova
 const testRows = results.map(({ specimen, processed, fit, rawPoints }) => ({
   codigo: specimen.code,
   condicao: specimen.condition,
@@ -185,7 +170,6 @@ const testRows = results.map(({ specimen, processed, fit, rawPoints }) => ({
 }))
 writeCsv(path.join(OUT_DIR, 'corpos_de_prova.csv'), testRows)
 
-// ---------------------------------------------------------------- por condição
 const conditions = [...new Set(results.map((result) => result.specimen.condition))].sort()
 const byCondition = (condition: string) =>
   results.filter((result) => result.specimen.condition === condition)
@@ -237,7 +221,6 @@ const conditionRows = conditions.map((condition) => {
 })
 writeCsv(path.join(OUT_DIR, 'condicoes.csv'), conditionRows)
 
-// ---------------------------------------------------------------- pontos de treinamento
 const trainingData: RambergOsgoodTrainingPoint[] = conditions
   .map((condition) => {
     const group = byCondition(condition)
@@ -265,7 +248,6 @@ writeCsv(
   }))
 )
 
-// ---------------------------------------------------------------- comparação com os relatórios EMIC
 const emicComparison = conditions.map((condition) => {
   const reports = emicRows.filter((row) => row.condition === condition && !EXCLUDE.has(row.code))
   const group = byCondition(condition)
@@ -304,7 +286,6 @@ const emicComparison = conditions.map((condition) => {
 })
 writeCsv(path.join(OUT_DIR, 'comparacao_emic.csv'), emicComparison)
 
-// ---------------------------------------------------------------- ANOVA
 const levelT = (r: TestResult) => TEMPERATURES.indexOf(r.specimen.temperature)
 const levelV = (r: TestResult) => SPEEDS.indexOf(r.specimen.speed)
 const anovaTargets: [string, (r: TestResult) => number][] = [
@@ -363,7 +344,6 @@ writeCsv(path.join(OUT_DIR, 'medias_marginais.csv'), [
   })),
 ])
 
-// ---------------------------------------------------------------- validação cruzada leave-one-out
 function curveStressRmse(
   params: RambergOsgoodTrainingPoint,
   curves: StressStrainPoint[][]
@@ -409,7 +389,6 @@ async function crossValidation() {
       train,
       means((r) => r.processed.properties.apparentModulus)
     )
-    // rota antiga (interpolação direta dos parâmetros), mantida só para comparação no TCC
     const paramInterpolation = rbfInterpolation(input, train)
     const paramStress = calculateStress(paramInterpolation.maxStrain, paramInterpolation)
     const predictedPoint = { ...left, ...prediction.rambergOsgood, maxStrain: left.maxStrain }
@@ -489,7 +468,6 @@ async function crossValidation() {
   }
 }
 
-// ---------------------------------------------------------------- superfície de resposta e exemplo
 async function responseSurface() {
   const rows: Record<string, unknown>[] = []
   const stressMeans = conditions.map((c) =>
@@ -536,7 +514,6 @@ async function responseSurface() {
   }
 }
 
-// ---------------------------------------------------------------- curvas para figuras
 function exportCurves() {
   const corrected: Record<string, unknown>[] = []
   const raw: Record<string, unknown>[] = []

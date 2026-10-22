@@ -43,12 +43,10 @@ export function ThermalRings({ data, totalRuns }: ThermalRingsProps) {
         </div>
       ) : (
         <>
-          {/* Concentric rings: each ring is a temperature, fill encodes test count */}
           <div className="mt-5 flex flex-1 items-center justify-center">
             <ThermalSvg data={sorted} totalRuns={totalRuns} />
           </div>
 
-          {/* Table-style readout */}
           <div className="mt-4 space-y-1.5 border-t border-foreground/10 pt-3">
             {sorted.map((item) => {
               const share = totalRuns ? (item.tests / totalRuns) * 100 : 0
@@ -100,7 +98,6 @@ function ThermalSvg({ data, totalRuns }: { data: TemperatureUsage[]; totalRuns: 
         </radialGradient>
       </defs>
 
-      {/* Soft thermal halo at the center */}
       <circle cx={CENTER} cy={CENTER} r={MAX_R + 6} fill="url(#thermal-center)" />
 
       {data.map((item, index) => {
@@ -114,7 +111,6 @@ function ThermalSvg({ data, totalRuns }: { data: TemperatureUsage[]; totalRuns: 
 
         return (
           <g key={item.temperature} transform={`rotate(-90 ${CENTER} ${CENTER})`}>
-            {/* Background track */}
             <circle
               cx={CENTER}
               cy={CENTER}
@@ -124,7 +120,6 @@ function ThermalSvg({ data, totalRuns }: { data: TemperatureUsage[]; totalRuns: 
               className="text-foreground/8"
               strokeWidth="6"
             />
-            {/* Filled arc */}
             <circle
               cx={CENTER}
               cy={CENTER}
@@ -139,7 +134,6 @@ function ThermalSvg({ data, totalRuns }: { data: TemperatureUsage[]; totalRuns: 
         )
       })}
 
-      {/* Center counter */}
       <text
         x={CENTER}
         y={CENTER - 2}

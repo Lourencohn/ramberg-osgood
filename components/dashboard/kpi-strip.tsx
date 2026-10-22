@@ -23,7 +23,6 @@ export function KpiStrip({ items }: KpiStripProps) {
 function KpiCell({ item, index }: { item: Kpi; index: number }) {
   return (
     <div className="group relative px-5 py-5 md:py-6">
-      {/* Index marker, like a chapter number in an editorial layout */}
       <span className="absolute right-3 top-3 font-mono-data text-[10px] tracking-widest text-foreground/30">
         0{index + 1}
       </span>
@@ -49,7 +48,6 @@ function KpiCell({ item, index }: { item: Kpi; index: number }) {
         ) : null}
       </div>
 
-      {/* Subtle copper accent that fills on hover, like ink soaking into paper */}
       <span
         className="absolute bottom-0 left-0 h-px w-0 bg-copper transition-all duration-500 group-hover:w-full"
         aria-hidden="true"

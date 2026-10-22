@@ -6,19 +6,14 @@ import { cn } from '@/lib/utils'
 
 type PageShellProps = {
   title: string
-  // Short, conversational subtitle. Avoid jargon and em dashes; keep under 110 chars.
   description?: string
-  // Editorial chapter tag (e.g. "Cap. III"). When omitted no rubric is shown.
   chapter?: string
-  // Tiny label that sits in the top rule (e.g. "Análise", "Configuração").
   rubric?: string
-  // Optional accent piece for the title (rendered in copper italic at the end).
   accent?: string
   actions?: React.ReactNode
   children: React.ReactNode
   className?: string
   contentClassName?: string
-  // Wide pages can opt out of the centered max-width.
   fullBleed?: boolean
 }
 
@@ -44,11 +39,9 @@ export function PageShell({
         className
       )}
     >
-      {/* Paper-grain backdrop */}
       <div className="pointer-events-none absolute inset-0 -z-10 grain opacity-60" aria-hidden="true" />
 
       <header>
-        {/* Editorial top rule */}
         <div className="flex items-center gap-3 border-b border-foreground/15 pb-3">
           {chapter ? <span className="label-caps-copper">{chapter}</span> : null}
           <span className="h-px flex-1 bg-foreground/10" />
