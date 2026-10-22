@@ -1,5 +1,8 @@
+import { format } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
+
 import { DashboardLayout } from '@/components/layout/dashboard-layout'
-import { EditorialHeader } from '@/components/dashboard/editorial-header'
+import { PageShell } from '@/components/layout/page-shell'
 import { KpiStrip } from '@/components/dashboard/kpi-strip'
 import { CurveOverlayCard } from '@/components/dashboard/curve-overlay-card'
 import { ThermalRings } from '@/components/dashboard/thermal-rings'
@@ -15,6 +18,9 @@ export default async function DashboardPage() {
   const { stats, temperatureUsage, profileDetails } = await getDashboardData()
 
   const avgPoints = stats.totalTests ? Math.round(stats.totalMeasurements / stats.totalTests) : 0
+  const lastReading = stats.lastTest?.createdAt
+    ? format(new Date(stats.lastTest.createdAt), "dd MMM yyyy 'às' HH:mm", { locale: ptBR })
+    : null
 
   const kpis = [
     {
@@ -42,29 +48,35 @@ export default async function DashboardPage() {
 
   return (
     <DashboardLayout>
-      <div className="relative isolate mx-auto w-full max-w-[1320px] space-y-8 pb-12">
-        <div className="pointer-events-none absolute inset-0 -z-10 graph-paper opacity-60" aria-hidden="true" />
-
-        <EditorialHeader totalTests={stats.totalTests} lastTestAt={stats.lastTest?.createdAt} />
-
+      <PageShell
+        chapter="N.º 001"
+        rubric="Painel experimental"
+        title="Panorama"
+        accent="experimental"
+        description={
+          <>
+            Comportamento mecânico de peças impressas em FDM, modelado por{' '}
+            <em className="font-display text-foreground">Ramberg-Osgood</em> sobre ensaios reais de
+            tração.{lastReading ? ` Última leitura em ${lastReading}.` : null}
+          </>
+        }
+        fit
+      >
         <KpiStrip items={kpis} />
 
-        <section className="grid gap-5 lg:grid-cols-[1.7fr_1fr]">
+        <section className="grid grid-cols-1 gap-4 xl:min-h-0 xl:flex-1 xl:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)]">
           <CurveOverlayCard profiles={profileDetails} />
 
-          <div className="flex flex-col gap-5">
-            <ThermalRings data={temperatureUsage} totalRuns={stats.totalTests} />
-            <EditorialActions />
+          <div className="flex flex-col gap-4 xl:min-h-0">
+            <ProfileMatrix profiles={profileDetails} />
+
+            <div className="grid grid-cols-1 shrink-0 gap-4 md:grid-cols-2">
+              <ThermalRings data={temperatureUsage} totalRuns={stats.totalTests} />
+              <EditorialActions />
+            </div>
           </div>
         </section>
-
-        <ProfileMatrix profiles={profileDetails} />
-
-        <footer className="flex items-center justify-between border-t border-foreground/15 pt-4 text-[10px] uppercase tracking-[0.18em] text-foreground/40">
-          <span>ResistencIA · vol. 01 · ed. {new Date().getFullYear()}</span>
-          <span>Dados experimentais reais · sem síntese</span>
-        </footer>
-      </div>
+      </PageShell>
     </DashboardLayout>
   )
 }

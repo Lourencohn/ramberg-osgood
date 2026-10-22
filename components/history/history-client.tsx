@@ -461,8 +461,8 @@ export function HistoryClient({
   const exportFormats: Array<'csv' | 'json' | 'xlsx' | 'pdf'> = ['csv', 'json', 'xlsx', 'pdf']
 
   return (
-    <div className="space-y-6">
-      <section className="grid grid-cols-2 divide-y divide-foreground/10 border-y border-foreground/15 md:grid-cols-3 md:divide-x md:divide-y-0">
+    <div className="flex flex-col gap-3 xl:min-h-0 xl:flex-1">
+      <section className="grid shrink-0 grid-cols-2 divide-y divide-foreground/10 border-y border-foreground/15 md:grid-cols-3 md:divide-x md:divide-y-0">
         <KpiCell
           caption="Ensaios no acervo"
           value={countFormatter.format(orderedRuns.length).padStart(3, '0')}
@@ -481,7 +481,7 @@ export function HistoryClient({
         />
       </section>
 
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+      <div className="flex shrink-0 flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div className="flex flex-1 items-center gap-2">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -489,7 +489,7 @@ export function HistoryClient({
               placeholder="Buscar por ensaio, material, temperatura, velocidade ou perfil"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              className="h-10 border-foreground/15 bg-card pl-10 focus-visible:ring-brand"
+              className="h-9 border-foreground/15 bg-card pl-10 focus-visible:ring-brand"
             />
             {query ? (
               <button
@@ -503,7 +503,7 @@ export function HistoryClient({
           </div>
           <Button
             variant="outline"
-            className="h-10 gap-2 border-foreground/15"
+            className="h-9 gap-2 border-foreground/15"
             onClick={() => setShowFilters((current) => !current)}
           >
             <SlidersHorizontal className="size-4" />
@@ -513,7 +513,7 @@ export function HistoryClient({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
-              className="h-10 gap-2 bg-foreground text-background hover:bg-foreground/90"
+              className="h-9 gap-2 bg-foreground text-background hover:bg-foreground/90"
               disabled={!exportRuns.length}
             >
               <FileSpreadsheet className="size-4" />
@@ -535,7 +535,7 @@ export function HistoryClient({
       </div>
 
       {showFilters ? (
-        <div className="grid gap-3 rounded-md border border-foreground/15 bg-card p-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid shrink-0 gap-3 rounded-md border border-foreground/15 bg-card p-3 sm:grid-cols-2 lg:grid-cols-4">
           <FilterField label="Origem">
             <select
               className="h-9 w-full rounded-md border border-foreground/15 bg-background px-3 text-sm"
@@ -642,8 +642,8 @@ export function HistoryClient({
           </div>
         </div>
       ) : (
-        <article className="overflow-hidden rounded-md border border-foreground/15 bg-card">
-          <div className="hidden grid-cols-[1.6fr_1.1fr_0.8fr_0.8fr_0.9fr_0.9fr_0.7fr_88px] items-center gap-3 border-b border-foreground/10 bg-muted/40 px-5 py-2.5 lg:grid">
+        <article className="flex flex-col overflow-hidden rounded-md border border-foreground/15 bg-card xl:min-h-0 xl:flex-1">
+          <div className="hidden grid-cols-[1.6fr_1.1fr_0.8fr_0.8fr_0.9fr_0.9fr_0.7fr_88px] shrink-0 items-center gap-3 border-b border-foreground/10 bg-muted/40 px-4 py-2 lg:grid overflow-y-hidden [scrollbar-gutter:stable]">
             <span className="label-caps">Ensaio</span>
             <span className="label-caps">Perfil</span>
             <span className="label-caps">Temp.</span>
@@ -654,7 +654,7 @@ export function HistoryClient({
             <span aria-hidden="true" />
           </div>
 
-          <ul className="divide-y divide-foreground/8">
+          <ul className="min-h-0 flex-1 divide-y divide-foreground/8 overflow-y-auto [scrollbar-gutter:stable]">
             {filteredRuns.map((run) => {
               const tokens = formatProfileTokens({
                 material: run.material,
@@ -669,16 +669,16 @@ export function HistoryClient({
 
               return (
                 <li key={run.id} className="group">
-                  <div className="grid grid-cols-1 gap-3 px-5 py-3.5 transition-colors hover:bg-muted/40 lg:grid-cols-[1.6fr_1.1fr_0.8fr_0.8fr_0.9fr_0.9fr_0.7fr_88px] lg:items-center">
+                  <div className="grid grid-cols-1 gap-3 px-4 py-3 transition-colors hover:bg-muted/40 lg:py-1.5 lg:grid-cols-[1.6fr_1.1fr_0.8fr_0.8fr_0.9fr_0.9fr_0.7fr_88px] lg:items-center">
                     <div className="flex items-center gap-3">
                       <span
-                        className="h-9 w-1 rounded-full"
+                        className="h-9 w-1 shrink-0 rounded-full lg:h-5"
                         style={{ backgroundColor: accentColor }}
                         aria-hidden="true"
                       />
-                      <div className="min-w-0">
+                      <div className="min-w-0 lg:flex lg:items-baseline lg:gap-3">
                         <div className="flex items-baseline gap-2">
-                          <span className="font-display text-lg italic">
+                          <span className="font-display text-lg italic lg:text-base">
                             Ensaio {String(run.testNumber).padStart(2, '0')}
                           </span>
                           {formatDataSource(run.source) ? (
@@ -694,7 +694,7 @@ export function HistoryClient({
                       </div>
                     </div>
 
-                    <div className="hidden flex-col lg:flex">
+                    <div className="hidden items-baseline gap-2 lg:flex">
                       <span className="font-display italic">{tokens.material}</span>
                       <span className="font-mono-data text-[11px] text-muted-foreground">
                         {run.profileCode}
@@ -925,11 +925,11 @@ function KpiCell({
   accent?: boolean
 }) {
   return (
-    <div className="group relative px-5 py-5">
-      <div className="space-y-2">
+    <div className="group relative px-4 py-2.5">
+      <div className="space-y-1">
         <span className={accent ? 'label-caps-brand' : 'label-caps'}>{caption}</span>
         <p
-          className={`font-display text-[32px] leading-none tracking-tight md:text-[40px] ${
+          className={`font-display text-[26px] leading-none tracking-tight md:text-[30px] ${
             accent ? 'text-brand-deep' : 'text-foreground'
           }`}
         >
@@ -972,7 +972,7 @@ function ActionButton({
     <button
       type="button"
       {...props}
-      className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-transparent text-foreground/60 transition-all hover:border-foreground/15 hover:bg-background hover:text-brand-deep"
+      className="inline-flex size-7 items-center justify-center rounded-full border border-transparent text-foreground/60 transition-all hover:border-foreground/15 hover:bg-background hover:text-brand-deep"
     >
       {icon}
     </button>

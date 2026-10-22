@@ -109,11 +109,11 @@ export function ProfileMatrix({ profiles }: ProfileMatrixProps) {
   const totalTests = profiles.reduce((sum, profile) => sum + profile.tests.length, 0)
 
   return (
-    <article className="rounded-md border border-foreground/15 bg-card">
-      <div className="flex flex-col gap-2 border-b border-foreground/10 px-5 py-4 md:flex-row md:items-end md:justify-between">
+    <article className="flex flex-col rounded-md border border-foreground/15 bg-card xl:min-h-0 xl:flex-1">
+      <div className="flex shrink-0 flex-col gap-2 border-b border-foreground/10 px-4 py-3 md:flex-row md:items-end md:justify-between">
         <div>
           <span className="label-caps-brand">Tábua I</span>
-          <h2 className="mt-1 font-display text-2xl leading-tight tracking-tight">
+          <h2 className="mt-1 font-display text-xl leading-tight tracking-tight">
             Matriz de <span className="italic">perfis</span>
           </h2>
           <p className="mt-0.5 text-xs text-muted-foreground">
@@ -138,7 +138,7 @@ export function ProfileMatrix({ profiles }: ProfileMatrixProps) {
         </p>
       </div>
 
-      <div className="hidden grid-cols-[1.7fr_0.9fr_0.9fr_0.7fr_0.9fr_0.9fr_1.1fr_36px] items-center gap-3 border-b border-foreground/10 bg-muted/40 px-5 py-2.5 lg:grid">
+      <div className="hidden grid-cols-[1.7fr_0.9fr_0.9fr_0.7fr_0.9fr_0.9fr_1.1fr_36px] shrink-0 items-center gap-3 border-b border-foreground/10 bg-muted/40 px-4 py-2 lg:grid overflow-y-hidden [scrollbar-gutter:stable]">
         <span className="label-caps">Perfil</span>
         <SortHeader label="Temp." active={sortKey === 'temperature'} dir={sortDir} onClick={() => toggleSort('temperature')} />
         <SortHeader label="Vel." active={sortKey === 'speed'} dir={sortDir} onClick={() => toggleSort('speed')} />
@@ -150,11 +150,11 @@ export function ProfileMatrix({ profiles }: ProfileMatrixProps) {
       </div>
 
       {rows.length === 0 ? (
-        <div className="flex items-center justify-center px-5 py-12 text-sm italic text-muted-foreground">
+        <div className="flex items-center justify-center px-4 py-10 text-sm italic text-muted-foreground">
           Nenhum perfil cadastrado ainda.
         </div>
       ) : (
-        <ul className="divide-y divide-foreground/8">
+        <ul className="min-h-0 flex-1 divide-y divide-foreground/8 overflow-y-auto [scrollbar-gutter:stable]">
           {rows.map((row) => {
             const tokens = formatProfileTokens({
               material: row.profile.material,
@@ -169,24 +169,22 @@ export function ProfileMatrix({ profiles }: ProfileMatrixProps) {
                 <button
                   type="button"
                   onClick={() => setExpandedKey((current) => (current === row.profile.profile ? null : row.profile.profile))}
-                  className="group grid w-full grid-cols-[1fr_36px] items-center gap-3 px-5 py-3 text-left transition-colors hover:bg-muted/40 lg:grid-cols-[1.7fr_0.9fr_0.9fr_0.7fr_0.9fr_0.9fr_1.1fr_36px]"
+                  className="group grid w-full grid-cols-[1fr_36px] items-center gap-3 px-4 py-1.5 text-left transition-colors hover:bg-muted/40 lg:grid-cols-[1.7fr_0.9fr_0.9fr_0.7fr_0.9fr_0.9fr_1.1fr_36px]"
                 >
                   <div className="flex items-center gap-3">
                     <span
-                      className="h-9 w-1 rounded-full"
+                      className="h-5 w-1 shrink-0 rounded-full"
                       style={{ backgroundColor: accentColor }}
                       aria-hidden="true"
                     />
-                    <div className="min-w-0">
-                      <div className="flex items-baseline gap-2">
-                        <span className="font-display text-lg italic">{tokens.material}</span>
-                        {tokens.variant ? (
-                          <span className="label-caps text-foreground/60">{tokens.variant}</span>
-                        ) : null}
-                      </div>
-                      <p className="font-mono-data text-[11px] text-muted-foreground">
+                    <div className="flex min-w-0 items-baseline gap-2">
+                      <span className="font-display text-base leading-tight italic">{tokens.material}</span>
+                      {tokens.variant ? (
+                        <span className="label-caps text-foreground/60">{tokens.variant}</span>
+                      ) : null}
+                      <span className="truncate font-mono-data text-[11px] text-muted-foreground">
                         {row.profile.profile}
-                      </p>
+                      </span>
                     </div>
                   </div>
 
@@ -231,7 +229,7 @@ export function ProfileMatrix({ profiles }: ProfileMatrixProps) {
                     {row.avgStrain !== null ? strainFormatter.format(row.avgStrain) : 'sem dados'}
                   </span>
 
-                  <div className="hidden h-9 w-full lg:block">
+                  <div className="hidden h-7 w-full lg:block">
                     {row.bestPoints.length > 0 ? (
                       <ResponsiveContainer width="100%" height="100%">
                         <LineChart data={row.bestPoints}>
@@ -246,11 +244,11 @@ export function ProfileMatrix({ profiles }: ProfileMatrixProps) {
                         </LineChart>
                       </ResponsiveContainer>
                     ) : (
-                      <span className="block h-px w-full translate-y-4 bg-foreground/15" />
+                      <span className="block h-px w-full translate-y-3 bg-foreground/15" />
                     )}
                   </div>
 
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full border border-transparent text-foreground/40 transition-all group-hover:border-foreground/15 group-hover:text-foreground">
+                  <span className="flex size-7 items-center justify-center rounded-full border border-transparent text-foreground/40 transition-all group-hover:border-foreground/15 group-hover:text-foreground">
                     <ChevronRight
                       className={`h-4 w-4 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
                     />
@@ -258,7 +256,7 @@ export function ProfileMatrix({ profiles }: ProfileMatrixProps) {
                 </button>
 
                 {isExpanded ? (
-                  <div className="border-t border-foreground/10 bg-muted/30 px-5 py-4">
+                  <div className="border-t border-foreground/10 bg-muted/30 px-4 py-3">
                     <div className="mb-3 flex items-center justify-between">
                       <span className="label-caps">Ensaios deste perfil</span>
                       <Link

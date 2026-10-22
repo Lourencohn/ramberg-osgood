@@ -65,16 +65,16 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const openPalette = useCallback(() => setPaletteOpen(true), [])
 
   return (
-    <div className="flex min-h-svh w-full bg-background text-foreground">
+    <div className="flex h-svh w-full overflow-hidden bg-background text-foreground">
       <EditorialRail />
 
-      <div className="flex min-h-svh min-w-0 flex-1 flex-col">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col">
         <TopBar
           currentLabel={currentLabel}
           onOpenPalette={openPalette}
           onOpenMobileNav={() => setMobileNavOpen(true)}
         />
-        <main className="flex min-h-0 flex-1 flex-col overflow-auto px-4 py-4 md:px-6 md:py-6 lg:px-8 lg:py-8">
+        <main className="flex min-h-0 flex-1 flex-col overflow-y-auto p-4 md:px-6 md:py-5">
           {children}
         </main>
       </div>
@@ -128,7 +128,7 @@ type TopBarProps = {
 
 function TopBar({ currentLabel, onOpenPalette, onOpenMobileNav }: TopBarProps) {
   return (
-    <header className="sticky top-0 z-20 flex h-14 items-center gap-3 border-b border-foreground/15 bg-background/85 px-4 backdrop-blur md:px-6">
+    <header className="z-20 flex h-12 shrink-0 items-center gap-3 border-b border-foreground/15 bg-background/85 px-4 backdrop-blur md:px-6">
       <Button
         variant="ghost"
         size="icon"
@@ -148,7 +148,7 @@ function TopBar({ currentLabel, onOpenPalette, onOpenMobileNav }: TopBarProps) {
       <button
         type="button"
         onClick={onOpenPalette}
-        className="ml-auto flex h-9 items-center gap-2 rounded-md border border-foreground/15 bg-card px-3 text-sm text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground"
+        className="ml-auto flex h-8 items-center gap-2 rounded-md border border-foreground/15 bg-card px-3 text-sm text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground"
       >
         <Search className="size-4" />
         <span className="hidden sm:inline">Buscar ou navegar</span>

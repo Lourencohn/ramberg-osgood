@@ -16,7 +16,7 @@ export default async function CalibracaoPage() {
         title="Calibrar"
         accent="parâmetros"
         description="Ajuste E, σ₀ e n diretamente sobre os ensaios e veja o quanto cada combinação se aproxima dos dados reais."
-        fullBleed
+        fit
       >
         <CalibrationClient trainingData={trainingData} />
       </PageShell>

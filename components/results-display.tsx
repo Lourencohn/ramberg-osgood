@@ -487,8 +487,8 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
   }
 
   return (
-    <Card className="h-full">
-      <CardHeader className="pb-4">
+    <Card className="flex-1 xl:min-h-0">
+      <CardHeader>
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <CardTitle className="text-lg">Resultados da Previsao</CardTitle>
@@ -521,9 +521,9 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
           </div>
         </div>
       </CardHeader>
-      <CardContent className="@container">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2 @sm:grid-cols-4 h-auto @sm:h-11">
+      <CardContent className="@container flex min-h-0 flex-1 flex-col">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="min-h-0 w-full flex-1">
+          <TabsList className="grid w-full shrink-0 grid-cols-2 @sm:grid-cols-4 h-auto @sm:h-9">
             <TabsTrigger value="properties" className="gap-1.5 py-2 @sm:py-0 text-xs min-w-0 overflow-hidden">
               <BarChart3 className="size-4 shrink-0" />
               <span className="@sm:hidden truncate">Resumo</span>
@@ -545,15 +545,15 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="properties" className="space-y-4 mt-4">
+          <TabsContent value="properties" className="mt-1 space-y-3 xl:min-h-0 xl:overflow-y-auto">
             {!result ? (
-              <div className="rounded-xl border border-dashed border-border p-6 text-sm text-muted-foreground">
+              <div className="rounded-lg border border-dashed border-border px-3 py-2 text-xs text-muted-foreground">
                 Gere uma previsao para visualizar os indicadores tecnicos.
               </div>
             ) : null}
 
-            <div className="grid gap-4 lg:grid-cols-3">
-              <div className="rounded-xl border border-border bg-white dark:bg-black dark:text-white p-4 space-y-3">
+            <div className="grid gap-3 lg:grid-cols-3">
+              <div className="rounded-xl border border-border bg-white dark:bg-black dark:text-white p-3 space-y-2">
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <Thermometer className="size-4 text-foreground" />
                   Entrada da simulacao
@@ -581,12 +581,12 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
                 </div>
               </div>
 
-              <div className="rounded-xl border border-border bg-white dark:bg-black dark:text-white p-4 space-y-3">
+              <div className="rounded-xl border border-border bg-white dark:bg-black dark:text-white p-3 space-y-2">
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <Database className="size-4 text-foreground" />
                   Envelope experimental
                 </div>
-                <div className="space-y-4 text-xs text-muted-foreground">
+                <div className="space-y-3 text-xs text-muted-foreground">
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <span>Temperatura ({unitLabels.temperature})</span>
@@ -647,7 +647,7 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
                 </div>
               </div>
 
-              <div className="rounded-xl border border-border bg-white dark:bg-black dark:text-white p-4 space-y-3">
+              <div className="rounded-xl border border-border bg-white dark:bg-black dark:text-white p-3 space-y-2">
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <Shield className="size-4 text-foreground" />
                   Qualidade do ajuste
@@ -700,9 +700,9 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
               </div>
             </div>
 
-            <div className="grid gap-4 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
-              <div className="rounded-xl border border-foreground/20 bg-white dark:bg-black dark:text-white p-4">
-                <div className="flex items-center gap-2 mb-4">
+            <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+              <div className="rounded-xl border border-foreground/20 bg-white dark:bg-black dark:text-white p-3">
+                <div className="flex items-center gap-2 mb-3">
                   <div className="flex size-8 items-center justify-center rounded-lg bg-foreground/10">
                     <Zap className="size-4 text-foreground" />
                   </div>
@@ -713,11 +713,11 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
                     </p>
                   </div>
                 </div>
-                <div className="grid gap-3 sm:grid-cols-2">
+                <div className="grid gap-2 sm:grid-cols-2">
                   {modelParameters.map((param) => (
                     <div
                       key={param.code}
-                      className="flex items-start justify-between gap-3 rounded-lg border border-border bg-white dark:bg-black dark:text-white px-4 py-3"
+                      className="flex items-start justify-between gap-3 rounded-lg border border-border bg-white dark:bg-black dark:text-white px-3 py-2"
                     >
                       <div>
                         <div className="flex items-center gap-2">
@@ -734,8 +734,8 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
                 </div>
               </div>
 
-              <div className="rounded-xl border border-border bg-white dark:bg-black dark:text-white p-4">
-                <div className="flex items-center gap-2 mb-4">
+              <div className="rounded-xl border border-border bg-white dark:bg-black dark:text-white p-3">
+                <div className="flex items-center gap-2 mb-3">
                   <div className="flex size-8 items-center justify-center rounded-lg bg-muted">
                     <Target className="size-4 text-foreground" />
                   </div>
@@ -746,13 +746,13 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
                     </p>
                   </div>
                 </div>
-                <div className="grid gap-3 sm:grid-cols-2">
+                <div className="grid gap-2 sm:grid-cols-2 @5xl:grid-cols-3">
                   {mechanicalProperties.map((property) => {
                     const Icon = property.icon
                     return (
                       <div
                         key={property.label}
-                        className="flex items-center gap-3 rounded-lg border border-border bg-white dark:bg-black dark:text-white px-4 py-3"
+                        className="flex items-center gap-3 rounded-lg border border-border bg-white dark:bg-black dark:text-white px-3 py-2"
                       >
                         <Icon className="size-4 text-foreground" />
                         <div className="flex-1">
@@ -765,15 +765,15 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
                     )
                   })}
                 </div>
-                <p className="mt-3 text-xs text-muted-foreground">
+                <p className="mt-2 text-xs text-muted-foreground">
                   Resiliência considera energia até o escoamento. Tenacidade considera a energia
                   total.
                 </p>
               </div>
             </div>
 
-            <div className="rounded-xl border border-border bg-white dark:bg-black dark:text-white p-4">
-              <div className="flex items-center gap-2 mb-3">
+            <div className="rounded-xl border border-border bg-white dark:bg-black dark:text-white p-3">
+              <div className="flex items-center gap-2 mb-2">
                 <div className="flex size-8 items-center justify-center rounded-lg bg-muted">
                   <Database className="size-4 text-foreground" />
                 </div>
@@ -784,11 +784,11 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
                   </p>
                 </div>
               </div>
-              <div className="grid gap-3 md:grid-cols-2">
+              <div className="grid gap-2 md:grid-cols-2 @5xl:grid-cols-3">
                 {glossary.map((item) => (
                   <div
                     key={item.term}
-                    className="rounded-lg border border-border bg-white dark:bg-black dark:text-white px-4 py-3 text-xs"
+                    className="rounded-lg border border-border bg-white dark:bg-black dark:text-white px-3 py-2 text-xs"
                   >
                     <p className="font-semibold text-foreground">{item.term}</p>
                     <p className="text-muted-foreground">{item.description}</p>
@@ -829,30 +829,31 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
             ) : null}
           </TabsContent>
 
-          <TabsContent value="curve" className="mt-4">
-            <div className="rounded-xl border border-border p-4">
+          <TabsContent value="curve" className="relative mt-1 min-h-[360px]">
+            <div className="absolute inset-0 rounded-xl border border-border p-4">
               <StressStrainChart
                 curve={result?.curve ?? []}
                 unitSystem={settings.unitSystem}
                 interactive={settings.interactiveCharts}
+                className="h-full"
               />
             </div>
           </TabsContent>
 
-          <TabsContent value="surfaces" className="mt-4">
-            <div className="rounded-xl border border-border p-4 bg-white dark:bg-black dark:text-white">
-              <ResponseSurfaceChart trainingData={trainingData} result={result} />
+          <TabsContent value="surfaces" className="mt-1 flex min-h-[460px] flex-col">
+            <div className="flex flex-1 flex-col rounded-xl border border-border p-3 bg-white dark:bg-black dark:text-white">
+              <ResponseSurfaceChart trainingData={trainingData} result={result} className="flex-1" />
             </div>
           </TabsContent>
 
-          <TabsContent value="validation" className="mt-4 space-y-4">
+          <TabsContent value="validation" className="mt-1 flex min-h-[440px] flex-col gap-3">
             {!result ? (
-              <div className="rounded-xl border border-dashed border-border p-6 text-sm text-muted-foreground">
+              <div className="rounded-lg border border-dashed border-border px-3 py-2 text-xs text-muted-foreground">
                 Gere uma previsao para validar a curva com pontos reais.
               </div>
             ) : (
               <>
-                <div className="rounded-xl border border-border bg-white dark:bg-black dark:text-white p-4 text-xs text-muted-foreground">
+                <div className="shrink-0 rounded-lg border border-border bg-white dark:bg-black dark:text-white px-3 py-2 text-xs text-muted-foreground">
                   {validationProfile ? (
                     <p>
                       {validationProfile.isExact
@@ -870,23 +871,26 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
                   )}
                 </div>
 
-                <div className="grid gap-4 lg:grid-cols-2">
-                  <div className="rounded-xl border border-border p-4">
-                    <h3 className="text-sm font-semibold text-foreground mb-3">
+                <div className="grid grid-cols-1 min-h-0 flex-1 gap-3 lg:grid-cols-2">
+                  <div className="flex flex-col rounded-xl border border-border p-3">
+                    <h3 className="text-sm font-semibold text-foreground mb-2">
                       Curva prevista x pontos reais
                     </h3>
-                    <StressStrainValidationChart
-                      curve={result.curve}
-                      points={validationPoints}
-                      unitSystem={settings.unitSystem}
-                      interactive={settings.interactiveCharts}
-                    />
+                    <div className="relative min-h-[300px] flex-1">
+                      <StressStrainValidationChart
+                        curve={result.curve}
+                        points={validationPoints}
+                        unitSystem={settings.unitSystem}
+                        interactive={settings.interactiveCharts}
+                        className="absolute inset-0 h-auto"
+                      />
+                    </div>
                   </div>
-                  <div className="rounded-xl border border-border p-4">
-                    <h3 className="text-sm font-semibold text-foreground mb-3">
+                  <div className="flex flex-col rounded-xl border border-border p-3">
+                    <h3 className="text-sm font-semibold text-foreground mb-1">
                       Linearizacao Ramberg-Osgood (log-log)
                     </h3>
-                    <p className="text-xs text-muted-foreground mb-3">
+                    <p className="text-xs text-muted-foreground mb-2">
                       A deformacao plastica e estimada removendo a parcela elastica; em escala
                       log-log, um bom ajuste tende a alinhar os pontos reais.
                     </p>
@@ -894,6 +898,7 @@ export function ResultsDisplay({ result, trainingData }: ResultsDisplayProps) {
                       points={validationPoints}
                       unitSystem={settings.unitSystem}
                       interactive={settings.interactiveCharts}
+                      className="flex-1"
                     />
                   </div>
                 </div>

@@ -5,6 +5,7 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import type { PredictionResult, RambergOsgoodTrainingPoint } from '@/types'
 import { rbfInterpolation } from '@/lib/metamodel'
+import { cn } from '@/lib/utils'
 import { calculateMechanicalProperties } from '@/lib/mechanical-properties'
 import {
   Select,
@@ -41,6 +42,7 @@ type SurfacePoint = {
 type ResponseSurfaceChartProps = {
   trainingData: RambergOsgoodTrainingPoint[]
   result: PredictionResult | null
+  className?: string
 }
 
 const numberFormatter = new Intl.NumberFormat('pt-BR', {
@@ -128,7 +130,11 @@ function isFiniteNumber(value: number) {
   return Number.isFinite(value)
 }
 
-export function ResponseSurfaceChart({ trainingData, result }: ResponseSurfaceChartProps) {
+export function ResponseSurfaceChart({
+  trainingData,
+  result,
+  className,
+}: ResponseSurfaceChartProps) {
   const [metricKey, setMetricKey] = useState<MetricKey>('yieldStress')
   const [isReady, setIsReady] = useState(false)
   const containerRef = useRef<HTMLDivElement | null>(null)
@@ -507,7 +513,7 @@ export function ResponseSurfaceChart({ trainingData, result }: ResponseSurfaceCh
   const metricUnitLabel = metric.unit || 'adimensional'
 
   return (
-    <div className="space-y-4">
+    <div className={cn('flex flex-col gap-3', className)}>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="text-sm font-semibold text-foreground">Superficie de Resposta 3D</p>
@@ -527,9 +533,11 @@ export function ResponseSurfaceChart({ trainingData, result }: ResponseSurfaceCh
         </Select>
       </div>
 
-      <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_220px]">
-        <div className="rounded-xl border border-border bg-white dark:bg-black dark:text-white p-3">
-          <div className="h-[360px] w-full" ref={containerRef} />
+      <div className="grid min-h-0 flex-1 gap-3 md:grid-cols-[minmax(0,1fr)_220px]">
+        <div className="flex flex-col rounded-xl border border-border bg-white dark:bg-black dark:text-white p-3">
+          <div className="relative min-h-[360px] flex-1">
+            <div className="absolute inset-0" ref={containerRef} />
+          </div>
           <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
             <span>Arraste para rotacionar. Role para zoom.</span>
             <span>

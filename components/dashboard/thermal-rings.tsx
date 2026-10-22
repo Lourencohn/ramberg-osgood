@@ -22,17 +22,17 @@ export function ThermalRings({ data, totalRuns }: ThermalRingsProps) {
   const maxTests = sorted.length ? Math.max(...sorted.map((d) => d.tests)) : 1
 
   return (
-    <article className="corner-brackets relative flex h-full flex-col rounded-md border border-foreground/15 bg-card p-5">
-      <div className="flex items-center justify-between border-b border-foreground/10 pb-3">
+    <article className="corner-brackets relative flex h-full flex-col rounded-md border border-foreground/15 bg-card px-4 py-3">
+      <div className="flex items-center justify-between border-b border-foreground/10 pb-2">
         <span className="label-caps-brand">Figura 02</span>
         <span className="label-caps">Espectro térmico</span>
       </div>
 
-      <div className="mt-3">
-        <h3 className="font-display text-2xl leading-tight tracking-tight">
+      <div className="mt-2">
+        <h3 className="font-display text-lg leading-tight tracking-tight">
           Distribuição por <span className="italic">temperatura</span>
         </h3>
-        <p className="mt-1 text-xs text-muted-foreground">
+        <p className="mt-0.5 text-xs text-muted-foreground">
           Quantidade de ensaios em cada bico térmico.
         </p>
       </div>
@@ -42,12 +42,12 @@ export function ThermalRings({ data, totalRuns }: ThermalRingsProps) {
           Sem dados.
         </div>
       ) : (
-        <>
-          <div className="mt-5 flex flex-1 items-center justify-center">
+        <div className="mt-3 flex flex-1 items-center gap-4">
+          <div className="w-[112px] shrink-0">
             <ThermalSvg data={sorted} totalRuns={totalRuns} />
           </div>
 
-          <div className="mt-4 space-y-1.5 border-t border-foreground/10 pt-3">
+          <div className="min-w-0 flex-1 space-y-1.5">
             {sorted.map((item) => {
               const share = totalRuns ? (item.tests / totalRuns) * 100 : 0
               const barWidth = (item.tests / maxTests) * 100
@@ -71,7 +71,7 @@ export function ThermalRings({ data, totalRuns }: ThermalRingsProps) {
               )
             })}
           </div>
-        </>
+        </div>
       )}
     </article>
   )
@@ -90,7 +90,7 @@ function ThermalSvg({ data, totalRuns }: { data: TemperatureUsage[]; totalRuns: 
 
   let cumulative = 0
   return (
-    <svg viewBox={`0 0 ${SIZE} ${SIZE}`} width={SIZE} height={SIZE} role="img" aria-label="Anéis térmicos">
+    <svg viewBox={`0 0 ${SIZE} ${SIZE}`} className="h-auto w-full" role="img" aria-label="Anéis térmicos">
       <defs>
         <radialGradient id="thermal-center" cx="50%" cy="50%" r="50%">
           <stop offset="0%" stopColor="var(--brand-soft)" stopOpacity="0.4" />

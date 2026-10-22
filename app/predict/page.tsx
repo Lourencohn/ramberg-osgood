@@ -16,6 +16,7 @@ export default async function PredictPage() {
         title="Nova"
         accent="predição"
         description="Informe a temperatura, a velocidade e o material. O sistema usa os ensaios reais já cadastrados para estimar a curva de tensão por deformação esperada."
+        fit
       >
         <PredictionWorkspace trainingData={trainingData} />
       </PageShell>

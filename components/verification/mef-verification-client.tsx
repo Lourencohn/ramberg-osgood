@@ -22,6 +22,7 @@ import {
   YAxis,
 } from 'recharts'
 import { Gauge, Orbit } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 const BAR_LENGTH = 120
 const BASE_AREA = 110
@@ -154,7 +155,7 @@ function mapColor(t: number) {
   return color
 }
 
-function MeshScene({ elements }: { elements: ElementState[] }) {
+function MeshScene({ elements, className }: { elements: ElementState[]; className?: string }) {
   const containerRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
@@ -170,13 +171,13 @@ function MeshScene({ elements }: { elements: ElementState[] }) {
 
     const scene = new THREE.Scene()
     const camera = new THREE.PerspectiveCamera(45, containerWidth / containerHeight, 0.1, 100)
-    camera.position.set(2.4, 2.1, 5.3)
+    camera.position.set(2.8, 2.2, 6.4)
 
     const controls = new OrbitControls(camera, renderer.domElement)
     controls.enableDamping = true
     controls.autoRotate = true
     controls.autoRotateSpeed = 0.6
-    controls.target.set(0, 0.5, 0)
+    controls.target.set(0, 0, 0)
     controls.update()
 
     const ambient = new THREE.AmbientLight(0xffffff, 0.7)
@@ -284,7 +285,7 @@ function MeshScene({ elements }: { elements: ElementState[] }) {
 
   if (!elements.length) {
     return (
-      <div className="h-[320px] flex items-center justify-center rounded-xl border border-dashed border-border">
+      <div className={cn('h-[320px] flex items-center justify-center rounded-xl border border-dashed border-border', className)}>
         <p className="text-sm text-muted-foreground">Sem malha para visualizar.</p>
       </div>
     )
@@ -292,9 +293,13 @@ function MeshScene({ elements }: { elements: ElementState[] }) {
 
   return (
     <div
-      ref={containerRef}
-      className="h-[320px] w-full rounded-xl border border-border bg-white/80 dark:bg-black/40"
-    />
+      className={cn(
+        'relative h-[320px] w-full overflow-hidden rounded-xl border border-border bg-white/80 dark:bg-black/40',
+        className
+      )}
+    >
+      <div ref={containerRef} className="absolute inset-0" />
+    </div>
   )
 }
 
@@ -349,12 +354,12 @@ export function MefVerificationClient() {
   ]
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[minmax(0,400px)_minmax(0,1fr)] lg:h-[calc(100svh-220px)] lg:items-stretch lg:overflow-hidden">
-      <Card className="flex h-full flex-col">
-        <CardHeader className="pb-4">
+    <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,340px)_minmax(0,1fr)] xl:min-h-0 xl:flex-1">
+      <Card className="flex flex-col xl:min-h-0">
+        <CardHeader>
           <div className="flex items-center gap-3">
-            <div className="flex size-10 items-center justify-center rounded-lg bg-foreground/10">
-              <Gauge className="size-5 text-foreground" />
+            <div className="flex size-8 items-center justify-center rounded-lg bg-foreground/10">
+              <Gauge className="size-4 text-foreground" />
             </div>
             <div>
               <CardTitle>Configuração do estudo</CardTitle>
@@ -362,24 +367,24 @@ export function MefVerificationClient() {
             </div>
           </div>
         </CardHeader>
-        <CardContent className="flex-1 overflow-y-auto">
+        <CardContent className="@container flex-1 xl:min-h-0 xl:overflow-y-auto">
           <Tabs defaultValue="config" className="space-y-3">
             <TabsList className="grid w-full grid-cols-2 h-auto gap-1 p-1">
-              <TabsTrigger value="config" className="py-2.5">
+              <TabsTrigger value="config" className="py-1.5">
                 Configuração
               </TabsTrigger>
-              <TabsTrigger value="summary" className="py-2.5">
+              <TabsTrigger value="summary" className="py-1.5">
                 Resumo
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="config" className="space-y-4">
+            <TabsContent value="config" className="space-y-3">
               <div className="space-y-2">
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                   Modelo constitutivo
                 </p>
                 <Select value={model} onValueChange={(value) => setModel(value as MaterialModel)}>
-                  <SelectTrigger>
+                  <SelectTrigger className="w-full">
                     <SelectValue placeholder="Selecione o modelo" />
                   </SelectTrigger>
                   <SelectContent>
@@ -394,7 +399,7 @@ export function MefVerificationClient() {
                   Nível de carga
                 </p>
                 <Select value={String(load)} onValueChange={(value) => setLoad(Number(value))}>
-                  <SelectTrigger>
+                  <SelectTrigger className="w-full">
                     <SelectValue placeholder="Selecione a carga" />
                   </SelectTrigger>
                   <SelectContent>
@@ -415,7 +420,7 @@ export function MefVerificationClient() {
                   value={String(meshCount)}
                   onValueChange={(value) => setMeshCount(Number(value))}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="w-full">
                     <SelectValue placeholder="Selecione a malha" />
                   </SelectTrigger>
                   <SelectContent>
@@ -428,7 +433,7 @@ export function MefVerificationClient() {
                 </Select>
               </div>
 
-              <div className="rounded-xl border border-border/70 bg-muted/30 p-4">
+              <div className="rounded-xl border border-border/70 bg-muted/30 p-3">
                 <p className="text-sm font-semibold text-foreground">Parâmetros fixos</p>
                 <div className="mt-2 flex flex-wrap gap-2 text-xs text-muted-foreground">
                   <Badge variant="outline">E {formatStress(DEFAULT_PARAMS.E)}</Badge>
@@ -439,13 +444,13 @@ export function MefVerificationClient() {
             </TabsContent>
 
             <TabsContent value="summary">
-              <div className="grid gap-3 @sm:grid-cols-2 @lg:grid-cols-4">
+              <div className="grid gap-2 @xs:grid-cols-2">
                 {summaryMetrics.map((metric) => (
-                  <div key={metric.label} className="rounded-xl border border-border/80 bg-card p-4">
+                  <div key={metric.label} className="rounded-xl border border-border/80 bg-card px-3 py-2.5">
                     <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                       {metric.label}
                     </p>
-                    <p className="mt-2 text-2xl font-semibold tracking-tight text-foreground">
+                    <p className="mt-1 text-xl font-semibold tracking-tight text-foreground">
                       {metric.value}
                     </p>
                     <p className="mt-1 text-xs text-muted-foreground">{metric.hint}</p>
@@ -457,11 +462,11 @@ export function MefVerificationClient() {
         </CardContent>
       </Card>
 
-      <Card className="flex h-full flex-col overflow-hidden">
-        <CardHeader className="pb-4">
+      <Card className="flex flex-col overflow-hidden xl:min-h-0">
+        <CardHeader>
           <div className="flex items-center gap-3">
-            <div className="flex size-10 items-center justify-center rounded-lg bg-foreground/10">
-              <Orbit className="size-5 text-foreground" />
+            <div className="flex size-8 items-center justify-center rounded-lg bg-foreground/10">
+              <Orbit className="size-4 text-foreground" />
             </div>
             <div>
               <CardTitle>Resultados numéricos</CardTitle>
@@ -469,28 +474,28 @@ export function MefVerificationClient() {
             </div>
           </div>
         </CardHeader>
-        <CardContent className="flex-1 overflow-hidden @container">
-          <Tabs defaultValue="mesh" className="flex h-full flex-col">
+        <CardContent className="@container flex min-h-0 flex-1 flex-col">
+          <Tabs defaultValue="mesh" className="min-h-0 flex-1">
             <TabsList className="grid w-full grid-cols-2 @sm:grid-cols-4 h-auto gap-1 p-1">
-              <TabsTrigger value="mesh" className="py-2.5 min-w-0 overflow-hidden text-xs">
+              <TabsTrigger value="mesh" className="py-1.5 min-w-0 overflow-hidden text-xs">
                 <span className="truncate">Discretização</span>
               </TabsTrigger>
-              <TabsTrigger value="convergence" className="py-2.5 min-w-0 overflow-hidden text-xs">
+              <TabsTrigger value="convergence" className="py-1.5 min-w-0 overflow-hidden text-xs">
                 <span className="truncate">Convergência</span>
               </TabsTrigger>
-              <TabsTrigger value="table" className="py-2.5 min-w-0 overflow-hidden text-xs">
+              <TabsTrigger value="table" className="py-1.5 min-w-0 overflow-hidden text-xs">
                 <span className="truncate">Tabela</span>
               </TabsTrigger>
-              <TabsTrigger value="notes" className="py-2.5 min-w-0 overflow-hidden text-xs">
+              <TabsTrigger value="notes" className="py-1.5 min-w-0 overflow-hidden text-xs">
                 <span className="truncate">Notas</span>
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="mesh" className="mt-3">
-              <MeshScene elements={selectedResponse.elements} />
+            <TabsContent value="mesh" className="mt-1 flex min-h-[420px] flex-col">
+              <MeshScene elements={selectedResponse.elements} className="h-auto flex-1" />
             </TabsContent>
 
-            <TabsContent value="convergence" className="mt-3">
+            <TabsContent value="convergence" className="relative mt-1 min-h-[360px]">
               <ChartContainer
                 config={{
                   error: {
@@ -498,7 +503,7 @@ export function MefVerificationClient() {
                     color: 'var(--chart-1)',
                   },
                 }}
-                className="h-80 w-full aspect-auto"
+                className="absolute inset-0 aspect-auto"
               >
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={convergence.points}>
@@ -561,7 +566,7 @@ export function MefVerificationClient() {
               </ChartContainer>
             </TabsContent>
 
-            <TabsContent value="table" className="mt-3">
+            <TabsContent value="table" className="mt-1 xl:min-h-0 xl:overflow-y-auto">
               <div className="overflow-x-auto">
               <div className="grid gap-2 text-xs text-muted-foreground min-w-[360px]">
                 <div className="grid grid-cols-4 rounded-lg bg-muted/40 px-3 py-2 font-semibold text-foreground">
@@ -589,7 +594,7 @@ export function MefVerificationClient() {
               </div>
             </TabsContent>
 
-            <TabsContent value="notes" className="mt-3">
+            <TabsContent value="notes" className="mt-1 xl:min-h-0 xl:overflow-y-auto">
               <div className="space-y-3 text-sm text-muted-foreground">
                 <p>
                   Procedimento: definir malha de referência, comparar erro relativo e validar a

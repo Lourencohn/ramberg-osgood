@@ -50,19 +50,17 @@ type SectionProps = {
 function Section({ chapter, title, hint, icon: Icon, children }: SectionProps) {
   return (
     <section className="rounded-md border border-foreground/15 bg-card">
-      <div className="flex items-center justify-between border-b border-foreground/10 px-5 py-4">
-        <div className="flex items-center gap-3">
-          <span className="flex size-9 items-center justify-center rounded-md border border-foreground/15 bg-background text-brand-deep">
-            <Icon className="size-4" />
-          </span>
-          <div>
-            <span className="label-caps">{chapter}</span>
-            <h2 className="font-display text-xl italic leading-tight">{title}</h2>
-          </div>
+      <div className="flex items-start gap-3 border-b border-foreground/10 px-4 py-3">
+        <span className="flex size-8 shrink-0 items-center justify-center rounded-md border border-foreground/15 bg-background text-brand-deep">
+          <Icon className="size-4" />
+        </span>
+        <div className="min-w-0">
+          <span className="label-caps">{chapter}</span>
+          <h2 className="font-display text-xl italic leading-tight">{title}</h2>
+          <p className="mt-0.5 text-xs text-muted-foreground">{hint}</p>
         </div>
-        <p className="hidden max-w-xs text-right text-xs text-muted-foreground sm:block">{hint}</p>
       </div>
-      <div className="space-y-5 px-5 py-5">{children}</div>
+      <div className="space-y-4 p-4">{children}</div>
     </section>
   )
 }
@@ -81,7 +79,7 @@ function ToggleRow({
   onCheckedChange: (checked: boolean) => void
 }) {
   return (
-    <div className="flex items-center justify-between gap-4 rounded-md border border-foreground/10 bg-background px-4 py-3">
+    <div className="flex items-center justify-between gap-4 rounded-md border border-foreground/10 bg-background px-3 py-2.5">
       <div className="flex items-center gap-3">
         <Icon className="size-4 text-foreground/70" />
         <div>
@@ -149,8 +147,8 @@ export function SettingsClient() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="grid gap-5 lg:grid-cols-2">
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-4">
         <Section
           chapter="Seção 01"
           title="Cálculo"
@@ -173,7 +171,7 @@ export function SettingsClient() {
                   toNumber(event.target.value, draft.stressCurvePoints)
                 )
               }
-              className="h-10 border-foreground/15 font-mono-data"
+              className="h-9 border-foreground/15 font-mono-data"
             />
           </div>
 
@@ -200,7 +198,7 @@ export function SettingsClient() {
               value={draft.theme}
               onValueChange={(value) => updateField('theme', value as AppSettings['theme'])}
             >
-              <SelectTrigger id="theme" className="h-10 border-foreground/15">
+              <SelectTrigger id="theme" className="h-9 border-foreground/15">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -236,7 +234,7 @@ export function SettingsClient() {
                 updateField('unitSystem', value as AppSettings['unitSystem'])
               }
             >
-              <SelectTrigger id="units" className="h-10 border-foreground/15">
+              <SelectTrigger id="units" className="h-9 border-foreground/15">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -269,7 +267,7 @@ export function SettingsClient() {
               value={draft.exportFormat}
               onValueChange={(value) => updateField('exportFormat', value as ExportFormat)}
             >
-              <SelectTrigger id="export-format" className="h-10 border-foreground/15">
+              <SelectTrigger id="export-format" className="h-9 border-foreground/15">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -317,7 +315,7 @@ export function SettingsClient() {
               onChange={(event) =>
                 updateField('cacheSize', toNumber(event.target.value, draft.cacheSize))
               }
-              className="h-10 border-foreground/15 font-mono-data"
+              className="h-9 border-foreground/15 font-mono-data"
             />
             <p className="text-xs text-muted-foreground">
               Quantas simulações ficam guardadas em memória.
@@ -332,7 +330,7 @@ export function SettingsClient() {
             onCheckedChange={(checked) => updateField('debugMode', checked)}
           />
 
-          <div className="flex items-center justify-between gap-4 rounded-md border border-foreground/10 bg-background px-4 py-3">
+          <div className="flex items-center justify-between gap-4 rounded-md border border-foreground/10 bg-background px-3 py-2.5">
             <div className="flex items-center gap-3">
               <Database className="size-4 text-foreground/70" />
               <div>
@@ -356,7 +354,7 @@ export function SettingsClient() {
 
           <Button
             variant="outline"
-            className="h-10 w-full gap-2 border-destructive/40 text-destructive hover:bg-destructive/10 hover:text-destructive"
+            className="h-9 w-full gap-2 border-destructive/40 text-destructive hover:bg-destructive/10 hover:text-destructive"
             onClick={handleReset}
           >
             <RotateCcw className="size-4" />

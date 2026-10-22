@@ -64,12 +64,12 @@ const makeProfileKey = (point: RambergOsgoodTrainingPoint) =>
 
 function MetricTile({ label, value, hint }: MetricTileProps) {
   return (
-    <div className="rounded-xl border border-border/80 bg-card p-3 shadow-sm">
+    <div className="rounded-xl border border-border/80 bg-card px-3 py-2 shadow-xs">
       <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
         {label}
       </p>
-      <p className="mt-2 text-xl font-semibold tracking-tight text-foreground">{value}</p>
-      {hint ? <p className="mt-1 text-xs text-muted-foreground">{hint}</p> : null}
+      <p className="mt-1 text-lg font-semibold tracking-tight text-foreground">{value}</p>
+      {hint ? <p className="text-xs text-muted-foreground">{hint}</p> : null}
     </div>
   )
 }
@@ -216,12 +216,12 @@ export function CalibrationClient({ trainingData }: CalibrationClientProps) {
   }
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[minmax(0,400px)_minmax(0,1fr)] lg:h-[calc(100svh-220px)] lg:items-stretch lg:overflow-hidden">
-      <Card className="flex h-full flex-col">
-        <CardHeader className="pb-4">
+    <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,340px)_minmax(0,1fr)] xl:min-h-0 xl:flex-1">
+      <Card className="flex flex-col xl:min-h-0">
+        <CardHeader>
           <div className="flex items-center gap-3">
-            <div className="flex size-10 items-center justify-center rounded-lg bg-foreground/10">
-              <Target className="size-5 text-foreground" />
+            <div className="flex size-8 items-center justify-center rounded-lg bg-foreground/10">
+              <Target className="size-4 text-foreground" />
             </div>
             <div>
               <CardTitle>Seleção do perfil</CardTitle>
@@ -229,9 +229,9 @@ export function CalibrationClient({ trainingData }: CalibrationClientProps) {
             </div>
           </div>
         </CardHeader>
-        <CardContent className="flex-1 space-y-3">
+        <CardContent className="flex-1 space-y-3 xl:min-h-0 xl:overflow-y-auto">
           <Select value={selectedId} onValueChange={setSelectedId}>
-            <SelectTrigger>
+            <SelectTrigger className="w-full">
               <SelectValue placeholder="Selecione um perfil" />
             </SelectTrigger>
             <SelectContent>
@@ -257,16 +257,16 @@ export function CalibrationClient({ trainingData }: CalibrationClientProps) {
 
           <Tabs defaultValue="params" className="space-y-3">
             <TabsList className="grid w-full grid-cols-2 h-auto gap-1 p-1">
-              <TabsTrigger value="params" className="py-2.5">
+              <TabsTrigger value="params" className="py-1.5">
                 Parâmetros
               </TabsTrigger>
-              <TabsTrigger value="props" className="py-2.5">
+              <TabsTrigger value="props" className="py-1.5">
                 Propriedades
               </TabsTrigger>
             </TabsList>
 
             <TabsContent value="params">
-              <div className="grid gap-3 grid-cols-2">
+              <div className="grid gap-2 grid-cols-2">
                 <MetricTile label="Módulo E" value={formatStress(params.E)} hint="Rigidez inicial" />
                 <MetricTile
                   label="σ₀"
@@ -303,7 +303,7 @@ export function CalibrationClient({ trainingData }: CalibrationClientProps) {
             </TabsContent>
 
             <TabsContent value="props">
-              <div className="grid gap-3 grid-cols-2">
+              <div className="grid gap-2 grid-cols-2">
                 <MetricTile
                   label="σy"
                   value={formatStress(properties.yieldStress)}
@@ -330,11 +330,11 @@ export function CalibrationClient({ trainingData }: CalibrationClientProps) {
         </CardContent>
       </Card>
 
-      <Card className="flex h-full flex-col overflow-hidden">
-        <CardHeader className="pb-4">
+      <Card className="flex flex-col overflow-hidden xl:min-h-0">
+        <CardHeader>
           <div className="flex items-center gap-3">
-            <div className="flex size-10 items-center justify-center rounded-lg bg-foreground/10">
-              <TrendingUp className="size-5 text-foreground" />
+            <div className="flex size-8 items-center justify-center rounded-lg bg-foreground/10">
+              <TrendingUp className="size-4 text-foreground" />
             </div>
             <div>
               <CardTitle>Análises visuais</CardTitle>
@@ -342,32 +342,33 @@ export function CalibrationClient({ trainingData }: CalibrationClientProps) {
             </div>
           </div>
         </CardHeader>
-        <CardContent className="flex-1 overflow-hidden">
-          <Tabs defaultValue="error" className="flex h-full flex-col">
+        <CardContent className="flex min-h-0 flex-1 flex-col">
+          <Tabs defaultValue="error" className="min-h-0 flex-1">
             <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5 h-auto gap-1 p-1">
-              <TabsTrigger value="error" className="py-2.5">
+              <TabsTrigger value="error" className="py-1.5">
                 Erro 3D
               </TabsTrigger>
-              <TabsTrigger value="curve" className="py-2.5">
+              <TabsTrigger value="curve" className="py-1.5">
                 Curva
               </TabsTrigger>
-              <TabsTrigger value="residuals" className="py-2.5">
+              <TabsTrigger value="residuals" className="py-1.5">
                 Resíduos
               </TabsTrigger>
-              <TabsTrigger value="linear" className="py-2.5">
+              <TabsTrigger value="linear" className="py-1.5">
                 Log-Log
               </TabsTrigger>
-              <TabsTrigger value="notes" className="py-2.5">
+              <TabsTrigger value="notes" className="py-1.5">
                 Notas
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="error" className="mt-3">
-              <CalibrationErrorSurface points={points} params={params} />
+            <TabsContent value="error" className="mt-1 flex min-h-[420px] flex-col">
+              <CalibrationErrorSurface points={points} params={params} className="flex-1" />
             </TabsContent>
 
-            <TabsContent value="curve" className="mt-3">
+            <TabsContent value="curve" className="relative mt-1 min-h-[360px]">
               <StressStrainValidationChart
+                className="absolute inset-0 h-auto"
                 curve={curve}
                 points={points}
                 unitSystem={settings.unitSystem}
@@ -375,23 +376,25 @@ export function CalibrationClient({ trainingData }: CalibrationClientProps) {
               />
             </TabsContent>
 
-            <TabsContent value="residuals" className="mt-3">
+            <TabsContent value="residuals" className="relative mt-1 min-h-[320px]">
               <CalibrationResidualsChart
+                className="absolute inset-0 h-auto"
                 data={residuals}
                 unitSystem={settings.unitSystem}
                 interactive={settings.interactiveCharts}
               />
             </TabsContent>
 
-            <TabsContent value="linear" className="mt-3">
+            <TabsContent value="linear" className="mt-1 flex min-h-[340px] flex-col">
               <RambergOsgoodLinearizationChart
+                className="flex-1"
                 points={points}
                 unitSystem={settings.unitSystem}
                 interactive={settings.interactiveCharts}
               />
             </TabsContent>
 
-            <TabsContent value="notes" className="mt-3">
+            <TabsContent value="notes" className="mt-1 xl:min-h-0 xl:overflow-y-auto">
               <div className="space-y-3 text-sm text-muted-foreground">
                 <p>
                   Método: selecionar o intervalo elastoplastico, ajustar E, σ₀ e n por minima

@@ -16,7 +16,7 @@ export default async function AtlasPage() {
         title="Atlas"
         accent="paramétrico"
         description="Veja em três dimensões como o módulo E, a tensão de escoamento σ₀ e o expoente n se relacionam entre todos os perfis cadastrados."
-        fullBleed
+        fit
       >
         <MaterialAtlasClient trainingData={trainingData} />
       </PageShell>

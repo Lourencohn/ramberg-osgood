@@ -11,7 +11,7 @@ export default function MefPage() {
         title="MEF e"
         accent="Ramberg-Osgood"
         description="Conecta a curva do material à resposta da peça em elementos finitos para entender como o conjunto se deforma."
-        fullBleed
+        fit
       >
         <MefRambergClient />
       </PageShell>

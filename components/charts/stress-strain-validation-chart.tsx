@@ -6,12 +6,14 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/
 import { Line, LineChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer, Legend } from 'recharts'
 import type { UnitSystem } from '@/lib/settings'
 import { convertStress, getUnitLabels } from '@/lib/units'
+import { cn } from '@/lib/utils'
 
 type StressStrainValidationChartProps = {
   curve: StressStrainPoint[]
   points: StressStrainPoint[]
   unitSystem?: UnitSystem
   interactive?: boolean
+  className?: string
 }
 
 const strainFormatter = new Intl.NumberFormat('pt-BR', {
@@ -29,6 +31,7 @@ export function StressStrainValidationChart({
   points,
   unitSystem = 'si',
   interactive = true,
+  className,
 }: StressStrainValidationChartProps) {
   const unitLabels = getUnitLabels(unitSystem)
   const displayCurve = useMemo(
@@ -50,7 +53,12 @@ export function StressStrainValidationChart({
 
   if (!displayPoints.length || !displayCurve.length) {
     return (
-      <div className="h-[340px] flex items-center justify-center border-2 border-dashed border-border rounded-lg">
+      <div
+        className={cn(
+          'h-[340px] flex items-center justify-center border-2 border-dashed border-border rounded-lg',
+          className
+        )}
+      >
         <p className="text-muted-foreground">Sem pontos reais suficientes para validação.</p>
       </div>
     )
@@ -68,7 +76,7 @@ export function StressStrainValidationChart({
           color: 'var(--chart-3)',
         },
       }}
-      className="h-[340px] w-full aspect-auto"
+      className={cn('h-[340px] w-full aspect-auto', className)}
     >
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={displayCurve}>

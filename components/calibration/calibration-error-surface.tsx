@@ -5,6 +5,7 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import type { RambergOsgoodParams, StressStrainPoint } from '@/types'
 import { calculateStrain } from '@/lib/ramberg-osgood'
+import { cn } from '@/lib/utils'
 
 type ErrorSurfaceGrid = {
   cols: number
@@ -33,6 +34,7 @@ type ErrorSurfaceGrid = {
 type CalibrationErrorSurfaceProps = {
   points: StressStrainPoint[]
   params: RambergOsgoodParams
+  className?: string
 }
 
 const rmseFormatter = new Intl.NumberFormat('pt-BR', {
@@ -67,7 +69,7 @@ function computeRmse(points: StressStrainPoint[], params: RambergOsgoodParams) {
   return count ? Math.sqrt(sum / count) : 0
 }
 
-export function CalibrationErrorSurface({ points, params }: CalibrationErrorSurfaceProps) {
+export function CalibrationErrorSurface({ points, params, className }: CalibrationErrorSurfaceProps) {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const [isReady, setIsReady] = useState(false)
 
@@ -315,7 +317,7 @@ export function CalibrationErrorSurface({ points, params }: CalibrationErrorSurf
 
   if (!points.length) {
     return (
-      <div className="h-[320px] flex items-center justify-center rounded-xl border border-dashed border-border">
+      <div className={cn('h-[320px] flex items-center justify-center rounded-xl border border-dashed border-border', className)}>
         <p className="text-sm text-muted-foreground">
           Sem dados suficientes para estimar a superfície de erro.
         </p>
@@ -325,7 +327,7 @@ export function CalibrationErrorSurface({ points, params }: CalibrationErrorSurf
 
   if (!grid) {
     return (
-      <div className="h-[320px] flex items-center justify-center rounded-xl border border-dashed border-border">
+      <div className={cn('h-[320px] flex items-center justify-center rounded-xl border border-dashed border-border', className)}>
         <p className="text-sm text-muted-foreground">
           Dados insuficientes para calcular a paisagem de calibração.
         </p>
@@ -334,11 +336,10 @@ export function CalibrationErrorSurface({ points, params }: CalibrationErrorSurf
   }
 
   return (
-    <div className="space-y-3">
-      <div
-        ref={containerRef}
-        className="h-[320px] w-full rounded-xl border border-border bg-white/80 dark:bg-black/40"
-      />
+    <div className={cn('flex flex-col gap-3', className)}>
+      <div className="relative min-h-[320px] flex-1 overflow-hidden rounded-xl border border-border bg-white/80 dark:bg-black/40">
+        <div ref={containerRef} className="absolute inset-0" />
+      </div>
       <div className="grid gap-2 text-xs text-muted-foreground sm:grid-cols-3">
         <div className="rounded-lg border border-border/60 bg-muted/30 px-3 py-2">
           <p className="font-semibold text-foreground">Faixas avaliadas</p>

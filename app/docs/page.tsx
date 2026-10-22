@@ -18,6 +18,7 @@ import {
 import { DashboardLayout } from '@/components/layout/dashboard-layout'
 import { PageShell } from '@/components/layout/page-shell'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { cn } from '@/lib/utils'
 
 export default function DocsPage() {
   return (
@@ -29,39 +30,39 @@ export default function DocsPage() {
         accent="sistema"
         description="O essencial sobre o que o ResistencIA calcula, com qual modelo e em quais faixas de parâmetros."
       >
-        <Tabs defaultValue="overview" className="space-y-6">
+        <Tabs defaultValue="overview" className="space-y-4">
           <TabsList className="grid h-auto w-full grid-cols-2 gap-1 border border-foreground/15 bg-background p-1 sm:grid-cols-4">
             <TabsTrigger
               value="overview"
-              className="gap-2 py-2.5 data-[state=active]:bg-foreground data-[state=active]:text-background"
+              className="gap-2 py-1.5 data-[state=active]:bg-foreground data-[state=active]:text-background"
             >
               <Lightbulb className="size-4" />
               Visão geral
             </TabsTrigger>
             <TabsTrigger
               value="model"
-              className="gap-2 py-2.5 data-[state=active]:bg-foreground data-[state=active]:text-background"
+              className="gap-2 py-1.5 data-[state=active]:bg-foreground data-[state=active]:text-background"
             >
               <Calculator className="size-4" />
               Modelo
             </TabsTrigger>
             <TabsTrigger
               value="parameters"
-              className="gap-2 py-2.5 data-[state=active]:bg-foreground data-[state=active]:text-background"
+              className="gap-2 py-1.5 data-[state=active]:bg-foreground data-[state=active]:text-background"
             >
               <Settings2 className="size-4" />
               Parâmetros
             </TabsTrigger>
             <TabsTrigger
               value="interpretation"
-              className="gap-2 py-2.5 data-[state=active]:bg-foreground data-[state=active]:text-background"
+              className="gap-2 py-1.5 data-[state=active]:bg-foreground data-[state=active]:text-background"
             >
               <BarChart3 className="size-4" />
               Resultados
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="overview" className="space-y-5">
+          <TabsContent value="overview" className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:items-start">
             <Section chapter="Capítulo introdutório" title="O que o sistema faz">
               <p className="text-sm leading-relaxed text-muted-foreground">
                 O ResistencIA usa ensaios reais de tração para estimar como uma peça impressa em
@@ -87,12 +88,6 @@ export default function DocsPage() {
                 ))}
               </div>
             </Section>
-
-            <InfoCallout
-              icon={Info}
-              title="Aplicação na engenharia"
-              body="Os resultados nascem de ajustes sobre ensaios reais. Para aplicações críticas de engenharia, valide sempre com novos ensaios próprios antes de confiar na predição."
-            />
 
             <Section chapter="Por onde começar" title="Fluxo recomendado">
               <ol className="space-y-3 text-sm">
@@ -130,9 +125,16 @@ export default function DocsPage() {
                 ))}
               </ol>
             </Section>
+
+            <InfoCallout
+              icon={Info}
+              title="Aplicação na engenharia"
+              body="Os resultados nascem de ajustes sobre ensaios reais. Para aplicações críticas de engenharia, valide sempre com novos ensaios próprios antes de confiar na predição."
+              className="lg:col-span-2"
+            />
           </TabsContent>
 
-          <TabsContent value="model" className="space-y-5">
+          <TabsContent value="model" className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:items-start">
             <Section chapter="Equação base" title="Ramberg-Osgood">
               <p className="text-sm leading-relaxed text-muted-foreground">
                 A equação de Ramberg-Osgood descreve o comportamento de materiais que combinam uma
@@ -191,32 +193,34 @@ export default function DocsPage() {
             </Section>
           </TabsContent>
 
-          <TabsContent value="parameters" className="space-y-5">
+          <TabsContent value="parameters">
             <Section chapter="Faixas de validade" title="Parâmetros de entrada">
               <p className="text-sm leading-relaxed text-muted-foreground">
                 Os limites abaixo refletem as faixas em que os ensaios atuais foram realizados. Fora
                 delas a confiança da predição cai.
               </p>
 
-              <ParamCard
-                icon={Thermometer}
-                title="Temperatura de extrusão"
-                hint="Faixas típicas para PLA padrão."
-                min="190°C"
-                max="230°C"
-              />
+              <div className="grid gap-3 md:grid-cols-2">
+                <ParamCard
+                  icon={Thermometer}
+                  title="Temperatura de extrusão"
+                  hint="Faixas típicas para PLA padrão."
+                  min="190°C"
+                  max="230°C"
+                />
 
-              <ParamCard
-                icon={Gauge}
-                title="Velocidade de impressão"
-                hint="Velocidades recomendadas para qualidade estrutural."
-                min="20 mm/s"
-                max="100 mm/s"
-              />
+                <ParamCard
+                  icon={Gauge}
+                  title="Velocidade de impressão"
+                  hint="Velocidades recomendadas para qualidade estrutural."
+                  min="20 mm/s"
+                  max="100 mm/s"
+                />
+              </div>
             </Section>
           </TabsContent>
 
-          <TabsContent value="interpretation" className="space-y-5">
+          <TabsContent value="interpretation" className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:items-start">
             <Section chapter="Como ler" title="Resultados">
               <p className="text-sm leading-relaxed text-muted-foreground">
                 Cada predição mostra três números principais. As faixas indicadas são valores
@@ -240,41 +244,43 @@ export default function DocsPage() {
               />
             </Section>
 
-            <InfoCallout
-              icon={AlertTriangle}
-              title="Tendências observadas nos ensaios"
-              body={
-                <ul className="mt-1 space-y-1.5">
-                  <li className="flex items-start gap-2">
-                    <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-brand" />
-                    Temperaturas mais baixas costumam aumentar a resistência, mas reduzem a adesão
-                    entre camadas.
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-brand" />
-                    Velocidades mais baixas permitem melhor fusão entre filamentos.
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-brand" />
-                    Existe sempre um ponto ótimo entre temperatura e velocidade para cada peça.
-                  </li>
-                </ul>
-              }
-            />
+            <div className="space-y-4">
+              <InfoCallout
+                icon={AlertTriangle}
+                title="Tendências observadas nos ensaios"
+                body={
+                  <ul className="mt-1 space-y-1.5">
+                    <li className="flex items-start gap-2">
+                      <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-brand" />
+                      Temperaturas mais baixas costumam aumentar a resistência, mas reduzem a adesão
+                      entre camadas.
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-brand" />
+                      Velocidades mais baixas permitem melhor fusão entre filamentos.
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-brand" />
+                      Existe sempre um ponto ótimo entre temperatura e velocidade para cada peça.
+                    </li>
+                  </ul>
+                }
+              />
 
-            <div className="grid gap-3 sm:grid-cols-2">
-              <ShortcutLink
-                href="/predict"
-                icon={Sparkles}
-                title="Gerar uma predição"
-                hint="Aplique tudo isso a um caso novo."
-              />
-              <ShortcutLink
-                href="/compare"
-                icon={GitCompare}
-                title="Comparar ensaios"
-                hint="Veja como cada parâmetro muda o resultado."
-              />
+              <div className="grid gap-3 sm:grid-cols-2">
+                <ShortcutLink
+                  href="/predict"
+                  icon={Sparkles}
+                  title="Gerar uma predição"
+                  hint="Aplique tudo isso a um caso novo."
+                />
+                <ShortcutLink
+                  href="/compare"
+                  icon={GitCompare}
+                  title="Comparar ensaios"
+                  hint="Veja como cada parâmetro muda o resultado."
+                />
+              </div>
             </div>
           </TabsContent>
         </Tabs>
@@ -294,11 +300,11 @@ function Section({
 }) {
   return (
     <section className="rounded-md border border-foreground/15 bg-card">
-      <div className="border-b border-foreground/10 px-5 py-4">
+      <div className="border-b border-foreground/10 px-4 py-3">
         <span className="label-caps-brand">{chapter}</span>
-        <h2 className="mt-1 font-display text-2xl italic leading-tight">{title}</h2>
+        <h2 className="mt-1 font-display text-xl italic leading-tight">{title}</h2>
       </div>
-      <div className="space-y-4 px-5 py-5">{children}</div>
+      <div className="space-y-3 p-4">{children}</div>
     </section>
   )
 }
@@ -307,13 +313,20 @@ function InfoCallout({
   icon: Icon,
   title,
   body,
+  className,
 }: {
   icon: React.ComponentType<{ className?: string }>
   title: string
   body: React.ReactNode
+  className?: string
 }) {
   return (
-    <div className="flex items-start gap-3 rounded-md border border-brand/40 bg-brand-soft/40 p-4">
+    <div
+      className={cn(
+        'flex items-start gap-3 rounded-md border border-brand/40 bg-brand-soft/40 p-4',
+        className
+      )}
+    >
       <Icon className="mt-0.5 size-4 shrink-0 text-brand-deep" />
       <div className="space-y-1 text-sm">
         <p className="font-display text-base italic text-foreground">{title}</p>
@@ -337,7 +350,7 @@ function ParamCard({
   max: string
 }) {
   return (
-    <div className="rounded-md border border-foreground/10 bg-background p-5">
+    <div className="rounded-md border border-foreground/10 bg-background p-4">
       <div className="mb-3 flex items-center gap-3">
         <span className="flex size-9 items-center justify-center rounded-md border border-foreground/15 text-brand-deep">
           <Icon className="size-4" />

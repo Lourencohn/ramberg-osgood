@@ -11,7 +11,7 @@ export default function TestLivePage() {
         title="Ensaio ao"
         accent="vivo"
         description="Acompanhe a curva de tração e a deformação do corpo de prova ASTM D638 em tempo real, em três dimensões."
-        fullBleed
+        fit
       >
         <TestLiveClient />
       </PageShell>

@@ -23,12 +23,12 @@ export function PredictionWorkspace({ trainingData }: PredictionWorkspaceProps) 
   }
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,360px)_minmax(0,1fr)]">
-      <section className="h-full">
+    <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,300px)_minmax(0,1fr)] xl:min-h-0 xl:flex-1">
+      <section className="flex min-h-0 flex-col">
         <PredictionForm trainingData={trainingData} onResult={handleResult} />
       </section>
 
-      <section className="h-full">
+      <section className="flex min-h-0 flex-col">
         <ResultsDisplay result={result} trainingData={trainingData} />
       </section>
     </div>

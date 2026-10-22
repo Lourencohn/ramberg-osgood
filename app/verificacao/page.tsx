@@ -11,7 +11,7 @@ export default function VerificacaoPage() {
         title="Verificação"
         accent="da malha"
         description="Confira como o refinamento da malha influencia o erro relativo e a estabilidade do resultado numérico."
-        fullBleed
+        fit
       >
         <MefVerificationClient />
       </PageShell>

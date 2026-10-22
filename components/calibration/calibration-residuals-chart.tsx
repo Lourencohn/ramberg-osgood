@@ -12,6 +12,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
+import { cn } from '@/lib/utils'
 
 type ResidualPoint = {
   strain: number
@@ -22,6 +23,7 @@ type CalibrationResidualsChartProps = {
   data: ResidualPoint[]
   unitSystem?: UnitSystem
   interactive?: boolean
+  className?: string
 }
 
 const strainFormatter = new Intl.NumberFormat('pt-BR', {
@@ -38,12 +40,18 @@ export function CalibrationResidualsChart({
   data,
   unitSystem = 'si',
   interactive = true,
+  className,
 }: CalibrationResidualsChartProps) {
   const unitLabels = getUnitLabels(unitSystem)
 
   if (!data.length) {
     return (
-      <div className="h-72 flex items-center justify-center rounded-lg border border-dashed border-border">
+      <div
+        className={cn(
+          'h-72 flex items-center justify-center rounded-lg border border-dashed border-border',
+          className
+        )}
+      >
         <p className="text-sm text-muted-foreground">Sem resíduos disponíveis.</p>
       </div>
     )
@@ -57,7 +65,7 @@ export function CalibrationResidualsChart({
           color: 'var(--chart-2)',
         },
       }}
-      className="h-72 w-full aspect-auto"
+      className={cn('h-72 w-full aspect-auto', className)}
     >
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data}>

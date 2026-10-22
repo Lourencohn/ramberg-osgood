@@ -191,16 +191,16 @@ export function PredictionForm({ trainingData, onResult }: PredictionFormProps) 
   }
 
   return (
-    <Card className="h-full flex flex-col">
-      <CardHeader className="pb-4">
+    <Card className="flex-1">
+      <CardHeader>
         <CardTitle className="text-lg">Parâmetros de Impressão</CardTitle>
         <CardDescription>
           Informe as condições para estimar as propriedades mecânicas.
         </CardDescription>
       </CardHeader>
-      <CardContent className="flex-1 flex flex-col justify-between">
-        <div className="space-y-6">
-          <div className="space-y-3">
+      <CardContent className="flex flex-1 flex-col">
+        <div className="space-y-5">
+          <div className="space-y-2">
             <Label htmlFor="temperature" className="flex items-center gap-2 text-sm font-medium">
               <Thermometer className="size-4 text-foreground" />
               Temperatura de Impressão
@@ -217,7 +217,7 @@ export function PredictionForm({ trainingData, onResult }: PredictionFormProps) 
                 placeholder={tempFormatter.format(
                   (displayLimits.temperature.min + displayLimits.temperature.max) / 2
                 )}
-                className="pr-12 text-lg font-semibold h-12"
+                className="pr-12 text-base font-semibold h-10"
               />
               <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">
                 {unitLabels.temperature}
@@ -235,7 +235,7 @@ export function PredictionForm({ trainingData, onResult }: PredictionFormProps) 
             </div>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-2">
             <Label htmlFor="speed" className="flex items-center gap-2 text-sm font-medium">
               <Gauge className="size-4 text-foreground" />
               Velocidade de Impressão
@@ -252,7 +252,7 @@ export function PredictionForm({ trainingData, onResult }: PredictionFormProps) 
                 placeholder={speedFormatter.format(
                   (displayLimits.speed.min + displayLimits.speed.max) / 2
                 )}
-                className="pr-16 text-lg font-semibold h-12"
+                className="pr-16 text-base font-semibold h-10"
               />
               <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">
                 {unitLabels.speed}
@@ -282,7 +282,7 @@ export function PredictionForm({ trainingData, onResult }: PredictionFormProps) 
           )}
         </div>
 
-        <div className="space-y-4 pt-6">
+        <div className="space-y-3 pt-4">
           <p className="text-xs text-muted-foreground">
             {trainingData.length > 0
               ? `Baseado em ${trainingData.length} perfis reais com ajuste Ramberg-Osgood.`
@@ -296,7 +296,7 @@ export function PredictionForm({ trainingData, onResult }: PredictionFormProps) 
 
           <Button
             onClick={handleCalculate}
-            className="w-full h-12 text-base font-semibold gap-2 shadow-md hover:shadow-lg transition-all"
+            className="w-full h-10 text-sm font-semibold gap-2 shadow-sm hover:shadow-md transition-all"
             disabled={isCalculating}
           >
             {isCalculating ? (

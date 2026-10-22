@@ -6,6 +6,7 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/
 import { Line, LineChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer, Legend } from 'recharts'
 import type { UnitSystem } from '@/lib/settings'
 import { convertStress, getUnitLabels } from '@/lib/units'
+import { cn } from '@/lib/utils'
 
 type LinearizationPoint = {
   logStress: number
@@ -16,6 +17,7 @@ type RambergOsgoodLinearizationChartProps = {
   points: StressStrainPoint[]
   unitSystem?: UnitSystem
   interactive?: boolean
+  className?: string
 }
 
 const axisFormatter = new Intl.NumberFormat('pt-BR', {
@@ -41,6 +43,7 @@ export function RambergOsgoodLinearizationChart({
   points,
   unitSystem = 'si',
   interactive = true,
+  className,
 }: RambergOsgoodLinearizationChartProps) {
   const unitLabels = getUnitLabels(unitSystem)
   const { actualPoints, linePoints, xDomain, yDomain, r2, estimatedE } = useMemo(() => {
@@ -162,14 +165,19 @@ export function RambergOsgoodLinearizationChart({
 
   if (!actualPoints.length) {
     return (
-      <div className="h-72 flex items-center justify-center border-2 border-dashed border-border rounded-lg">
+      <div
+        className={cn(
+          'h-72 flex items-center justify-center border-2 border-dashed border-border rounded-lg',
+          className
+        )}
+      >
         <p className="text-muted-foreground">Sem dados suficientes para linearização.</p>
       </div>
     )
   }
 
   return (
-    <div className="space-y-2">
+    <div className={cn('flex flex-col gap-2', className)}>
       <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
         <span>Reta ajustada por regressao linear (log-log)</span>
         {r2 !== null ? <span>• R²: {r2.toFixed(3)}</span> : null}
@@ -179,97 +187,100 @@ export function RambergOsgoodLinearizationChart({
           </span>
         ) : null}
       </div>
-      <ChartContainer
-        config={{
-          linear: {
-            label: 'Reta ajustada',
-            color: 'var(--chart-2)',
-          },
-          points: {
-            label: 'Pontos reais',
-            color: 'var(--chart-4)',
-          },
-        }}
-        className="h-72 w-full aspect-auto"
-      >
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={linePoints} margin={{ top: 8, right: 18, left: 10, bottom: 10 }}>
-            <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-            <XAxis
-              type="number"
-              dataKey="logStress"
-              domain={xDomain ?? undefined}
-              padding={{ left: 6, right: 6 }}
-              tickFormatter={(value) => axisFormatter.format(value)}
-              className="text-xs"
-              name={`log tensao (${unitLabels.stress})`}
-            />
-            <YAxis
-              type="number"
-              dataKey="logPlasticStrain"
-              domain={yDomain ?? undefined}
-              tickFormatter={(value) => axisFormatter.format(value)}
-              className="text-xs"
-              name="log deformacao plastica"
-            />
-            {interactive ? (
-              <ChartTooltip
-                content={
-                  <ChartTooltipContent
-                    formatter={(value, _name, payload) => {
-                      const entry = payload && !Array.isArray(payload) ? payload.payload : undefined
-                      if (!entry) return value as number
-                      return (
-                        <div className="space-y-1">
-                          <div className="flex items-center justify-between gap-2">
-                            <span className="text-muted-foreground">log tensao</span>
-                            <span className="font-mono font-semibold">
-                              {axisFormatter.format(entry.logStress)}
-                            </span>
-                          </div>
-                          <div className="flex items-center justify-between gap-2">
-                            <span className="text-muted-foreground">log deformacao plastica</span>
-                            <span className="font-mono font-semibold">
-                              {axisFormatter.format(entry.logPlasticStrain)}
-                            </span>
-                          </div>
-                        </div>
-                      )
-                    }}
-                  />
-                }
+      <div className="relative min-h-72 flex-1">
+        <ChartContainer
+          config={{
+            linear: {
+              label: 'Reta ajustada',
+              color: 'var(--chart-2)',
+            },
+            points: {
+              label: 'Pontos reais',
+              color: 'var(--chart-4)',
+            },
+          }}
+          className="absolute inset-0 aspect-auto"
+        >
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={linePoints} margin={{ top: 8, right: 18, left: 10, bottom: 10 }}>
+              <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+              <XAxis
+                type="number"
+                dataKey="logStress"
+                domain={xDomain ?? undefined}
+                padding={{ left: 6, right: 6 }}
+                tickFormatter={(value) => axisFormatter.format(value)}
+                className="text-xs"
+                name={`log tensao (${unitLabels.stress})`}
               />
-            ) : null}
-            <Legend />
-            <Line
-              type="linear"
-              dataKey="logPlasticStrain"
-              name="Reta ajustada"
-              stroke="var(--chart-2)"
-              strokeWidth={2}
-              dot={false}
-            />
-            <Line
-              data={actualPoints}
-              dataKey="logPlasticStrain"
-              name="Pontos reais"
-              stroke="transparent"
-              dot={{
-                r: 2,
-                fill: 'var(--chart-4)',
-                stroke: 'var(--chart-4)',
-                strokeWidth: 1,
-              }}
-              activeDot={{
-                r: 3,
-                fill: 'var(--chart-4)',
-                stroke: 'var(--chart-4)',
-                strokeWidth: 1,
-              }}
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      </ChartContainer>
+              <YAxis
+                type="number"
+                dataKey="logPlasticStrain"
+                domain={yDomain ?? undefined}
+                tickFormatter={(value) => axisFormatter.format(value)}
+                className="text-xs"
+                name="log deformacao plastica"
+              />
+              {interactive ? (
+                <ChartTooltip
+                  content={
+                    <ChartTooltipContent
+                      formatter={(value, _name, payload) => {
+                        const entry =
+                          payload && !Array.isArray(payload) ? payload.payload : undefined
+                        if (!entry) return value as number
+                        return (
+                          <div className="space-y-1">
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="text-muted-foreground">log tensao</span>
+                              <span className="font-mono font-semibold">
+                                {axisFormatter.format(entry.logStress)}
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="text-muted-foreground">log deformacao plastica</span>
+                              <span className="font-mono font-semibold">
+                                {axisFormatter.format(entry.logPlasticStrain)}
+                              </span>
+                            </div>
+                          </div>
+                        )
+                      }}
+                    />
+                  }
+                />
+              ) : null}
+              <Legend />
+              <Line
+                type="linear"
+                dataKey="logPlasticStrain"
+                name="Reta ajustada"
+                stroke="var(--chart-2)"
+                strokeWidth={2}
+                dot={false}
+              />
+              <Line
+                data={actualPoints}
+                dataKey="logPlasticStrain"
+                name="Pontos reais"
+                stroke="transparent"
+                dot={{
+                  r: 2,
+                  fill: 'var(--chart-4)',
+                  stroke: 'var(--chart-4)',
+                  strokeWidth: 1,
+                }}
+                activeDot={{
+                  r: 3,
+                  fill: 'var(--chart-4)',
+                  stroke: 'var(--chart-4)',
+                  strokeWidth: 1,
+                }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </ChartContainer>
+      </div>
     </div>
   )
 }

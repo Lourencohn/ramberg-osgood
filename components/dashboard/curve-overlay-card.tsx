@@ -115,7 +115,7 @@ export function CurveOverlayCard({ profiles }: CurveOverlayCardProps) {
 
   if (!series.length) {
     return (
-      <article className="relative flex h-full flex-col rounded-md border border-foreground/15 bg-card p-6">
+      <article className="relative flex h-full flex-col rounded-md border border-foreground/15 bg-card p-4">
         <div className="flex items-center justify-between border-b border-foreground/10 pb-3">
           <span className="label-caps-brand">Figura 01</span>
           <span className="label-caps">Curva σ x ε</span>
@@ -130,11 +130,11 @@ export function CurveOverlayCard({ profiles }: CurveOverlayCardProps) {
   }
 
   return (
-    <article className="corner-brackets relative flex h-full flex-col rounded-md border border-foreground/15 bg-card p-5">
-      <div className="flex items-start justify-between gap-3 border-b border-foreground/10 pb-4">
+    <article className="corner-brackets relative flex h-full min-h-[420px] flex-col rounded-md border border-foreground/15 bg-card p-4">
+      <div className="flex items-start justify-between gap-3 border-b border-foreground/10 pb-3">
         <div>
           <span className="label-caps-brand">Figura 01</span>
-          <h2 className="mt-1 font-display text-3xl leading-tight tracking-tight">
+          <h2 className="mt-1 font-display text-2xl leading-tight tracking-tight">
             Curva <span className="italic">tensão por deformação</span>
           </h2>
           <p className="mt-1 max-w-md text-xs text-muted-foreground">
@@ -154,12 +154,12 @@ export function CurveOverlayCard({ profiles }: CurveOverlayCardProps) {
         ) : null}
       </div>
 
-      <div className="relative mt-4 flex-1">
+      <div className="relative mt-3 min-h-[260px] flex-1">
         <span className="label-caps absolute -left-1 top-0 -rotate-90 origin-top-left translate-y-6 text-foreground/50">
           σ (MPa) →
         </span>
 
-        <ChartContainer config={chartConfig} className="h-[300px] w-full aspect-auto">
+        <ChartContainer config={chartConfig} className="absolute inset-0 aspect-auto">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={overlayData} margin={{ top: 8, right: 12, bottom: 0, left: 28 }}>
               <defs>
@@ -221,7 +221,7 @@ export function CurveOverlayCard({ profiles }: CurveOverlayCardProps) {
         </span>
       </div>
 
-      <div className="mt-4 grid grid-cols-2 gap-x-3 gap-y-1.5 border-t border-foreground/10 pt-3 sm:grid-cols-3 lg:grid-cols-4">
+      <div className="mt-4 grid grid-cols-2 gap-x-3 gap-y-1.5 border-t border-foreground/10 pt-3 sm:grid-cols-3 lg:grid-cols-5">
         {series.map((item) => {
           const isHidden = hidden.has(item.key)
           return (

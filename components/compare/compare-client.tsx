@@ -85,9 +85,9 @@ function getDifferenceInfo(val1: number | null, val2: number | null): Difference
 
 function DifferenceMetric({ label, info }: { label: string; info: DifferenceInfo }) {
   return (
-    <div className="rounded-xl border border-border bg-card p-4 transition-all hover:shadow-sm">
+    <div className="rounded-xl border border-border bg-card px-3 py-2.5 transition-all hover:shadow-sm">
       <p className="text-sm text-muted-foreground">{label}</p>
-      <div className="mt-2 flex items-center gap-2">
+      <div className="mt-1.5 flex items-center gap-2">
         <div
           className={`flex items-center gap-1 rounded-full px-2.5 py-1 text-sm font-semibold ${
             info.hasData && info.isPositive
@@ -117,114 +117,112 @@ function RunComparison({ left, right }: { left: RunMetrics; right: RunMetrics })
   const pointsInfo = getDifferenceInfo(left.pointCount, right.pointCount)
 
   return (
-    <>
-      <div className="grid gap-6 lg:grid-cols-2">
-        {[left, right].map((run, index) => (
-          <Card key={run.id} className="relative overflow-hidden">
-            <div
-              className={`absolute left-0 top-0 h-full w-1 ${
-                index === 0 ? 'bg-foreground' : 'bg-foreground/50'
-              }`}
-            />
+    <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.75fr)]">
+      {[left, right].map((run, index) => (
+        <Card key={run.id} className="relative overflow-hidden">
+          <div
+            className={`absolute left-0 top-0 h-full w-1 ${
+              index === 0 ? 'bg-foreground' : 'bg-foreground/50'
+            }`}
+          />
 
-            <CardHeader className="pb-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Badge
-                    variant="outline"
-                    className={`font-semibold ${
-                      index === 0
-                        ? 'border-foreground/50 text-foreground'
-                        : 'border-foreground/30 text-foreground/70'
-                    }`}
-                  >
-                    Ensaio {index + 1}
-                  </Badge>
-                  <span className="inline-flex items-center rounded-md bg-foreground px-2.5 py-1 text-sm font-semibold text-background">
-                    Ensaio {run.testNumber}
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Badge
+                  variant="outline"
+                  className={`font-semibold ${
+                    index === 0
+                      ? 'border-foreground/50 text-foreground'
+                      : 'border-foreground/30 text-foreground/70'
+                  }`}
+                >
+                  Ensaio {index + 1}
+                </Badge>
+                <span className="inline-flex items-center rounded-md bg-foreground px-2.5 py-1 text-sm font-semibold text-background">
+                  Ensaio {run.testNumber}
+                </span>
+              </div>
+            </div>
+            <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+              <span>{formatProfileLabel(run.temperature, run.speed)}</span>
+              <span className="text-muted-foreground/60">•</span>
+              <span className="flex items-center gap-1">
+                <Calendar className="size-3" />
+                {dateFormatter.format(new Date(run.createdAt))}
+              </span>
+              {formatDataSource(run.source) ? (
+                <>
+                  <span className="text-muted-foreground/60">•</span>
+                  <span className="flex items-center gap-1">
+                    <FileSpreadsheet className="size-3" />
+                    {formatDataSource(run.source)}
+                  </span>
+                </>
+              ) : null}
+            </div>
+          </CardHeader>
+
+          <CardContent className="space-y-3">
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="flex items-center gap-3 rounded-xl bg-muted px-3 py-2.5">
+                <div className="flex size-8 items-center justify-center rounded-lg bg-foreground/10">
+                  <Thermometer className="size-5 text-foreground" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Temperatura</p>
+                  <p className="text-lg font-bold">{formatTemperature(run.temperature)}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 rounded-xl bg-muted px-3 py-2.5">
+                <div className="flex size-8 items-center justify-center rounded-lg bg-foreground/10">
+                  <Gauge className="size-5 text-foreground" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Velocidade</p>
+                  <p className="text-lg font-bold">{formatSpeed(run.speed)}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-2 rounded-xl border border-border px-3 py-2.5">
+              <h4 className="text-sm font-semibold text-foreground">Métricas do Ensaio</h4>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Tensão máxima (σ máx)</span>
+                  <span className="text-sm font-bold text-foreground">
+                    {run.maxStress !== null
+                      ? `${stressFormatter.format(run.maxStress)} MPa`
+                      : 'sem dados'}
+                  </span>
+                </div>
+                <div className="h-px bg-border" />
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Deformação máxima (ε máx)</span>
+                  <span className="text-sm font-bold text-foreground">
+                    {run.maxStrain !== null
+                      ? `${strainFormatter.format(run.maxStrain)} mm/mm`
+                      : 'sem dados'}
+                  </span>
+                </div>
+                <div className="h-px bg-border" />
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Pontos medidos</span>
+                  <span className="text-sm font-bold text-foreground">
+                    {countFormatter.format(run.pointCount)}
                   </span>
                 </div>
               </div>
-              <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                <span>{formatProfileLabel(run.temperature, run.speed)}</span>
-                <span className="text-muted-foreground/60">•</span>
-                <span className="flex items-center gap-1">
-                  <Calendar className="size-3" />
-                  {dateFormatter.format(new Date(run.createdAt))}
-                </span>
-                {formatDataSource(run.source) ? (
-                  <>
-                    <span className="text-muted-foreground/60">•</span>
-                    <span className="flex items-center gap-1">
-                      <FileSpreadsheet className="size-3" />
-                      {formatDataSource(run.source)}
-                    </span>
-                  </>
-                ) : null}
-              </div>
-            </CardHeader>
+            </div>
+          </CardContent>
+        </Card>
+      ))}
 
-            <CardContent className="space-y-5">
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div className="flex items-center gap-3 rounded-xl bg-muted p-4">
-                  <div className="flex size-10 items-center justify-center rounded-lg bg-foreground/10">
-                    <Thermometer className="size-5 text-foreground" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground">Temperatura</p>
-                    <p className="text-lg font-bold">{formatTemperature(run.temperature)}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 rounded-xl bg-muted p-4">
-                  <div className="flex size-10 items-center justify-center rounded-lg bg-foreground/10">
-                    <Gauge className="size-5 text-foreground" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground">Velocidade</p>
-                    <p className="text-lg font-bold">{formatSpeed(run.speed)}</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-3 rounded-xl border border-border p-4">
-                <h4 className="text-sm font-semibold text-foreground">Métricas do Ensaio</h4>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Tensão máxima (σ máx)</span>
-                    <span className="text-sm font-bold text-foreground">
-                      {run.maxStress !== null
-                        ? `${stressFormatter.format(run.maxStress)} MPa`
-                        : 'sem dados'}
-                    </span>
-                  </div>
-                  <div className="h-px bg-border" />
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Deformação máxima (ε máx)</span>
-                    <span className="text-sm font-bold text-foreground">
-                      {run.maxStrain !== null
-                        ? `${strainFormatter.format(run.maxStrain)} mm/mm`
-                        : 'sem dados'}
-                    </span>
-                  </div>
-                  <div className="h-px bg-border" />
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Pontos medidos</span>
-                    <span className="text-sm font-bold text-foreground">
-                      {countFormatter.format(run.pointCount)}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      <Card className="bg-gradient-to-br from-muted/30 to-muted/50">
-        <CardHeader className="pb-4">
+      <Card className="bg-gradient-to-br from-muted/30 to-muted/50 lg:col-span-2 xl:col-span-1">
+        <CardHeader>
           <div className="flex items-center gap-3">
-            <div className="flex size-10 items-center justify-center rounded-lg bg-foreground/10">
-              <GitCompare className="size-5 text-foreground" />
+            <div className="flex size-8 items-center justify-center rounded-lg bg-foreground/10">
+              <GitCompare className="size-4 text-foreground" />
             </div>
             <div>
               <CardTitle className="text-lg">Diferenças Relativas</CardTitle>
@@ -235,14 +233,14 @@ function RunComparison({ left, right }: { left: RunMetrics; right: RunMetrics })
           </div>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 sm:grid-cols-3">
+          <div className="grid gap-3 sm:grid-cols-3 xl:grid-cols-1">
             <DifferenceMetric label="Tensão máxima" info={stressInfo} />
             <DifferenceMetric label="Deformação máxima" info={strainInfo} />
             <DifferenceMetric label="Pontos medidos" info={pointsInfo} />
           </div>
         </CardContent>
       </Card>
-    </>
+    </div>
   )
 }
 
@@ -252,104 +250,100 @@ function AverageComparison({ left, right }: { left: ProfileAverages; right: Prof
   const testsInfo = getDifferenceInfo(left.tests, right.tests)
 
   return (
-    <>
-      <div className="grid gap-6 lg:grid-cols-2">
-        {[left, right].map((profile, index) => (
-          <Card key={profile.profile} className="relative overflow-hidden">
-            <div
-              className={`absolute left-0 top-0 h-full w-1 ${
-                index === 0 ? 'bg-foreground' : 'bg-foreground/50'
-              }`}
-            />
+    <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.75fr)]">
+      {[left, right].map((profile, index) => (
+        <Card key={profile.profile} className="relative overflow-hidden">
+          <div
+            className={`absolute left-0 top-0 h-full w-1 ${
+              index === 0 ? 'bg-foreground' : 'bg-foreground/50'
+            }`}
+          />
 
-            <CardHeader className="pb-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Badge
-                    variant="outline"
-                    className={`font-semibold ${
-                      index === 0
-                        ? 'border-foreground/50 text-foreground'
-                        : 'border-foreground/30 text-foreground/70'
-                    }`}
-                  >
-                    Perfil {index + 1}
-                  </Badge>
-                  <span className="inline-flex items-center rounded-md bg-foreground px-2.5 py-1 text-sm font-semibold text-background">
-                    {profile.profile}
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Badge
+                  variant="outline"
+                  className={`font-semibold ${
+                    index === 0
+                      ? 'border-foreground/50 text-foreground'
+                      : 'border-foreground/30 text-foreground/70'
+                  }`}
+                >
+                  Perfil {index + 1}
+                </Badge>
+                <span className="inline-flex items-center rounded-md bg-foreground px-2.5 py-1 text-sm font-semibold text-background">
+                  {profile.profile}
+                </span>
+              </div>
+            </div>
+            <div className="mt-2 text-xs text-muted-foreground">
+              {formatProfileLabel(profile.temperature, profile.speed)} • {profile.tests} ensaios
+            </div>
+          </CardHeader>
+
+          <CardContent className="space-y-3">
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="flex items-center gap-3 rounded-xl bg-muted px-3 py-2.5">
+                <div className="flex size-8 items-center justify-center rounded-lg bg-foreground/10">
+                  <Thermometer className="size-5 text-foreground" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Temperatura</p>
+                  <p className="text-lg font-bold">{formatTemperature(profile.temperature)}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 rounded-xl bg-muted px-3 py-2.5">
+                <div className="flex size-8 items-center justify-center rounded-lg bg-foreground/10">
+                  <Gauge className="size-5 text-foreground" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Velocidade</p>
+                  <p className="text-lg font-bold">{formatSpeed(profile.speed)}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-2 rounded-xl border border-border px-3 py-2.5">
+              <h4 className="text-sm font-semibold text-foreground">Médias do Perfil</h4>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Tensão máxima média (σ máx)</span>
+                  <span className="text-sm font-bold text-foreground">
+                    {profile.avgMaxStress !== null
+                      ? `${stressFormatter.format(profile.avgMaxStress)} MPa`
+                      : 'sem dados'}
+                  </span>
+                </div>
+                <div className="h-px bg-border" />
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">
+                    Deformação máxima média (ε máx)
+                  </span>
+                  <span className="text-sm font-bold text-foreground">
+                    {profile.avgMaxStrain !== null
+                      ? `${strainFormatter.format(profile.avgMaxStrain)} mm/mm`
+                      : 'sem dados'}
+                  </span>
+                </div>
+                <div className="h-px bg-border" />
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Ensaios considerados</span>
+                  <span className="text-sm font-bold text-foreground">
+                    {countFormatter.format(profile.tests)}
                   </span>
                 </div>
               </div>
-              <div className="mt-2 text-xs text-muted-foreground">
-                {formatProfileLabel(profile.temperature, profile.speed)} • {profile.tests} ensaios
-              </div>
-            </CardHeader>
+            </div>
+          </CardContent>
+        </Card>
+      ))}
 
-            <CardContent className="space-y-5">
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div className="flex items-center gap-3 rounded-xl bg-muted p-4">
-                  <div className="flex size-10 items-center justify-center rounded-lg bg-foreground/10">
-                    <Thermometer className="size-5 text-foreground" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground">Temperatura</p>
-                    <p className="text-lg font-bold">{formatTemperature(profile.temperature)}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 rounded-xl bg-muted p-4">
-                  <div className="flex size-10 items-center justify-center rounded-lg bg-foreground/10">
-                    <Gauge className="size-5 text-foreground" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground">Velocidade</p>
-                    <p className="text-lg font-bold">{formatSpeed(profile.speed)}</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-3 rounded-xl border border-border p-4">
-                <h4 className="text-sm font-semibold text-foreground">Médias do Perfil</h4>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">
-                      Tensão máxima média (σ máx)
-                    </span>
-                    <span className="text-sm font-bold text-foreground">
-                      {profile.avgMaxStress !== null
-                        ? `${stressFormatter.format(profile.avgMaxStress)} MPa`
-                        : 'sem dados'}
-                    </span>
-                  </div>
-                  <div className="h-px bg-border" />
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">
-                      Deformação máxima média (ε máx)
-                    </span>
-                    <span className="text-sm font-bold text-foreground">
-                      {profile.avgMaxStrain !== null
-                        ? `${strainFormatter.format(profile.avgMaxStrain)} mm/mm`
-                        : 'sem dados'}
-                    </span>
-                  </div>
-                  <div className="h-px bg-border" />
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Ensaios considerados</span>
-                    <span className="text-sm font-bold text-foreground">
-                      {countFormatter.format(profile.tests)}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      <Card className="bg-gradient-to-br from-muted/30 to-muted/50">
-        <CardHeader className="pb-4">
+      <Card className="bg-gradient-to-br from-muted/30 to-muted/50 lg:col-span-2 xl:col-span-1">
+        <CardHeader>
           <div className="flex items-center gap-3">
-            <div className="flex size-10 items-center justify-center rounded-lg bg-foreground/10">
-              <GitCompare className="size-5 text-foreground" />
+            <div className="flex size-8 items-center justify-center rounded-lg bg-foreground/10">
+              <GitCompare className="size-4 text-foreground" />
             </div>
             <div>
               <CardTitle className="text-lg">Diferenças Relativas</CardTitle>
@@ -360,14 +354,14 @@ function AverageComparison({ left, right }: { left: ProfileAverages; right: Prof
           </div>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 sm:grid-cols-3">
+          <div className="grid gap-3 sm:grid-cols-3 xl:grid-cols-1">
             <DifferenceMetric label="Tensão máxima média" info={stressInfo} />
             <DifferenceMetric label="Deformação máxima média" info={strainInfo} />
             <DifferenceMetric label="Ensaios considerados" info={testsInfo} />
           </div>
         </CardContent>
       </Card>
-    </>
+    </div>
   )
 }
 
@@ -433,7 +427,7 @@ export function CompareClient({ runs, profileAverages }: CompareClientProps) {
         <TabsTrigger value="average">Médias por perfil</TabsTrigger>
       </TabsList>
 
-      <TabsContent value="individual" className="space-y-6">
+      <TabsContent value="individual" className="space-y-4">
         <Card>
           <CardHeader>
             <CardTitle>Seleção de ensaios</CardTitle>
@@ -445,7 +439,7 @@ export function CompareClient({ runs, profileAverages }: CompareClientProps) {
                 Nenhum ensaio disponível para comparação.
               </p>
             ) : (
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="run-left">Ensaio 1</Label>
                   <Select value={leftRunId} onValueChange={setLeftRunId}>
@@ -493,14 +487,14 @@ export function CompareClient({ runs, profileAverages }: CompareClientProps) {
           <RunComparison left={selectedLeftRun} right={selectedRightRun} />
         ) : (
           <Card className="border-dashed">
-            <CardContent className="p-6 text-sm text-muted-foreground">
+            <CardContent className="text-sm text-muted-foreground">
               Selecione dois ensaios para visualizar a comparação detalhada.
             </CardContent>
           </Card>
         )}
       </TabsContent>
 
-      <TabsContent value="average" className="space-y-6">
+      <TabsContent value="average" className="space-y-4">
         <Card>
           <CardHeader>
             <CardTitle>Seleção de perfis</CardTitle>
@@ -512,7 +506,7 @@ export function CompareClient({ runs, profileAverages }: CompareClientProps) {
                 Nenhum perfil com dados suficientes para comparar.
               </p>
             ) : (
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="profile-left">Perfil 1</Label>
                   <Select value={leftProfileId} onValueChange={setLeftProfileId}>
@@ -560,7 +554,7 @@ export function CompareClient({ runs, profileAverages }: CompareClientProps) {
           <AverageComparison left={selectedLeftProfile} right={selectedRightProfile} />
         ) : (
           <Card className="border-dashed">
-            <CardContent className="p-6 text-sm text-muted-foreground">
+            <CardContent className="text-sm text-muted-foreground">
               Selecione dois perfis para visualizar a comparação de médias.
             </CardContent>
           </Card>

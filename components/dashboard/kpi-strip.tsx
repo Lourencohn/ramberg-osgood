@@ -12,7 +12,7 @@ type KpiStripProps = {
 
 export function KpiStrip({ items }: KpiStripProps) {
   return (
-    <section className="grid grid-cols-2 divide-y divide-foreground/10 border-y border-foreground/15 md:grid-cols-4 md:divide-x md:divide-y-0">
+    <section className="grid shrink-0 grid-cols-2 divide-y divide-foreground/10 border-y border-foreground/15 bg-background/60 md:grid-cols-4 md:divide-x md:divide-y-0">
       {items.map((item, index) => (
         <KpiCell key={item.caption} item={item} index={index} />
       ))}
@@ -22,16 +22,16 @@ export function KpiStrip({ items }: KpiStripProps) {
 
 function KpiCell({ item, index }: { item: Kpi; index: number }) {
   return (
-    <div className="group relative px-5 py-5 md:py-6">
+    <div className="group relative px-4 py-2.5">
       <span className="absolute right-3 top-3 font-mono-data text-[10px] tracking-widest text-foreground/30">
         0{index + 1}
       </span>
 
-      <div className="space-y-2">
+      <div className="space-y-1">
         <span className={item.accent ? 'label-caps-brand' : 'label-caps'}>{item.caption}</span>
         <div className="flex items-baseline gap-1.5">
           <span
-            className={`font-display text-[44px] leading-none tracking-tight md:text-[52px] ${
+            className={`font-display text-[28px] leading-none tracking-tight md:text-[32px] ${
               item.accent ? 'text-brand-deep' : 'text-foreground'
             }`}
           >

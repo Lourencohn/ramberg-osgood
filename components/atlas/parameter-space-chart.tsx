@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
+import { cn } from '@/lib/utils'
 
 type AxisMeta = {
   label: string
@@ -27,6 +28,7 @@ type ParameterSpaceChartProps = {
     z: AxisMeta
     color: AxisMeta
   }
+  className?: string
 }
 
 type AxisBounds = {
@@ -47,7 +49,7 @@ function mapColor(t: number) {
   return color
 }
 
-export function ParameterSpaceChart({ points, highlightId, axis }: ParameterSpaceChartProps) {
+export function ParameterSpaceChart({ points, highlightId, axis, className }: ParameterSpaceChartProps) {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const [isReady, setIsReady] = useState(false)
 
@@ -211,7 +213,7 @@ export function ParameterSpaceChart({ points, highlightId, axis }: ParameterSpac
 
   if (!points.length) {
     return (
-      <div className="h-[320px] flex items-center justify-center rounded-xl border border-dashed border-border">
+      <div className={cn('h-[320px] flex items-center justify-center rounded-xl border border-dashed border-border', className)}>
         <p className="text-sm text-muted-foreground">Sem pontos para o atlas 3D.</p>
       </div>
     )
@@ -219,7 +221,7 @@ export function ParameterSpaceChart({ points, highlightId, axis }: ParameterSpac
 
   if (!bounds) {
     return (
-      <div className="h-[320px] flex items-center justify-center rounded-xl border border-dashed border-border">
+      <div className={cn('h-[320px] flex items-center justify-center rounded-xl border border-dashed border-border', className)}>
         <p className="text-sm text-muted-foreground">
           Dados insuficientes para mapa paramétrico.
         </p>
@@ -228,11 +230,10 @@ export function ParameterSpaceChart({ points, highlightId, axis }: ParameterSpac
   }
 
   return (
-    <div className="space-y-3">
-      <div
-        ref={containerRef}
-        className="h-[320px] w-full rounded-xl border border-border bg-white/80 dark:bg-black/40"
-      />
+    <div className={cn('flex flex-col gap-3', className)}>
+      <div className="relative min-h-[320px] flex-1 overflow-hidden rounded-xl border border-border bg-white/80 dark:bg-black/40">
+        <div ref={containerRef} className="absolute inset-0" />
+      </div>
       <div className="grid gap-2 text-xs text-muted-foreground sm:grid-cols-2">
         <div className="rounded-lg border border-border/60 bg-muted/30 px-3 py-2">
           <p className="font-semibold text-foreground">Eixos</p>

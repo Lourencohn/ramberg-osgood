@@ -9,6 +9,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
+import { cn } from '@/lib/utils'
 
 type CorrelationPoint = {
   x: number
@@ -23,6 +24,7 @@ type ParameterCorrelationChartProps = {
   yLabel: string
   xFormatter?: (value: number) => string
   yFormatter?: (value: number) => string
+  className?: string
 }
 
 export function ParameterCorrelationChart({
@@ -31,10 +33,11 @@ export function ParameterCorrelationChart({
   yLabel,
   xFormatter,
   yFormatter,
+  className,
 }: ParameterCorrelationChartProps) {
   if (!points.length) {
     return (
-      <div className="h-72 flex items-center justify-center rounded-lg border border-dashed border-border">
+      <div className={cn('h-72 flex items-center justify-center rounded-lg border border-dashed border-border', className)}>
         <p className="text-sm text-muted-foreground">Sem dados para correlação.</p>
       </div>
     )
@@ -48,7 +51,7 @@ export function ParameterCorrelationChart({
           color: 'var(--chart-2)',
         },
       }}
-      className="h-72 w-full aspect-auto"
+      className={cn('h-72 w-full aspect-auto', className)}
     >
       <ResponsiveContainer width="100%" height="100%">
         <ScatterChart>

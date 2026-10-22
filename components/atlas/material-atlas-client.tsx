@@ -375,12 +375,12 @@ export function MaterialAtlasClient({ trainingData }: MaterialAtlasClientProps) 
   }
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[minmax(0,400px)_minmax(0,1fr)] lg:h-[calc(100svh-220px)] lg:items-stretch lg:overflow-hidden">
-      <Card className="flex h-full flex-col">
-        <CardHeader className="pb-4">
+    <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,340px)_minmax(0,1fr)] xl:min-h-0 xl:flex-1">
+      <Card className="flex flex-col xl:min-h-0">
+        <CardHeader>
           <div className="flex items-center gap-3">
-            <div className="flex size-10 items-center justify-center rounded-lg bg-foreground/10">
-              <SlidersHorizontal className="size-5 text-foreground" />
+            <div className="flex size-8 items-center justify-center rounded-lg bg-foreground/10">
+              <SlidersHorizontal className="size-4 text-foreground" />
             </div>
             <div>
               <CardTitle>Controle do atlas</CardTitle>
@@ -388,13 +388,13 @@ export function MaterialAtlasClient({ trainingData }: MaterialAtlasClientProps) 
             </div>
           </div>
         </CardHeader>
-        <CardContent className="flex-1">
+        <CardContent className="flex-1 xl:min-h-0 xl:overflow-y-auto">
           <Tabs defaultValue="filters" className="space-y-3">
             <TabsList className="grid w-full grid-cols-2 h-auto gap-1 p-1">
-              <TabsTrigger value="filters" className="py-2.5">
+              <TabsTrigger value="filters" className="py-1.5">
                 Filtros
               </TabsTrigger>
-              <TabsTrigger value="summary" className="py-2.5">
+              <TabsTrigger value="summary" className="py-1.5">
                 Resumo
               </TabsTrigger>
             </TabsList>
@@ -411,7 +411,7 @@ export function MaterialAtlasClient({ trainingData }: MaterialAtlasClientProps) 
                       setAxisState((current) => ({ ...current, x: value as MetricKey }))
                     }
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="w-full">
                       <SelectValue placeholder="Selecione X" />
                     </SelectTrigger>
                     <SelectContent>
@@ -433,7 +433,7 @@ export function MaterialAtlasClient({ trainingData }: MaterialAtlasClientProps) 
                       setAxisState((current) => ({ ...current, y: value as MetricKey }))
                     }
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="w-full">
                       <SelectValue placeholder="Selecione Y" />
                     </SelectTrigger>
                     <SelectContent>
@@ -455,7 +455,7 @@ export function MaterialAtlasClient({ trainingData }: MaterialAtlasClientProps) 
                       setAxisState((current) => ({ ...current, z: value as MetricKey }))
                     }
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="w-full">
                       <SelectValue placeholder="Selecione Z" />
                     </SelectTrigger>
                     <SelectContent>
@@ -477,7 +477,7 @@ export function MaterialAtlasClient({ trainingData }: MaterialAtlasClientProps) 
                       setAxisState((current) => ({ ...current, color: value as MetricKey }))
                     }
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="w-full">
                       <SelectValue placeholder="Selecione cor" />
                     </SelectTrigger>
                     <SelectContent>
@@ -550,7 +550,7 @@ export function MaterialAtlasClient({ trainingData }: MaterialAtlasClientProps) 
                   Perfil em destaque
                 </p>
                 <Select value={selectedId} onValueChange={setSelectedId}>
-                  <SelectTrigger>
+                  <SelectTrigger className="w-full">
                     <SelectValue placeholder="Selecione um perfil" />
                   </SelectTrigger>
                   <SelectContent>
@@ -566,38 +566,38 @@ export function MaterialAtlasClient({ trainingData }: MaterialAtlasClientProps) 
 
             <TabsContent value="summary">
               <div className="grid gap-3 grid-cols-2">
-                <div className="rounded-xl border border-border/80 bg-card p-4">
+                <div className="rounded-xl border border-border/80 bg-card px-3 py-2.5">
                   <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                     Perfis
                   </p>
-                  <p className="mt-2 text-2xl font-semibold tracking-tight text-foreground">
+                  <p className="mt-1 text-xl font-semibold tracking-tight text-foreground">
                     {countFormatter.format(summary.total)}
                   </p>
                   <p className="mt-1 text-xs text-muted-foreground">Total filtrado</p>
                 </div>
-                <div className="rounded-xl border border-border/80 bg-card p-4">
+                <div className="rounded-xl border border-border/80 bg-card px-3 py-2.5">
                   <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                     Faixa térmica
                   </p>
-                  <p className="mt-2 text-2xl font-semibold tracking-tight text-foreground">
+                  <p className="mt-1 text-xl font-semibold tracking-tight text-foreground">
                     {summary.tempRange}
                   </p>
                   <p className="mt-1 text-xs text-muted-foreground">Temperatura</p>
                 </div>
-                <div className="rounded-xl border border-border/80 bg-card p-4">
+                <div className="rounded-xl border border-border/80 bg-card px-3 py-2.5">
                   <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                     Faixa de velocidade
                   </p>
-                  <p className="mt-2 text-2xl font-semibold tracking-tight text-foreground">
+                  <p className="mt-1 text-xl font-semibold tracking-tight text-foreground">
                     {summary.speedRange}
                   </p>
                   <p className="mt-1 text-xs text-muted-foreground">Velocidade de impressão</p>
                 </div>
-                <div className="rounded-xl border border-border/80 bg-card p-4">
+                <div className="rounded-xl border border-border/80 bg-card px-3 py-2.5">
                   <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                     Mediana RMSE
                   </p>
-                  <p className="mt-2 text-2xl font-semibold tracking-tight text-foreground">
+                  <p className="mt-1 text-xl font-semibold tracking-tight text-foreground">
                     {summary.rmseMedian} {unitLabels.strain}
                   </p>
                   <p className="mt-1 text-xs text-muted-foreground">Qualidade do ajuste</p>
@@ -608,11 +608,11 @@ export function MaterialAtlasClient({ trainingData }: MaterialAtlasClientProps) 
         </CardContent>
       </Card>
 
-      <Card className="flex h-full flex-col overflow-hidden">
-        <CardHeader className="pb-4">
+      <Card className="flex flex-col overflow-hidden xl:min-h-0">
+        <CardHeader>
           <div className="flex items-center gap-3">
-            <div className="flex size-10 items-center justify-center rounded-lg bg-foreground/10">
-              <Layers className="size-5 text-foreground" />
+            <div className="flex size-8 items-center justify-center rounded-lg bg-foreground/10">
+              <Layers className="size-4 text-foreground" />
             </div>
             <div>
               <CardTitle>Atlas paramétrico 3D</CardTitle>
@@ -620,25 +620,26 @@ export function MaterialAtlasClient({ trainingData }: MaterialAtlasClientProps) 
             </div>
           </div>
         </CardHeader>
-        <CardContent className="flex-1 overflow-hidden">
-          <Tabs defaultValue="map" className="flex h-full flex-col">
+        <CardContent className="flex min-h-0 flex-1 flex-col">
+          <Tabs defaultValue="map" className="min-h-0 flex-1">
             <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto gap-1 p-1">
-              <TabsTrigger value="map" className="py-2.5">
+              <TabsTrigger value="map" className="py-1.5">
                 Mapa 3D
               </TabsTrigger>
-              <TabsTrigger value="correlation" className="py-2.5">
+              <TabsTrigger value="correlation" className="py-1.5">
                 Correlações
               </TabsTrigger>
-              <TabsTrigger value="ranking" className="py-2.5">
+              <TabsTrigger value="ranking" className="py-1.5">
                 Rankings
               </TabsTrigger>
-              <TabsTrigger value="detail" className="py-2.5">
+              <TabsTrigger value="detail" className="py-1.5">
                 Destaque
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="map" className="mt-3">
+            <TabsContent value="map" className="mt-1 flex min-h-[420px] flex-col">
               <ParameterSpaceChart
+                className="flex-1"
                 points={chartPoints}
                 highlightId={selected?.id}
                 axis={{
@@ -668,8 +669,9 @@ export function MaterialAtlasClient({ trainingData }: MaterialAtlasClientProps) 
               />
             </TabsContent>
 
-            <TabsContent value="correlation" className="mt-3">
+            <TabsContent value="correlation" className="relative mt-1 min-h-[360px]">
               <ParameterCorrelationChart
+                className="absolute inset-0 h-auto"
                 points={correlationPoints}
                 xLabel={axisMeta.x.label}
                 yLabel={axisMeta.y.label}
@@ -678,10 +680,10 @@ export function MaterialAtlasClient({ trainingData }: MaterialAtlasClientProps) 
               />
             </TabsContent>
 
-            <TabsContent value="ranking" className="mt-3">
+            <TabsContent value="ranking" className="mt-1 xl:min-h-0 xl:overflow-y-auto">
               <div className="grid gap-4 lg:grid-cols-2">
                 <Card>
-                  <CardHeader className="pb-4">
+                  <CardHeader>
                     <CardTitle>Melhor ajuste (RMSE)</CardTitle>
                     <CardDescription>Perfis com menor erro de calibração.</CardDescription>
                   </CardHeader>
@@ -705,7 +707,7 @@ export function MaterialAtlasClient({ trainingData }: MaterialAtlasClientProps) 
                 </Card>
 
                 <Card>
-                  <CardHeader className="pb-4">
+                  <CardHeader>
                     <CardTitle>Maior tenacidade</CardTitle>
                     <CardDescription>Perfis com maior energia acumulada.</CardDescription>
                   </CardHeader>
@@ -734,7 +736,7 @@ export function MaterialAtlasClient({ trainingData }: MaterialAtlasClientProps) 
               </div>
             </TabsContent>
 
-            <TabsContent value="detail" className="mt-3">
+            <TabsContent value="detail" className="mt-1 xl:min-h-0 xl:overflow-y-auto">
               {selected ? (
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {[
@@ -752,11 +754,11 @@ export function MaterialAtlasClient({ trainingData }: MaterialAtlasClientProps) 
                     const formatter = option?.format ?? ((value: number) => value.toFixed(2))
                     const value = valueForMetric(selected, metric.key as MetricKey)
                     return (
-                      <div key={metric.key} className="rounded-xl border border-border/70 p-4">
+                      <div key={metric.key} className="rounded-xl border border-border/70 px-3 py-2.5">
                         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                           {metric.label}
                         </p>
-                        <p className="mt-2 text-2xl font-semibold tracking-tight text-foreground">
+                        <p className="mt-1 text-xl font-semibold tracking-tight text-foreground">
                           {formatter(value)}
                           {metric.unit ? ` ${metric.unit}` : ''}
                         </p>

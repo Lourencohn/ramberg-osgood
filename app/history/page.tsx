@@ -30,6 +30,7 @@ export default async function HistoryPage({ searchParams }: HistoryPageProps) {
         title="Histórico de"
         accent="ensaios"
         description="Todos os ensaios já cadastrados, com busca, filtros e exportação por linha ou em lote."
+        fit
       >
         <HistoryClient runs={runs} initialQuery={query} initialViewId={initialViewId} />
       </PageShell>

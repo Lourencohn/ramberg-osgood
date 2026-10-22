@@ -6,11 +6,13 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/
 import { Line, LineChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer } from 'recharts'
 import type { UnitSystem } from '@/lib/settings'
 import { convertStress, getUnitLabels } from '@/lib/units'
+import { cn } from '@/lib/utils'
 
 type StressStrainChartProps = {
   curve: StressStrainPoint[]
   unitSystem?: UnitSystem
   interactive?: boolean
+  className?: string
 }
 
 const strainFormatter = new Intl.NumberFormat('pt-BR', {
@@ -27,6 +29,7 @@ export function StressStrainChart({
   curve,
   unitSystem = 'si',
   interactive = true,
+  className,
 }: StressStrainChartProps) {
   const unitLabels = getUnitLabels(unitSystem)
   const displayCurve = useMemo(
@@ -40,7 +43,12 @@ export function StressStrainChart({
 
   if (!displayCurve.length) {
     return (
-      <div className="h-80 flex items-center justify-center border-2 border-dashed border-border rounded-lg">
+      <div
+        className={cn(
+          'h-80 flex items-center justify-center border-2 border-dashed border-border rounded-lg',
+          className
+        )}
+      >
         <p className="text-muted-foreground">
           Insira parametros para gerar a curva tensao x deformacao.
         </p>
@@ -56,7 +64,7 @@ export function StressStrainChart({
           color: 'var(--chart-1)',
         },
       }}
-      className="h-80 w-full aspect-auto"
+      className={cn('h-80 w-full aspect-auto', className)}
     >
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={displayCurve}>

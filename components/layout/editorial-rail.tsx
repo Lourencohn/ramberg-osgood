@@ -76,8 +76,8 @@ export function EditorialRail() {
 
   return (
     <TooltipProvider delayDuration={200}>
-      <aside className="sticky top-0 z-30 hidden h-svh w-16 shrink-0 flex-col border-r border-foreground/15 bg-sidebar md:flex">
-        <div className="flex h-16 items-center justify-center border-b border-foreground/10">
+      <aside className="z-30 hidden h-svh w-16 shrink-0 flex-col border-r border-foreground/15 bg-sidebar md:flex">
+        <div className="flex h-12 shrink-0 items-center justify-center border-b border-foreground/10">
           <Link
             href="/dashboard"
             className="flex size-9 items-center justify-center rounded-md border border-foreground/10 bg-background transition-colors hover:border-brand"
@@ -87,7 +87,7 @@ export function EditorialRail() {
           </Link>
         </div>
 
-        <nav className="flex-1 overflow-y-auto py-3">
+        <nav className="min-h-0 flex-1 overflow-y-auto py-2">
           <ul className="flex flex-col items-center gap-1">
             {RAIL_SECTIONS.map((section, index) => (
               <li key={section.label} className="flex w-full flex-col items-center gap-1">

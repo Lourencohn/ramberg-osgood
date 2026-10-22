@@ -31,8 +31,8 @@ const actions = [
 
 export function EditorialActions() {
   return (
-    <nav aria-label="Ações" className="rounded-md border border-foreground/15 bg-card p-4">
-      <div className="flex items-center justify-between border-b border-foreground/10 pb-3">
+    <nav aria-label="Ações" className="rounded-md border border-foreground/15 bg-card px-4 py-3">
+      <div className="flex items-center justify-between border-b border-foreground/10 pb-2">
         <span className="label-caps-brand">Coluna II</span>
         <span className="label-caps">Atalhos</span>
       </div>
@@ -41,10 +41,10 @@ export function EditorialActions() {
           <li key={action.href}>
             <Link
               href={action.href}
-              className="group flex items-center gap-3 py-3 transition-colors hover:text-brand-deep"
+              className="group flex items-center gap-3 py-2 transition-colors hover:text-brand-deep"
             >
               <span
-                className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-md border ${
+                className={`flex size-8 shrink-0 items-center justify-center rounded-md border ${
                   action.accent
                     ? 'border-brand bg-brand-soft text-brand-deep'
                     : 'border-foreground/15 bg-background text-foreground'
@@ -53,8 +53,8 @@ export function EditorialActions() {
                 <action.icon className="h-4 w-4" />
               </span>
               <div className="min-w-0 flex-1">
-                <p className="font-display text-base leading-tight">{action.label}</p>
-                <p className="font-sans text-[11px] leading-snug text-muted-foreground">
+                <p className="font-display text-[15px] leading-tight">{action.label}</p>
+                <p className="truncate font-sans text-[11px] leading-snug text-muted-foreground">
                   {action.hint}
                 </p>
               </div>

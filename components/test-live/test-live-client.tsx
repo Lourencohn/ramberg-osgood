@@ -20,6 +20,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { ChartContainer } from '@/components/ui/chart'
 import { generateStressStrainCurve } from '@/lib/ramberg-osgood'
 import type { RambergOsgoodParams, StressStrainPoint } from '@/types'
+import { cn } from '@/lib/utils'
 
 const SIMULATION_DURATION_MS = 16000
 const RAMBERG_PARAMS: RambergOsgoodParams = {
@@ -130,22 +131,22 @@ type SensorGaugeProps = {
 
 function SensorGauge({ label, value, unit, progress, hint }: SensorGaugeProps) {
   return (
-    <div className="rounded-xl border border-border/80 bg-card p-4 shadow-sm">
+    <div className="rounded-xl border border-border/80 bg-card px-3 py-2.5 shadow-xs">
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
             {label}
           </p>
-          <p className="mt-2 text-2xl font-semibold tracking-tight text-foreground">
+          <p className="mt-1 text-xl font-semibold tracking-tight text-foreground">
             {value.toFixed(2)} <span className="text-sm text-muted-foreground">{unit}</span>
           </p>
-          <p className="mt-1 text-xs text-muted-foreground">{hint}</p>
+          <p className="text-xs text-muted-foreground">{hint}</p>
         </div>
         <span className="rounded-full border border-border/70 bg-muted/30 px-2 py-1 text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
           Sensor
         </span>
       </div>
-      <div className="mt-4 h-2 rounded-full bg-muted">
+      <div className="mt-2 h-2 rounded-full bg-muted">
         <div
           className="h-full rounded-full bg-gradient-to-r from-foreground to-foreground/70 transition-[width] duration-100"
           style={{ width: `${Math.min(Math.max(progress, 0), 1) * 100}%` }}
@@ -163,12 +164,12 @@ type MetricTileProps = {
 
 function MetricTile({ label, value, detail }: MetricTileProps) {
   return (
-    <div className="rounded-xl border border-border/80 bg-card p-4 shadow-sm">
+    <div className="rounded-xl border border-border/80 bg-card px-3 py-2 shadow-xs">
       <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
         {label}
       </p>
-      <p className="mt-2 text-2xl font-semibold tracking-tight text-foreground">{value}</p>
-      <p className="mt-1 text-xs text-muted-foreground">{detail}</p>
+      <p className="mt-1 text-xl font-semibold tracking-tight text-foreground">{value}</p>
+      <p className="text-xs text-muted-foreground">{detail}</p>
     </div>
   )
 }
@@ -179,6 +180,7 @@ type LiveStressStrainChartProps = {
   maxStrain: number
   maxStress: number
   currentPoint: StressStrainPoint
+  className?: string
 }
 
 function LiveStressStrainChart({
@@ -187,6 +189,7 @@ function LiveStressStrainChart({
   maxStrain,
   maxStress,
   currentPoint,
+  className,
 }: LiveStressStrainChartProps) {
   const displayCurve = useMemo(() => buildDisplayCurve(curve, progress), [curve, progress])
 
@@ -198,7 +201,7 @@ function LiveStressStrainChart({
           color: 'var(--chart-1)',
         },
       }}
-      className="h-80 w-full aspect-auto"
+      className={cn('h-80 w-full aspect-auto', className)}
     >
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={displayCurve}>
@@ -243,9 +246,10 @@ function LiveStressStrainChart({
 
 type SpecimenSceneProps = {
   progress: number
+  className?: string
 }
 
-function SpecimenScene({ progress }: SpecimenSceneProps) {
+function SpecimenScene({ progress, className }: SpecimenSceneProps) {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const progressRef = useRef(progress)
 
@@ -520,9 +524,16 @@ function SpecimenScene({ progress }: SpecimenSceneProps) {
 
   return (
     <div
-      ref={containerRef}
-      className="relative flex h-80 w-full items-center justify-center overflow-hidden rounded-xl border border-border/70 bg-gradient-to-br from-muted/40 via-background to-muted/30"
-    />
+      className={cn(
+        'relative h-80 w-full overflow-hidden rounded-xl border border-border/70 bg-gradient-to-br from-muted/40 via-background to-muted/30',
+        className
+      )}
+    >
+      <div
+        ref={containerRef}
+        className="absolute inset-0 flex items-center justify-center [&>canvas]:block [&>canvas]:h-full [&>canvas]:w-full"
+      />
+    </div>
   )
 }
 
@@ -602,9 +613,9 @@ export function TestLiveClient() {
   }, [progress, isLive])
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-4 rounded-xl border border-border/70 bg-card p-5 shadow-sm md:flex-row md:items-center md:justify-between">
-        <div className="space-y-2">
+    <div className="flex flex-col gap-4 xl:min-h-0 xl:flex-1">
+      <div className="flex shrink-0 flex-col gap-3 rounded-xl border border-border/70 bg-card px-4 py-3 shadow-xs md:flex-row md:items-center md:justify-between">
+        <div className="space-y-1">
           <div className="flex flex-wrap items-center gap-2">
             <Badge variant="outline" className={statusStyles.className}>
               <span className={`mr-1 inline-flex size-2 rounded-full ${statusStyles.dot}`} />
@@ -613,12 +624,12 @@ export function TestLiveClient() {
             <Badge variant="outline" className="gap-2 border-border/70 text-muted-foreground">
               <Activity className="size-3" /> Tempo real
             </Badge>
+            <span className="text-xs text-muted-foreground">
+              Tempo: {elapsedSeconds.toFixed(1)}s / {durationSeconds.toFixed(0)}s
+            </span>
           </div>
           <p className="text-sm text-muted-foreground">
             Acompanhe a curva Ramberg-Osgood sendo tracada enquanto o corpo de prova se estira.
-          </p>
-          <p className="text-xs text-muted-foreground">
-            Tempo: {elapsedSeconds.toFixed(1)}s / {durationSeconds.toFixed(0)}s
           </p>
         </div>
         <Button onClick={handleStart} className="gap-2 shadow-sm">
@@ -627,39 +638,59 @@ export function TestLiveClient() {
         </Button>
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
-        <div className="space-y-6">
-          <Card className="border-border/70">
-            <CardHeader className="pb-3">
+      <div className="grid grid-cols-1 gap-4 xl:min-h-0 xl:flex-1 xl:grid-cols-[minmax(0,1.25fr)_minmax(0,0.85fr)_minmax(0,0.9fr)]">
+        <div className="grid grid-cols-1 gap-4 xl:min-h-0 xl:grid-rows-2">
+          <Card className="border-border/70 xl:min-h-0">
+            <CardHeader>
               <CardTitle>Curva Ramberg-Osgood (tempo real)</CardTitle>
               <CardDescription>
                 A linha nasce do zero e acompanha a trajetoria prevista do material.
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="relative min-h-64 flex-1 xl:min-h-44">
               <LiveStressStrainChart
                 curve={curve}
                 progress={progress}
                 maxStrain={MAX_STRAIN}
                 maxStress={maxStress}
                 currentPoint={currentPoint}
+                className="absolute inset-0 h-auto px-4"
               />
             </CardContent>
           </Card>
 
-          <Card className="border-border/70">
-            <CardHeader className="pb-3">
+          <Card className="border-border/70 xl:min-h-0">
+            <CardHeader>
               <CardTitle>Grafico Tensao x Deformacao (curva completa)</CardTitle>
               <CardDescription>
                 Visualizacao completa da curva prevista para referencia.
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <StressStrainChart curve={curve} interactive={false} />
+            <CardContent className="relative min-h-64 flex-1 xl:min-h-44">
+              <StressStrainChart
+                curve={curve}
+                interactive={false}
+                className="absolute inset-0 h-auto px-4"
+              />
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="flex flex-col gap-4 xl:min-h-0">
+          <Card className="flex-1 border-border/70 xl:min-h-0">
+            <CardHeader>
+              <CardTitle>Corpo de Prova ASTM D638</CardTitle>
+              <CardDescription>
+                Arraste para rotacionar e use o scroll para aproximar. O estricamento acompanha o
+                ensaio. Padrao ASTM D638 Tipo I.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex min-h-80 flex-1 flex-col xl:min-h-56">
+              <SpecimenScene progress={progress} className="h-auto flex-1" />
             </CardContent>
           </Card>
 
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid shrink-0 gap-3 sm:grid-cols-2">
             <SensorGauge
               label="Tensao Atual"
               value={stressReading}
@@ -675,29 +706,14 @@ export function TestLiveClient() {
               hint="Leitura instantanea do extensometro virtual."
             />
           </div>
-        </div>
 
-        <div className="space-y-6">
-          <Card className="border-border/70">
-            <CardHeader className="pb-3">
-              <CardTitle>Corpo de Prova ASTM D638</CardTitle>
-              <CardDescription>
-                Arraste para rotacionar e use o scroll para aproximar. O estricamento acompanha o
-                ensaio. Padrao ASTM D638 Tipo I.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <SpecimenScene progress={progress} />
-            </CardContent>
-          </Card>
-
-          <Card className="border-border/70">
-            <CardHeader className="pb-3">
+          <Card className="shrink-0 border-border/70">
+            <CardHeader>
               <CardTitle>Indicadores do corpo de prova</CardTitle>
               <CardDescription>Leituras sincronizadas ao alongamento do ensaio.</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid gap-4 md:grid-cols-2">
+              <div className="grid gap-2 sm:grid-cols-2">
                 <MetricTile
                   label="Alongamento"
                   value={`${(progress * 100).toFixed(1)}%`}
@@ -711,14 +727,16 @@ export function TestLiveClient() {
               </div>
             </CardContent>
           </Card>
+        </div>
 
+        <div className="flex flex-col gap-4 xl:min-h-0 xl:overflow-y-auto">
           <Card className="border-border/70">
-            <CardHeader className="pb-3">
+            <CardHeader>
               <CardTitle>Parametros do ensaio</CardTitle>
               <CardDescription>Configuracao usada para a curva Ramberg-Osgood.</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid gap-3 sm:grid-cols-2">
+              <div className="grid gap-2 sm:grid-cols-2">
                 {[
                   {
                     label: 'Modulo elastico (E)',
@@ -726,7 +744,7 @@ export function TestLiveClient() {
                     detail: 'Rigidez inicial do material.',
                   },
                   {
-                    label: 'Limite de escoamento (\u03c3\u2080)',
+                    label: 'Limite de escoamento (σ₀)',
                     value: `${RAMBERG_PARAMS.sigma_0} MPa`,
                     detail: 'Inicio do comportamento plastico.',
                   },
@@ -753,13 +771,13 @@ export function TestLiveClient() {
                 ].map((item) => (
                   <div
                     key={item.label}
-                    className="rounded-xl border border-border/80 bg-card p-4 shadow-sm"
+                    className="rounded-xl border border-border/80 bg-card px-3 py-2 shadow-xs"
                   >
                     <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                       {item.label}
                     </p>
-                    <p className="mt-2 text-lg font-semibold text-foreground">{item.value}</p>
-                    <p className="mt-1 text-xs text-muted-foreground">{item.detail}</p>
+                    <p className="mt-1 text-lg font-semibold text-foreground">{item.value}</p>
+                    <p className="text-xs text-muted-foreground">{item.detail}</p>
                   </div>
                 ))}
               </div>
@@ -767,7 +785,7 @@ export function TestLiveClient() {
           </Card>
 
           <Card className="border-border/70">
-            <CardHeader className="pb-3">
+            <CardHeader>
               <CardTitle>Eventos do ensaio</CardTitle>
               <CardDescription>
                 {breakReached
@@ -776,11 +794,11 @@ export function TestLiveClient() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {eventTimeline.map((event) => (
                   <div
                     key={event.label}
-                    className="flex items-center justify-between rounded-lg border border-border/70 bg-muted/40 px-4 py-3"
+                    className="flex items-center justify-between rounded-lg border border-border/70 bg-muted/40 px-3 py-2"
                   >
                     <div className="flex items-center gap-3">
                       <span

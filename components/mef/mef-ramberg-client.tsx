@@ -20,6 +20,7 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { calculateStrain, generateStressStrainCurve } from '@/lib/ramberg-osgood'
 import type { RambergOsgoodParams } from '@/types'
+import { cn } from '@/lib/utils'
 
 const SIMULATION_DURATION_MS = 14000
 const ELEMENT_COUNT = 12
@@ -195,6 +196,7 @@ type FemSceneProps = {
   maxStress: number
   deformationScale: number
   criticalIndex: number
+  className?: string
 }
 
 function FemScene({
@@ -204,6 +206,7 @@ function FemScene({
   maxStress,
   deformationScale,
   criticalIndex,
+  className,
 }: FemSceneProps) {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const dataRef = useRef({
@@ -477,9 +480,13 @@ function FemScene({
 
   return (
     <div
-      ref={containerRef}
-      className="relative flex h-80 w-full items-center justify-center overflow-hidden rounded-xl border border-border/70 bg-gradient-to-br from-muted/40 via-background to-muted/30"
-    />
+      className={cn(
+        'relative h-80 w-full overflow-hidden rounded-xl border border-border/70 bg-gradient-to-br from-muted/40 via-background to-muted/30',
+        className
+      )}
+    >
+      <div ref={containerRef} className="absolute inset-0 flex items-center justify-center" />
+    </div>
   )
 }
 
@@ -506,6 +513,7 @@ type ForceDisplacementChartProps = {
   currentLoad: number
   currentLinear: number
   currentNonlinear: number
+  className?: string
 }
 
 function ForceDisplacementChart({
@@ -513,6 +521,7 @@ function ForceDisplacementChart({
   currentLoad,
   currentLinear,
   currentNonlinear,
+  className,
 }: ForceDisplacementChartProps) {
   return (
     <ChartContainer
@@ -526,7 +535,7 @@ function ForceDisplacementChart({
           color: 'var(--chart-2)',
         },
       }}
-      className="h-72 w-full aspect-auto"
+      className={cn('h-72 w-full aspect-auto', className)}
     >
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data}>
@@ -601,6 +610,7 @@ type MaterialCurveChartProps = {
   highlightStrain: number
   highlightStress: number
   model: MaterialModel
+  className?: string
 }
 
 function MaterialCurveChart({
@@ -608,6 +618,7 @@ function MaterialCurveChart({
   highlightStrain,
   highlightStress,
   model,
+  className,
 }: MaterialCurveChartProps) {
   return (
     <ChartContainer
@@ -621,7 +632,7 @@ function MaterialCurveChart({
           color: 'var(--chart-3)',
         },
       }}
-      className="h-72 w-full aspect-auto"
+      className={cn('h-72 w-full aspect-auto', className)}
     >
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data}>
@@ -794,151 +805,133 @@ export function MefRambergClient() {
   const loadRatio = progress * 100
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-4 rounded-xl border border-border/70 bg-card p-5 shadow-sm">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div className="space-y-2">
-            <div className="flex flex-wrap items-center gap-2">
-              <Badge variant="outline" className={statusStyles.className}>
-                <span className={`mr-1 inline-flex size-2 rounded-full ${statusStyles.dot}`} />
-                {statusStyles.label}
-              </Badge>
-              <Badge variant="outline" className="border-border/70 text-muted-foreground">
-                MEF 1D
-              </Badge>
-              <Badge variant="outline" className="border-border/70 text-muted-foreground">
-                Ramberg-Osgood
-              </Badge>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              A barra e discretizada em elementos finitos para ligar a curva constitutiva a resposta
-              estrutural global.
-            </p>
-            <p className="text-xs text-muted-foreground">
+    <div className="flex flex-col gap-4 xl:min-h-0 xl:flex-1">
+      <div className="grid shrink-0 gap-3 rounded-xl border border-border/70 bg-card px-4 py-3 shadow-xs lg:grid-cols-[minmax(0,1.3fr)_minmax(0,0.8fr)_minmax(0,1fr)_auto] lg:items-center lg:gap-6">
+        <div className="min-w-0 space-y-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge variant="outline" className={statusStyles.className}>
+              <span className={`mr-1 inline-flex size-2 rounded-full ${statusStyles.dot}`} />
+              {statusStyles.label}
+            </Badge>
+            <Badge variant="outline" className="border-border/70 text-muted-foreground">
+              MEF 1D
+            </Badge>
+            <Badge variant="outline" className="border-border/70 text-muted-foreground">
+              Ramberg-Osgood
+            </Badge>
+            <span className="text-xs text-muted-foreground">
               Tempo: {elapsedSeconds.toFixed(1)}s / {durationSeconds.toFixed(0)}s
-            </p>
+            </span>
           </div>
-          <Button onClick={handleStart} className="gap-2 shadow-sm">
-            {status === 'running' ? <RotateCcw className="size-4" /> : <Play className="size-4" />}
-            {status === 'running' ? 'Reiniciar analise' : 'Iniciar analise'}
-          </Button>
+          <p className="text-sm text-muted-foreground">
+            A barra e discretizada em elementos finitos para ligar a curva constitutiva a resposta
+            estrutural global.
+          </p>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
-          <div className="space-y-1">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-              Etapa de carga
-            </p>
-            <p className="text-sm text-muted-foreground">
-              Carga aplicada: {loadFormatter.format(currentLoad)} N ({loadRatio.toFixed(0)}%)
-            </p>
-            <p className="text-xs text-muted-foreground">
-              Deformacao visual amplificada em {DEFORMATION_SCALE}x para leitura.
-            </p>
-          </div>
-          <div className="space-y-2">
-            <label className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-              Controle manual
-            </label>
-            <input
-              type="range"
-              min={0}
-              max={100}
-              value={loadRatio}
-              onChange={(event) => handleManualProgress(Number(event.target.value) / 100)}
-              className="h-2 w-full cursor-pointer appearance-none rounded-full bg-muted accent-foreground"
-            />
-          </div>
+        <div className="space-y-0.5">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+            Etapa de carga
+          </p>
+          <p className="text-sm text-muted-foreground">
+            Carga aplicada: {loadFormatter.format(currentLoad)} N ({loadRatio.toFixed(0)}%)
+          </p>
+          <p className="text-xs text-muted-foreground">
+            Deformacao visual amplificada em {DEFORMATION_SCALE}x para leitura.
+          </p>
         </div>
+
+        <div className="space-y-2">
+          <label className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+            Controle manual
+          </label>
+          <input
+            type="range"
+            min={0}
+            max={100}
+            value={loadRatio}
+            onChange={(event) => handleManualProgress(Number(event.target.value) / 100)}
+            className="h-2 w-full cursor-pointer appearance-none rounded-full bg-muted accent-foreground"
+          />
+        </div>
+
+        <Button onClick={handleStart} className="gap-2 shadow-sm">
+          {status === 'running' ? <RotateCcw className="size-4" /> : <Play className="size-4" />}
+          {status === 'running' ? 'Reiniciar analise' : 'Iniciar analise'}
+        </Button>
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
-        <Card className="border-border/70">
-          <CardHeader className="pb-3">
+      <div className="grid grid-cols-1 gap-4 xl:min-h-0 xl:flex-1 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,0.8fr)_minmax(0,1.3fr)]">
+        <Card className="border-border/70 xl:min-h-0">
+          <CardHeader>
             <CardTitle>Malha MEF e campo de tensoes</CardTitle>
             <CardDescription>
               Veja a malha, o carregamento e o campo de tensao no mesmo quadro. Arraste para
               rotacionar e use o scroll para aproximar.
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
-              <div className="relative">
-                <FemScene
-                  elements={currentResponse.elements}
-                  nodeDisplacements={currentResponse.nodeDisplacements}
-                  minStress={currentResponse.minStress}
-                  maxStress={currentResponse.maxStress}
-                  deformationScale={DEFORMATION_SCALE}
-                  criticalIndex={criticalIndex}
-                />
-                <div className="pointer-events-none absolute left-3 top-3 rounded-full border border-border/60 bg-background/80 px-2 py-1 text-[10px] uppercase tracking-[0.2em] text-muted-foreground shadow-sm">
-                  Carga aplicada
-                </div>
-                <div className="pointer-events-none absolute left-3 bottom-3 rounded-full border border-border/60 bg-background/80 px-2 py-1 text-[10px] uppercase tracking-[0.2em] text-muted-foreground shadow-sm">
-                  Engaste fixo
-                </div>
+          <CardContent className="flex flex-1 flex-col gap-3 xl:min-h-0">
+            <div className="relative flex min-h-80 flex-1 flex-col xl:min-h-56">
+              <FemScene
+                elements={currentResponse.elements}
+                nodeDisplacements={currentResponse.nodeDisplacements}
+                minStress={currentResponse.minStress}
+                maxStress={currentResponse.maxStress}
+                deformationScale={DEFORMATION_SCALE}
+                criticalIndex={criticalIndex}
+                className="h-auto flex-1"
+              />
+              <div className="pointer-events-none absolute left-3 top-3 rounded-full border border-border/60 bg-background/80 px-2 py-1 text-[10px] uppercase tracking-[0.2em] text-muted-foreground shadow-sm">
+                Carga aplicada
               </div>
-              <div className="space-y-3">
-                <div className="rounded-lg border border-border/70 bg-muted/30 p-3">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-                    Como ler
-                  </p>
-                  <ul className="mt-2 space-y-1 text-xs text-muted-foreground">
-                    <li>Malha com {ELEMENT_COUNT} elementos e secao reduzida no centro.</li>
-                    <li>Base fixa; carga aplicada no topo da barra.</li>
-                    <li>Cores indicam tensao local e o elemento critico acende.</li>
-                  </ul>
-                </div>
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <SummaryTile
-                    label="Tensao maxima"
-                    value={`${stressFormatter.format(currentResponse.maxStress)} MPa`}
-                    detail={
-                      criticalElement
-                        ? `Elemento ${criticalIndex + 1} - Area ${criticalElement.area.toFixed(0)} mm2`
-                        : undefined
-                    }
-                  />
-                  <SummaryTile
-                    label="Deformacao maxima"
-                    value={`${strainFormatter.format(currentResponse.maxStrain)} mm/mm`}
-                    detail="Zona central da barra."
-                  />
-                  <SummaryTile
-                    label="Deslocamento total"
-                    value={`${displacementFormatter.format(currentResponse.totalDisplacement)} mm`}
-                    detail={`Carga ${loadFormatter.format(currentLoad)} N`}
-                  />
-                  <SummaryTile
-                    label="Rigidez aparente"
-                    value={`${displacementFormatter.format(currentStiffness)} N/mm`}
-                    detail="K = F / u"
-                  />
-                </div>
-                <div className="rounded-lg border border-border/70 bg-muted/30 p-3">
-                  <div className="flex items-center justify-between text-xs text-muted-foreground">
-                    <span>Baixa tensao</span>
-                    <span className="mx-3 h-2 flex-1 rounded-full bg-gradient-to-r from-sky-500 via-emerald-400 to-orange-500" />
-                    <span>Alta tensao</span>
-                  </div>
-                  <p className="mt-2 text-[11px] text-muted-foreground">
-                    Deformacao visual amplificada em {DEFORMATION_SCALE}x para leitura.
-                  </p>
-                </div>
+              <div className="pointer-events-none absolute left-3 bottom-3 rounded-full border border-border/60 bg-background/80 px-2 py-1 text-[10px] uppercase tracking-[0.2em] text-muted-foreground shadow-sm">
+                Engaste fixo
               </div>
+            </div>
+            <div className="shrink-0 rounded-lg border border-border/70 bg-muted/30 px-3 py-2">
+              <div className="flex items-center justify-between text-xs text-muted-foreground">
+                <span>Baixa tensao</span>
+                <span className="mx-3 h-2 flex-1 rounded-full bg-gradient-to-r from-sky-500 via-emerald-400 to-orange-500" />
+                <span>Alta tensao</span>
+              </div>
+            </div>
+            <div className="grid shrink-0 gap-2 sm:grid-cols-2">
+              <SummaryTile
+                label="Tensao maxima"
+                value={`${stressFormatter.format(currentResponse.maxStress)} MPa`}
+                detail={
+                  criticalElement
+                    ? `Elemento ${criticalIndex + 1} - Area ${criticalElement.area.toFixed(0)} mm2`
+                    : undefined
+                }
+              />
+              <SummaryTile
+                label="Deformacao maxima"
+                value={`${strainFormatter.format(currentResponse.maxStrain)} mm/mm`}
+                detail="Zona central da barra."
+              />
+              <SummaryTile
+                label="Deslocamento total"
+                value={`${displacementFormatter.format(currentResponse.totalDisplacement)} mm`}
+                detail={`Carga ${loadFormatter.format(currentLoad)} N`}
+              />
+              <SummaryTile
+                label="Rigidez aparente"
+                value={`${displacementFormatter.format(currentStiffness)} N/mm`}
+                detail="K = F / u"
+              />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-border/70">
-          <CardHeader className="pb-3">
+        <Card className="border-border/70 xl:min-h-0">
+          <CardHeader>
             <CardTitle>Modelo constitutivo</CardTitle>
             <CardDescription>
               Alterne entre linear e nao linear para ver o impacto na resposta global.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-3 xl:min-h-0 xl:overflow-y-auto">
             <Tabs
               value={materialModel}
               onValueChange={(value) => setMaterialModel(value as MaterialModel)}
@@ -949,7 +942,7 @@ export function MefRambergClient() {
               </TabsList>
             </Tabs>
 
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid gap-2 sm:grid-cols-2">
               {[
                 {
                   label: 'Modulo elastico (E)',
@@ -957,7 +950,7 @@ export function MefRambergClient() {
                   detail: 'Rigidez inicial do material.',
                 },
                 {
-                  label: 'Limite de escoamento (\u03c3\u2080)',
+                  label: 'Limite de escoamento (σ₀)',
                   value: `${RAMBERG_PARAMS.sigma_0} MPa`,
                   detail: 'Referencia para plasticidade.',
                 },
@@ -974,7 +967,7 @@ export function MefRambergClient() {
               ].map((item) => (
                 <div
                   key={item.label}
-                  className="rounded-lg border border-border/70 bg-muted/30 px-3 py-3"
+                  className="rounded-lg border border-border/70 bg-muted/30 px-3 py-2"
                 >
                   <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                     {item.label}
@@ -985,11 +978,11 @@ export function MefRambergClient() {
               ))}
             </div>
 
-            <div className="rounded-lg border border-border/70 bg-muted/30 p-4">
+            <div className="rounded-lg border border-border/70 bg-muted/30 p-3">
               <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                 Comparativo rapido
               </p>
-              <div className="mt-3 space-y-2 text-xs text-muted-foreground">
+              <div className="mt-2 space-y-2 text-xs text-muted-foreground">
                 <div className="flex items-center justify-between">
                   <span>Deslocamento linear</span>
                   <span className="font-mono font-semibold text-foreground">
@@ -1010,110 +1003,124 @@ export function MefRambergClient() {
                 </div>
               </div>
             </div>
+
+            <div className="rounded-lg border border-border/70 bg-muted/30 p-3">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                Como ler
+              </p>
+              <ul className="mt-2 space-y-1 text-xs text-muted-foreground">
+                <li>Malha com {ELEMENT_COUNT} elementos e secao reduzida no centro.</li>
+                <li>Base fixa; carga aplicada no topo da barra.</li>
+                <li>Cores indicam tensao local e o elemento critico acende.</li>
+              </ul>
+            </div>
           </CardContent>
         </Card>
-      </div>
 
-      <Tabs defaultValue="curvas" className="space-y-4">
-        <TabsList className="grid w-full max-w-md grid-cols-2">
-          <TabsTrigger value="curvas">Curvas</TabsTrigger>
-          <TabsTrigger value="elementos">Elementos</TabsTrigger>
-        </TabsList>
-        <TabsContent value="curvas">
-          <div className="grid gap-6 lg:grid-cols-2">
-            <Card className="border-border/70">
-              <CardHeader className="pb-3">
+        <Tabs defaultValue="curvas" className="xl:min-h-0">
+          <TabsList className="grid w-full shrink-0 grid-cols-2">
+            <TabsTrigger value="curvas">Curvas</TabsTrigger>
+            <TabsTrigger value="elementos">Elementos</TabsTrigger>
+          </TabsList>
+          <TabsContent
+            value="curvas"
+            className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:min-h-0 xl:grid-cols-1 xl:grid-rows-2"
+          >
+            <Card className="border-border/70 xl:min-h-0">
+              <CardHeader>
                 <CardTitle>Curva carga x deslocamento</CardTitle>
                 <CardDescription>
                   Linha continua: nao linear. Linha tracejada: linear.
                 </CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="relative min-h-64 flex-1 xl:min-h-44">
                 <ForceDisplacementChart
                   data={forceDisplacementData}
                   currentLoad={currentLoad}
                   currentLinear={linearResponse.totalDisplacement}
                   currentNonlinear={nonlinearResponse.totalDisplacement}
+                  className="absolute inset-0 h-auto px-4"
                 />
               </CardContent>
             </Card>
 
-            <Card className="border-border/70">
-              <CardHeader className="pb-3">
+            <Card className="border-border/70 xl:min-h-0">
+              <CardHeader>
                 <CardTitle>Curva tensao x deformacao</CardTitle>
                 <CardDescription>O ponto marca o valor atual de tensao maxima.</CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="relative min-h-64 flex-1 xl:min-h-44">
                 <MaterialCurveChart
                   data={materialCurve}
                   highlightStrain={currentResponse.maxStrain}
                   highlightStress={currentResponse.maxStress}
                   model={materialModel}
+                  className="absolute inset-0 h-auto px-4"
                 />
               </CardContent>
             </Card>
-          </div>
-        </TabsContent>
-        <TabsContent value="elementos">
-          <Card className="border-border/70">
-            <CardHeader className="pb-3">
-              <CardTitle>Detalhamento dos elementos</CardTitle>
-              <CardDescription>
-                Tensao, deformacao e area por elemento da malha (critico destacado).
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {currentResponse.elements.map((element) => {
-                  const ratio = currentResponse.maxStress
-                    ? clamp(element.stress / currentResponse.maxStress)
-                    : 0
-                  const isCritical = element.index === criticalIndex
-                  return (
-                    <div
-                      key={element.index}
-                      className={`rounded-lg border px-3 py-3 ${
-                        isCritical
-                          ? 'border-amber-300/60 bg-amber-50/60 dark:border-amber-400/30 dark:bg-amber-500/10'
-                          : 'border-border/70 bg-muted/30'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between gap-3">
-                        <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-                          Elemento {element.index + 1}
-                        </p>
-                        <span className="text-[11px] text-muted-foreground">
-                          Area {element.area.toFixed(0)} mm2
-                        </span>
-                      </div>
-                      <div className="mt-2 space-y-1 text-[11px] text-muted-foreground">
-                        <div className="flex items-center justify-between">
-                          <span>Tensao</span>
-                          <span className="font-mono font-semibold text-foreground">
-                            {stressFormatter.format(element.stress)} MPa
+          </TabsContent>
+          <TabsContent value="elementos" className="xl:min-h-0">
+            <Card className="h-full border-border/70">
+              <CardHeader>
+                <CardTitle>Detalhamento dos elementos</CardTitle>
+                <CardDescription>
+                  Tensao, deformacao e area por elemento da malha (critico destacado).
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="xl:min-h-0 xl:overflow-y-auto">
+                <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                  {currentResponse.elements.map((element) => {
+                    const ratio = currentResponse.maxStress
+                      ? clamp(element.stress / currentResponse.maxStress)
+                      : 0
+                    const isCritical = element.index === criticalIndex
+                    return (
+                      <div
+                        key={element.index}
+                        className={`rounded-lg border px-3 py-2 ${
+                          isCritical
+                            ? 'border-amber-300/60 bg-amber-50/60 dark:border-amber-400/30 dark:bg-amber-500/10'
+                            : 'border-border/70 bg-muted/30'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between gap-3">
+                          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                            Elemento {element.index + 1}
+                          </p>
+                          <span className="text-[11px] text-muted-foreground">
+                            Area {element.area.toFixed(0)} mm2
                           </span>
                         </div>
-                        <div className="flex items-center justify-between">
-                          <span>Deformacao</span>
-                          <span className="font-mono font-semibold text-foreground">
-                            {strainFormatter.format(element.strain)}
-                          </span>
+                        <div className="mt-2 space-y-1 text-[11px] text-muted-foreground">
+                          <div className="flex items-center justify-between">
+                            <span>Tensao</span>
+                            <span className="font-mono font-semibold text-foreground">
+                              {stressFormatter.format(element.stress)} MPa
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span>Deformacao</span>
+                            <span className="font-mono font-semibold text-foreground">
+                              {strainFormatter.format(element.strain)}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="mt-2 h-2 rounded-full bg-muted">
+                          <div
+                            className="h-full rounded-full bg-gradient-to-r from-sky-500 to-orange-500"
+                            style={{ width: `${ratio * 100}%` }}
+                          />
                         </div>
                       </div>
-                      <div className="mt-2 h-2 rounded-full bg-muted">
-                        <div
-                          className="h-full rounded-full bg-gradient-to-r from-sky-500 to-orange-500"
-                          style={{ width: `${ratio * 100}%` }}
-                        />
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+                    )
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
   )
 }
