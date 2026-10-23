@@ -1,0 +1,13 @@
+code,condition,emic_cp,file,temperature_c,speed_mm_s,gauge_length_mm,rupture_force_n,rupture_stress_mpa,area_mm2,area_source,crosshead_speed_mm_min,emic_max_force_n,emic_yield_es1_mpa,emic_modulus_es1_mpa
+A12-6,A12,1,A12-6.txt,210,100,50,1782.64,40.92,43.564,relatório EMIC (força/tensão na ruptura),5,1796.75,25.41,629.16
+A12-8,A12,2,A12-8.txt,210,100,50,1787.74,40.70,43.925,relatório EMIC (força/tensão na ruptura),5,1801.86,26.36,605.39
+A12-9,A12,3,A12-9.txt,210,100,50,2039.31,43.08,47.338,relatório EMIC (força/tensão na ruptura),5,2044.59,24.29,569.97
+A20-6,A20,1,A20-6.txt,220,90,50,1637.03,35.07,46.679,relatório EMIC (força/tensão na ruptura),5,1648.26,22.00,566.38
+A20-8,A20,2,A20-8.txt,220,90,50,1751.34,36.99,47.346,relatório EMIC (força/tensão na ruptura),5,1760.69,24.12,577.52
+A20-9,A20,3,A20-9.txt,220,90,50,1464.72,30.91,47.387,relatório EMIC (força/tensão na ruptura),5,1464.72,21.39,549.46
+A21-6,A21,1,A21-6.txt,220,95,50,1791.82,38.09,47.042,relatório EMIC (força/tensão na ruptura),5,1805.94,25.22,604.55
+A21-7,A21,2,A21-7.txt,220,95,50,1532.25,31.56,48.551,relatório EMIC (força/tensão na ruptura),5,1543.31,22.94,555.50
+A21-9,A21,3,A21-9.txt,220,95,50,1492.79,30.75,48.546,relatório EMIC (força/tensão na ruptura),5,1492.79,21.27,560.81
+A22-6,A22,1,A22-6.txt,220,100,50,1955.97,40.75,48.000,relatório EMIC (força/tensão na ruptura),5,1960.05,21.54,542.82
+A22-7,A22,2,A22-7.txt,220,100,50,2037.61,43.48,46.863,relatório EMIC (força/tensão na ruptura),5,2040.51,24.57,567.18
+A22-8,A22,3,A22-8.txt,220,100,50,2053.77,43.38,47.344,relatório EMIC (força/tensão na ruptura),5,2053.77,24.33,564.58
