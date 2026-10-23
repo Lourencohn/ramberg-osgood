@@ -13,7 +13,8 @@
     "format:check": "prettier --check .",
     "start": "next start",
     "analysis": "tsx scripts/analysis/analyze-dataset.ts && tsx scripts/analysis/analyze-dataset.ts --exclude A00-3 --out analysis/results-sem-A00-3",
-    "analysis:figures": "python3 scripts/analysis/figures.py"
+    "analysis:figures": "python3 scripts/analysis/figures.py",
+    "analysis:validacao": "tsx scripts/analysis/validate-external.ts && python3 scripts/analysis/figures-validacao.py"
   },
   "dependencies": {
     "@radix-ui/react-collapsible": "1.1.2",
