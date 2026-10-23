@@ -11,6 +11,7 @@ mesmo código da plataforma (`lib/tensile-processing.ts`, `lib/ramberg-osgood-fi
 npm install
 npm run analysis            # gera analysis/results/ e analysis/results-sem-A00-3/
 npm run analysis:figures    # gera analysis/figures/ (requer Python 3 com numpy, pandas e matplotlib)
+npm run analysis:validacao  # validação externa: gera analysis/validacao/ e as figuras validacao_externa_*.png
 ```
 
 O ajuste de Ramberg-Osgood usa busca estocástica com semente fixa, derivada do código do corpo de
@@ -118,3 +119,17 @@ prova ou do perfil. Assim, rodar de novo produz os mesmos números.
   230 °C, 85 a 105 mm/s). Essa é a distância de extrapolação medida no esquema de nível, e a
   alavancagem da regressão no canto mais distante desse domínio fica abaixo da maior alavancagem
   testada ali.
+
+## Validação externa (campanha de 2026)
+
+Em 22/10/2026 foram ensaiados 12 corpos de prova novos nas condições A12, A20, A21 e A22 (três por
+condição). Os arquivos brutos estão em `data/validacao/`, com `specimens.csv` (área obtida do
+relatório EMIC: força na ruptura ÷ tensão na ruptura). O script `scripts/analysis/validate-external.ts`
+treina o metamodelo com a série A, exatamente como a plataforma, e compara a predição com os
+ensaios novos; `scripts/analysis/figures-validacao.py` gera as figuras. Saídas em `analysis/validacao/`:
+`condicoes_validacao.csv`, `corpos_de_prova_validacao.csv`, `curvas/` e `resumo.json`.
+
+Resultado: a plataforma superestima a tensão máxima da nova remessa em 4,2 a 10,5 MPa (MAE de
+6,7 MPa), contra 0,96 MPa na validação cruzada interna. Metade da diferença é geométrica (seções 6 a
+13% maiores que as da série A) e a outra metade, em A20 e A21, é de força (12% menor), com módulos
+aparentes 12 a 21% menores. Os ensaios de validação não entram no treinamento.

@@ -1,0 +1,37 @@
+{
+  "gerado_em": "2026-10-23T12:22:27.146Z",
+  "treinamento": {
+    "condicoes": 9,
+    "corpos_de_prova": 45
+  },
+  "validacao": {
+    "condicoes": 4,
+    "corpos_de_prova": 12
+  },
+  "tensao_max_por_condicao": {
+    "mae_ro_mpa": 6.688524638889177,
+    "rmse_ro_mpa": 7.1285034034851105,
+    "mae_ro_pct": 18.38403787437367,
+    "mae_esperada_mpa": 6.8027088498719905,
+    "mae_esperada_pct": 18.81631294778851,
+    "mae_ro_com_area_serie_a_mpa": 3.111107119681572,
+    "vies_ro_mpa": 6.688524638889177
+  },
+  "tensao_max_por_corpo_de_prova": {
+    "mae_ro_mpa": 6.688524638889175,
+    "rmse_ro_mpa": 7.485332674700874
+  },
+  "rmse_curva_prevista_ro_medio_mpa": 2.9960443320159524,
+  "modulo": {
+    "mae_esperado_mpa": 91.19899681072116,
+    "mae_esperado_pct": 17.191901384463975
+  },
+  "taxa_travessao_mm_min": {
+    "min": 4.992079110326715,
+    "max": 4.994906242113212
+  },
+  "ro_r2_validacao": {
+    "min": 0.99808331351899,
+    "max": 0.9991233971473891
+  }
+}
