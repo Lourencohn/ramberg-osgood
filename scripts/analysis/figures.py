@@ -29,6 +29,7 @@ plt.rcParams.update(
     {
         "font.family": "serif",
         "font.serif": ["Liberation Serif", "Times New Roman", "DejaVu Serif"],
+        "mathtext.fontset": "stix",
         "font.size": 10,
         "axes.titlesize": 10,
         "axes.labelsize": 10,
@@ -149,12 +150,12 @@ def fig_n_effect():
         ax.plot(ro_strain(sigma, E, s0, n), sigma, color=SERIES[i], ls=LINESTYLES[i], label=f"n = {n}")
     ax.plot(sigma / E, sigma, color=RAW, lw=1, label="parcela elástica (σ/E)")
     ax.axhline(s0, color=INK_2, lw=0.7, ls=":")
-    ax.text(0.001, s0 + 0.8, "σ₀ = 40 MPa", fontsize=8.5, color=INK_2)
+    ax.text(0.001, s0 + 0.8, "σ$_0$ = 40 MPa", fontsize=8.5, color=INK_2)
     ax.set_xlim(0, 0.12)
     ax.set_ylim(0, 50)
     style_axes(ax)
     ax.legend(loc="lower right")
-    ax.set_title("Modelo de Ramberg-Osgood com E = 590 MPa e σ₀ = 40 MPa", loc="left", color=INK)
+    ax.set_title("Modelo de Ramberg-Osgood com E = 590 MPa e σ$_0$ = 40 MPa", loc="left", color=INK)
     save(fig, "modelo_efeito_n.png")
 
 
@@ -166,7 +167,7 @@ def fig_flow():
     boxes = [
         (1, 24, 17, 15, "Arquivo bruto\nda máquina\n(raw.txt)"),
         (1, 4, 17, 15, "Dimensões\nmedidas\n(specimens.csv)"),
-        (24, 12, 18, 19, "Processamento\nσ = F/A₀\nε = ΔL/L₀\ncorreção da\nacomodação"),
+        (24, 12, 18, 19, "Processamento\nσ = F/A$_0$\nε = ΔL/L$_0$\ncorreção da\nacomodação"),
         (48, 27, 18, 13, "Propriedades\npor ensaio"),
         (48, 4, 18, 15, "Ajuste de\nRamberg-Osgood\npor condição"),
         (72, 4, 26, 15, "Metamodelo linear\n(regressão das\ncurvas em T e v)"),
@@ -284,7 +285,7 @@ def fig_fit(cond="A12"):
     profile = f"T{TEMPS[cond[1]]}_V{SPEEDS[cond[2]]}"
     p = tr.loc[profile]
     ax.plot(f.deformacao, f.tensao_mpa, color=MODEL, lw=1.6,
-            label=f"ajuste (E = {comma(round(p.E_mpa))} MPa; σ₀ = {comma(round(p.sigma0_mpa, 1))} MPa; n = {comma(round(p.n, 2))})")
+            label=f"ajuste (E = {comma(round(p.E_mpa))} MPa; σ$_0$ = {comma(round(p.sigma0_mpa, 1))} MPa; n = {comma(round(p.n, 2))})")
     row = conditions.set_index("condicao").loc[cond]
     ax.text(0.98, 0.06, f"R² médio dos ajustes por ensaio = {comma(round(row.ro_r2_medio, 4))}", transform=ax.transAxes,
             ha="right", fontsize=8.5, color=INK_2)
@@ -355,8 +356,8 @@ def fig_cv_scatter():
     ax.plot([lo, hi], [lo, hi], color=INK_2, lw=0.8, ls="--", label="predição perfeita")
     ax.errorbar(real, pred, xerr=sd, fmt="o", color=SERIES[0], ms=5, capsize=2, lw=1,
                 label="condição (barra: desvio padrão dos ensaios)")
-    placement = {"A00": (-5, 4, "right"), "A01": (-5, -10, "right"), "A02": (3, 5, "left"), "A10": (4, -11, "left"),
-                 "A11": (-5, 5, "right"), "A12": (4, 5, "left"), "A20": (4, -11, "left"), "A21": (-5, 5, "right"),
+    placement = {"A00": (-5, 4, "right"), "A01": (-5, -10, "right"), "A02": (3, 5, "left"), "A10": (-4, -11, "right"),
+                 "A11": (6, -11, "left"), "A12": (4, 5, "left"), "A20": (4, -11, "left"), "A21": (-5, 5, "right"),
                  "A22": (4, -11, "left")}
     for cond, x, y in zip(cv.condicao, real, pred):
         dx, dy, ha = placement.get(cond, (4, 3, "left"))
